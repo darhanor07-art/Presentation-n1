@@ -140,10 +140,13 @@ def build(video: bool, out_name: str):
             mm = re.match(r"ppt/slides/slide(\d+)\.xml$", item.filename)
             if mm:
                 k = int(mm.group(1)); x = data.decode("utf-8")
-                if "xmlns:p14=" not in x:
-                    x = x.replace("<p:sld ", '<p:sld xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" '
-                                  'xmlns:p14="http://schemas.microsoft.com/office/powerpoint/2010/main" '
-                                  'xmlns:p159="http://schemas.microsoft.com/office/powerpoint/2015/09/main" ', 1)
+                root_end = x.index(">", x.index("<p:sld "))
+                root = x[:root_end]
+                for pre, uri in (("mc", "http://schemas.openxmlformats.org/markup-compatibility/2006"),
+                                 ("p14", "http://schemas.microsoft.com/office/powerpoint/2010/main"),
+                                 ("p159", "http://schemas.microsoft.com/office/powerpoint/2015/09/main")):
+                    if f"xmlns:{pre}=" not in root:
+                        x = x.replace("<p:sld ", f'<p:sld xmlns:{pre}="{uri}" ', 1); root = x[:x.index(">", x.index("<p:sld "))]
                 if k == 1:
                     trn = '<p:transition spd="slow"><p:fade/></p:transition>' if not video else ""
                 else:
