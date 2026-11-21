@@ -117,6 +117,7 @@ function alloc() {
   rt.q2 = mk(W >> 2, H >> 2, {type: HF}); rt.q2b = mk(W >> 2, H >> 2, {type: HF});
   rt.q3 = mk(W >> 3, H >> 3, {type: HF}); rt.q3b = mk(W >> 3, H >> 3, {type: HF});
   for (const k of ['A', 'B', 'C']) rt[k] = mk(W, H, {});
+  PU.uPx.value.set(1 / W, 1 / H); PU.uFx.value = MSAA ? 0 : 1;   // MSAA жоқ болса — FXAA
 }
 X.size = () => [W, H];
 X.setSize = (w, h) => { W = w; H = h; R.setSize(w, h, false); alloc(); };
@@ -134,17 +135,24 @@ c+=(texture2D(t,vUv+dir*3.230769).rgb+texture2D(t,vUv-dir*3.230769).rgb)*.070270
 const down = (s, d) => { mDown.uniforms.t.value = s.texture; mDown.uniforms.px.value.set(1 / s.width, 1 / s.height); pass(mDown, d); };
 const blur = (a, b, k = 1) => { mBlur.uniforms.t.value = a.texture; mBlur.uniforms.dir.value.set(k / a.width, 0); pass(mBlur, b);
   mBlur.uniforms.t.value = b.texture; mBlur.uniforms.dir.value.set(0, k / a.height); pass(mBlur, a); };
-const PU = X.PU = {tC: {value: null}, tB1: {value: null}, tB2: {value: null}, tB3: {value: null}, tD: {value: null},
+const PU = X.PU = {uPx: {value: new T.Vector2(1 / 1600, 1 / 900)}, uFx: {value: 0}, tC: {value: null}, tB1: {value: null}, tB2: {value: null}, tB3: {value: null}, tD: {value: null},
   uFocus: {value: 3}, uCoc: {value: 0}, uExpo: {value: 1}, uBloom: {value: .26}, uSat: {value: 1.05}, uVig: {value: .55},
   uLift: {value: V(0, 0, 0)}, uGain: {value: V(1, 1, 1)}, uGamma: {value: V(1, 1, 1)}, uTint: {value: V(1, 1, 1)}};
-const mComp = sm(`uniform sampler2D tC,tB1,tB2,tB3,tD;uniform float uFocus,uCoc,uExpo,uBloom,uSat,uVig;uniform vec3 uLift,uGain,uGamma,uTint;varying vec2 vUv;
+const mComp = sm(`uniform sampler2D tC,tB1,tB2,tB3,tD;uniform float uFocus,uCoc,uExpo,uBloom,uSat,uVig,uFx;uniform vec2 uPx;uniform vec3 uLift,uGain,uGamma,uTint;varying vec2 vUv;
 vec3 aces(vec3 x){return clamp((x*(2.51*x+.03))/(x*(2.43*x+.59)+.14),0.,1.);}
+const vec3 LW=vec3(.299,.587,.114);float lu(vec3 c){return dot(c/(1.+c),LW);}
+vec3 fxaa(vec2 uv){vec3 m=texture2D(tC,uv).rgb;if(uFx<.5)return m;
+ vec3 nw=texture2D(tC,uv+vec2(-1.,1.)*uPx).rgb,ne=texture2D(tC,uv+vec2(1.,1.)*uPx).rgb,sw=texture2D(tC,uv+vec2(-1.,-1.)*uPx).rgb,se=texture2D(tC,uv+vec2(1.,-1.)*uPx).rgb;
+ float a=lu(nw),b=lu(ne),c=lu(sw),d=lu(se),e=lu(m);float mn=min(e,min(min(a,b),min(c,d))),mx=max(e,max(max(a,b),max(c,d)));
+ vec2 dir=vec2(-((a+b)-(c+d)),((a+c)-(b+d)));float red=max((a+b+c+d)*.03125,1./128.);float rcp=1./(min(abs(dir.x),abs(dir.y))+red);dir=clamp(dir*rcp,-8.,8.)*uPx;
+ vec3 A=.5*(texture2D(tC,uv+dir*(1./3.-.5)).rgb+texture2D(tC,uv+dir*(2./3.-.5)).rgb);vec3 B=A*.5+.25*(texture2D(tC,uv-dir*.5).rgb+texture2D(tC,uv+dir*.5).rgb);
+ float lb=lu(B);return (lb<mn||lb>mx)?A:B;}
 void main(){
- vec3 c=texture2D(tC,vUv).rgb; float d=texture2D(tD,vUv).r;
+ vec3 c=fxaa(vUv); float d=texture2D(tD,vUv).r;
  float k=clamp(abs(1./max(d,.03)-1./uFocus)*uCoc,0.,1.);
  vec3 b1=texture2D(tB1,vUv).rgb,b2=texture2D(tB2,vUv).rgb,b3=texture2D(tB3,vUv).rgb;
  c=mix(c,mix(b1,b2,smoothstep(.45,1.,k)),smoothstep(.0,.45,k));
- vec3 gl=b2*.4+b3*.6; c+=max(gl-.9,0.)*uBloom+gl*uBloom*.03;
+ vec3 gl=b2*.4+b3*.6; float lg=dot(gl,vec3(.2126,.7152,.0722)); c+=gl*(max(lg-1.,0.)/max(lg,1e-4))*uBloom+gl*uBloom*.02;
  c*=uExpo*uTint; c=aces(c); c=pow(c,vec3(1./2.2));
  c=uGain*(c+uLift*(1.-c)); c=pow(max(c,0.),uGamma); c=mix(c,c*c*(3.-2.*c),.28);
  float l=dot(c,vec3(.2126,.7152,.0722)); c=mix(vec3(l),c,uSat);
@@ -171,7 +179,7 @@ X.renderShot = target => {          // ағымдағы камера мен кү
 };
 X.init3 = (cv, o = {}) => {
   R = X.R = new T.WebGLRenderer({canvas: cv, antialias: false, alpha: false, powerPreference: 'high-performance', preserveDrawingBuffer: !!o.preserve});
-  R.setPixelRatio(1); R.shadowMap.enabled = true; R.shadowMap.type = T.PCFSoftShadowMap; R.shadowMap.autoUpdate = false;
+  R.setPixelRatio(1); R.shadowMap.enabled = true; R.shadowMap.type = o.pcf === 'hard' ? T.PCFShadowMap : T.PCFSoftShadowMap; R.shadowMap.autoUpdate = false;
   R.outputEncoding = T.LinearEncoding; R.toneMapping = T.NoToneMapping;
   if (o.msaa !== undefined) MSAA = o.msaa;
   sun.shadow.mapSize.set(o.shadow || 2048, o.shadow || 2048);

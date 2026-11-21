@@ -143,6 +143,8 @@ def build():
     base = rd(os.path.join(REPO, "build", "viewport-base.css"))
     css = rd(os.path.join(HERE, "deck.css"))
     rose = base64.b64encode(open(os.path.join(REPO, "assets", "rose.jpg"), "rb").read()).decode()
+    FONT_RUBIK = base64.b64encode(open(os.path.join(ROOT, "fonts", "Rubik-Variable.ttf"), "rb").read()).decode()
+    FONT_CAVEAT = base64.b64encode(open(os.path.join(ROOT, "fonts", "Caveat-Variable.ttf"), "rb").read()).decode()
     meta = [{"id": s["id"], "act": s["act"], "side": s["side"], "tr": s["tr"], "who": s["who"], "shot": s["shot"]} for s in C.S]
     notes = [f'<b>{E(C.AUTHORS[s["who"]]["name"])}</b> · {E(C.ACTS[s["act"]])}<br>{E(s["say"])}' for s in C.S]
     data = (f"const META = {json.dumps(meta, ensure_ascii=False)};\nconst NOTES = {json.dumps(notes, ensure_ascii=False)};\n"
@@ -157,9 +159,10 @@ def build():
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{E(C.TITLE)} — {E(C.SUBTITLE)}</title>
 <!-- Утепберген Айсамал · Еділ Ақерке · Тұрлан Қарақат — математика пәнінің мұғалімдері -->
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
 <style>
+/* === ҚАРІПТЕР: Rubik + Caveat (Google Fonts, SIL OFL) — интернетсіз де ашылуы үшін файлдың ішінде === */
+@font-face{{font-family:'Rubik';src:url(data:font/ttf;base64,{FONT_RUBIK}) format('truetype');font-weight:300 900;font-style:normal;font-display:block}}
+@font-face{{font-family:'Caveat';src:url(data:font/ttf;base64,{FONT_CAVEAT}) format('truetype');font-weight:400 700;font-style:normal;font-display:block}}
 /* === VIEWPORT BASE (frontend-slides, толық) === */
 {base}
 /* === x ≠ 0 · ДИЗАЙН === */

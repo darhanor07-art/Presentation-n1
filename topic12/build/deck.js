@@ -17,7 +17,7 @@ const N = META.length;
 const BASE = {x: [200, 200], eq: [200, 200], c: [140, 140], t: [140, 140], s: [140, 140], nl: [1400, 170], card: [150, 200]};
 const SH = {1: 'a', 9: 'a', 15: 'a', 16: 'a', 28: 'a', 30: 'a'};
 const PLAN = {
-  x:    {1: 'a', 7: 'a', 8: {rel: 'card', dx: 150, dy: -96, h: 150, r: -10}, 12: {x: 600, y: 300, w: 120, r: -10}, 26: 'a', 28: 'a', 29: 'a', 30: 'a'},
+  x:    {1: 'a', 7: 'a', 8: {rel: 'card', dx: 150, dy: -96, h: 150, r: -10}, 12: {x: 470, y: 330, w: 150, r: -10}, 26: 'a', 28: 'a', 29: 'a', 30: 'a'},
   eq:   {1: {a: 1, v: 'neq'}, 3: 'a', 7: 'a', 15: 'a', 28: 'a', 29: {a: 1, v: 'neq'}, 30: {a: 1, v: 'neq'}},
   c: SH, t: SH, s: SH,
   card: {4: {w3: 'card', h: 170, dx: -210, dy: -30, r: -7, lead: 1}, 7: {w3: 'card', h: 150, dx: -190, dy: -40, r: 7, lead: 1},
@@ -40,7 +40,7 @@ class Deck {
   async boot() {
     const q = QS.get('q'), res = q === 'lo' ? [1280, 720] : q === 'hi' ? [1920, 1080] : [1600, 900];
     this.res = res;
-    await World.init($('#gl'), IMG, {w: res[0], h: res[1], msaa: 4, shadow: 2048, tr: META.map(m => m.tr), preserve: STATIC});
+    await World.init($('#gl'), IMG, {w: res[0], h: res[1], msaa: +(QS.get('msaa') ?? 4), shadow: +(QS.get('shq') || 2048), pcf: QS.get('pcf'), tr: META.map(m => m.tr), preserve: STATIC});
     await document.fonts.ready;
     Edit.restore();
     this.layout();
@@ -222,7 +222,8 @@ class Deck {
     return {
       count: N, meta: META,
       show(i) { self.slides.forEach((s, k) => s.classList.toggle('active', k === i)); self.cur = i; self.hud(i); $('#hud').style.opacity = (i === 0 || i === N - 1) ? 0 : 1; self.moveProps(i + 1, 0, true);
-        if (i === N - 1) { utils.set($('#credits'), {y: -(1080 - 150)}); for (const k of ['x', 'eq', 'c', 't', 's']) { const r = self.anchorRect(self.slides[N - 1], k); if (r) utils.set(PEL[k], {x: r.cx - BASE[k][0] / 2, y: r.cy - BASE[k][1] / 2}); } } },
+        if (i === N - 1) { utils.set($('#credits'), {y: -(1080 - 150)}); for (const k of ['x', 'eq', 'c', 't', 's']) { const r = self.anchorRect(self.slides[N - 1], k); if (!r) continue;
+        utils.set(PEL[k], {x: r.cx - BASE[k][0] / 2, y: r.cy - BASE[k][1] / 2}); if (STATES[k][N]) Object.assign(STATES[k][N], {cx: r.cx, cy: r.cy}); } } },
       props(i) { return Object.keys(PEL).map(k => ({k, st: STATES[k][i + 1] || null, base: BASE[k]})).filter(o => o.st); },
       frame(i, tau, from = i - 1) { World.frame(i, tau, from); return $('#gl').toDataURL('image/jpeg', .9); },
       size(w, h) { World.resize(w, h); },
