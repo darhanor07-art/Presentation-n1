@@ -30,7 +30,7 @@ def encode_videos():
         src = os.path.join(EXP, "frames", f"{i:02d}"); mp4 = os.path.join(vd, f"{i:02d}.mp4")
         if not os.path.exists(mp4):
             subprocess.run(["ffmpeg", "-v", "error", "-y", "-framerate", "30", "-i", os.path.join(src, "%03d.jpg"),
-                            "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "21", "-preset", "medium", "-movflags", "+faststart", "-an", mp4], check=True)
+                            "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "23", "-preset", "medium", "-movflags", "+faststart", "-an", mp4], check=True)
     return vd
 
 def rgb(s):
