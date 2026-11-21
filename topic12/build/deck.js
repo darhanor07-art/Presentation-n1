@@ -46,6 +46,7 @@ class Deck {
     this.layout();
     if (STATIC) { document.body.classList.add('static'); window.deckAPI = this.api(); return; }
     this.bind();
+    $('#loader').classList.add('done');
     const h = parseInt(location.hash.slice(1)) || 1;
     this.go(Math.min(Math.max(h - 1, 0), N - 1), true);
     const loop = now => { this.render(now); requestAnimationFrame(loop); }; requestAnimationFrame(loop);

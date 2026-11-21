@@ -41,7 +41,7 @@ def slide_html(s):
     k, parts, panel_cls, scrim = s.get("kicker", ""), [], "panel", ""
     if sid == 1:
         panel_cls = "panel bare cover"; scrim = '<div class="scrim L"></div>'
-        auth = "".join(f'<span><i data-anchor="{ANCH[SHAPE_OF[a]]}"></i>{E(C.AUTHORS[a]["name"])}</span>' for a in "AKQ")
+        auth = "".join(f'<span><i data-anchor="{ANCH[SHAPE_OF[a]]}"></i><b data-edit>{E(C.AUTHORS[a]["name"])}</b></span>' for a in "AKQ")
         parts = [kick(k), title(C.TITLE, 1), body(s["body"]), f'<div class="authors" data-a="fade">{auth}</div>']
     elif sid == 7:
         panel_cls = "panel bare hook"; scrim = '<div class="scrim R"></div>'
@@ -176,6 +176,7 @@ def build():
 {props_html()}
 <div id="hud" class="off"><div class="segs">{"".join("<i></i>" for _ in range(6))}</div><span class="act"></span><span class="q"></span></div>
 </div></div>
+<div id="loader"><b>x ≠ 0</b><span>3D-сынып дайындалып жатыр…</span></div>
 <div id="notes"></div>
 <div class="edit-hotzone"></div><button class="edit-toggle" id="editToggle" title="Өңдеу (E)">✎</button><div class="toast" id="toast"></div>
 <script>/* === three.js r149 (MIT) === */

@@ -46,12 +46,14 @@ def set_alpha(run, a):
     clr = sf[0]; al = etree.SubElement(clr, qn("a:alpha")); al.set("val", str(int(max(0, min(1, a)) * 100000)))
 
 def add_text(shapes, t):
-    w = t["w"] * 1.06 + 10
-    tb = shapes.add_textbox(Emu(int((t["x"] - 2) * E)), Emu(int((t["y"] - 2) * E)), Emu(int(w * E)), Emu(int((t["h"] + 8) * E)))
     one_line = t["h"] < t["lh"] * 1.5
+    x0, w0 = (t["tx"], t["tw"]) if one_line and t.get("tw") else (t["x"], t["w"])   # бір жолдық мәтін — нақты ені бойынша
+    w = w0 * 1.06 + 10
+    tb = shapes.add_textbox(Emu(int((x0 - 2) * E)), Emu(int((t["y"] - 2) * E)), Emu(int(w * E)), Emu(int((t["h"] + 8) * E)))
     tf = tb.text_frame; tf.word_wrap = not (one_line or t.get("ws") == "nowrap")
     for side in ("margin_left", "margin_right", "margin_top", "margin_bottom"): setattr(tf, side, 0)
-    tf.vertical_anchor = MSO_ANCHOR.TOP
+    tf.vertical_anchor = MSO_ANCHOR.MIDDLE if t.get("vmid") else MSO_ANCHOR.TOP
+    if t.get("vmid"): tb.top = Emu(int(t["y"] * E)); tb.height = Emu(int(t["h"] * E))
     paras = [[]]
     for r in t["runs"]:
         for k, part in enumerate(r["t"].split("\n")):
@@ -61,7 +63,7 @@ def add_text(shapes, t):
     upper = t["tt"] == "uppercase"
     for i, pr in enumerate(paras):
         para = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
-        para.alignment = {"center": PP_ALIGN.CENTER, "right": PP_ALIGN.RIGHT, "end": PP_ALIGN.RIGHT}.get(t["align"], PP_ALIGN.LEFT)
+        para.alignment = PP_ALIGN.CENTER if t.get("hcen") else {"center": PP_ALIGN.CENTER, "right": PP_ALIGN.RIGHT, "end": PP_ALIGN.RIGHT}.get(t["align"], PP_ALIGN.LEFT)
         para.line_spacing = max(.8, min(1.7, t["lh"] / t["size"]))
         for k, (txt, s) in enumerate(pr):
             txt = re.sub(r"\s+", " ", txt)

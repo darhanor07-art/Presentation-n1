@@ -47,9 +47,11 @@ async function open(b, opts = {}) {
               if (k.display === 'inline' || k.display === 'inline-block') walk(c, {c: k.color, w: k.fontWeight, z: parseFloat(k.fontSize), i: k.fontStyle, f: k.fontFamily, hide: c.classList.contains('gx') ? 1 : 0, deco: k.textDecorationLine}); }
           });
           walk(e, null);
-          return {x: r.left - st.left, y: r.top - st.top, w: r.width, h: r.height, size: parseFloat(cs.fontSize), weight: cs.fontWeight, style: cs.fontStyle,
+          const rg = document.createRange(); rg.selectNodeContents(e); const rr = rg.getBoundingClientRect();
+          return {x: r.left - st.left, y: r.top - st.top, w: r.width, h: r.height, tx: rr.left - st.left, tw: rr.width, size: parseFloat(cs.fontSize), weight: cs.fontWeight, style: cs.fontStyle,
             color: cs.color, align: cs.textAlign, family: cs.fontFamily, lh: parseFloat(cs.lineHeight) || parseFloat(cs.fontSize) * 1.3, tt: cs.textTransform,
-            ls: parseFloat(cs.letterSpacing) || 0, deco: cs.textDecorationLine, ws: cs.whiteSpace, runs, credits: !!e.closest('#credits')};
+            ls: parseFloat(cs.letterSpacing) || 0, deco: cs.textDecorationLine, ws: cs.whiteSpace, runs, credits: !!e.closest('#credits'),
+            vmid: /grid|flex/.test(cs.display) && cs.alignItems === 'center', hcen: /grid|flex/.test(cs.display) && (cs.justifyItems === 'center' || cs.justifyContent === 'center')};
         }).filter(t => t.w > 2 && t.h > 2 && t.y < 1080 && t.y + t.h > 0);
         top.forEach(e => e.classList.add('notext'));
         return {texts, props: deckAPI.props(i), act: META[i].act, tr: META[i].tr, who: META[i].who};
