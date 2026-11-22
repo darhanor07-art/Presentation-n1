@@ -1,0 +1,45 @@
+mrdoob/three.js	119153	MIT	2026-11-22	JavaScript 3D Library.
+3b1b/manim	96816	MIT	2026-09-09	Animation engine for explanatory math videos
+animate-css/animate.css	83056	NOASSERTION	2024-07-29	🍿 A cross-browser library of CSS animations. As easy to use as an easy thing.
+juliangarnier/anime	74979	MIT	2026-11-02	JavaScript animation engine
+remotion-dev/remotion	74940	NOASSERTION	2026-11-22	🎥      Make videos programmatically with React
+hakimel/reveal.js	72614	MIT	2026-09-30	The HTML Presentation Framework
+slidevjs/slidev	49598	MIT	2026-11-05	Presentation Slides for Developers
+pixijs/pixijs	48882	MIT	2026-11-20	The HTML5 Creation Engine: Create beautiful digital content with the fastest, most flexibl
+ManimCommunity/manim	42806	MIT	2026-11-22	A community-maintained Python framework for creating mathematical animations. 
+motiondivision/motion	35452	MIT	2026-11-22	A modern animation library for React and JavaScript
+airbnb/lottie-web	32544	MIT	2025-09-01	Render After Effects animations natively on Web, Android and iOS, and React Native. http:/
+greensock/GSAP	31068	-	2026-11-04	GSAP (GreenSock Animation Platform), a JavaScript animation library for the modern web
+pmndrs/react-spring	29325	MIT	2026-11-22	✌️ A spring physics based React animation library
+michalsnik/aos	28054	MIT	2024-03-26	Animate on scroll library
+rough-stuff/rough	21431	MIT	2024-07-28	Create graphics with a hand-drawn, sketchy, appearance
+motion-canvas/motion-canvas	20143	MIT	2026-07-02	Visualize Your Ideas With Code
+mojs/mojs	18944	MIT	2026-07-30	The motion graphics toolbelt for the web
+liabru/matter-js	18668	MIT	2026-09-30	a 2D rigid body physics engine for the web ▲● ■
+darkroomengineering/lenis	17423	MIT	2026-11-19	Smooth scroll as it should be
+julianshapiro/velocity	17186	MIT	2020-10-24	Accelerated JavaScript animation.
+mattboldt/typed.js	16279	NOASSERTION	2026-01-25	A JavaScript Typing Animation Library
+maxwellito/vivus	15486	MIT	2022-07-06	JavaScript library to make drawing animation on SVG
+formkit/auto-animate	13977	MIT	2026-11-22	A zero-config, drop-in animation utility that adds smooth transitions to your web app. You
+theatre-js/theatre	13092	Apache-2.0	2024-08-14	Motion design editor for the web
+barbajs/barba	13003	MIT	2024-12-02	Create badass, fluid and smooth transitions between your website’s pages
+metafizzy/zdog	10726	-	2023-07-18	Flat, round, designer-friendly pseudo-3D engine for canvas & SVG
+rough-stuff/rough-notation	9762	MIT	2024-03-18	Create and animate hand-drawn annotations on a web page
+tsparticles/tsparticles	9125	MIT	2026-11-22	tsParticles - Easily create highly customizable JavaScript particles effects, confetti exp
+inorganik/countUp.js	8149	MIT	2026-10-17	Animates a numerical value by counting to it
+barvian/number-flow	7830	MIT	2026-09-20	An animated number component for React, Vue, Svelte, and TS/JS.
+tengbao/vanta	7414	MIT	2024-03-03	Animated 3D backgrounds for your website
+veltman/flubber	7010	MIT	2022-11-08	Tools for smoother shape animations.
+sarcadass/granim.js	5293	MIT	2022-12-06	Create fluid and interactive gradient animations with this small javascript library.
+swup/swup	5254	MIT	2026-11-03	Versatile and extensible page transition library for server-rendered websites 🎉
+oframe/ogl	4761	-	2025-04-13	Minimal WebGL Library
+paper-design/shaders	4007	Apache-2.0	2026-11-21	Zero-dependency canvas shaders that can be installed from npm or designed in Paper
+pmndrs/postprocessing	2989	Zlib	2026-11-22	A post processing library for three.js.
+thednp/kute.js	2657	MIT	2026-03-26	KUTE.js is a JavaScript animation engine for modern browsers. 
+gl-transitions/gl-transitions	2267	NOASSERTION	2026-11-22	The open collection of GL Transitions
+robin-dela/hover-effect	1881	MIT	2023-06-27	Javascript library to draw and animate images on hover
+martinlaxenaire/curtainsjs	1832	MIT	2025-04-03	curtains.js is a lightweight vanilla WebGL javascript library that turns HTML DOM elements
+shshaw/Splitting	1757	MIT	2024-06-19	JavaScript microlibrary to split an element by words, characters, children and more, popul
+camwiegert/baffle	1747	MIT	2017-08-28	A tiny javascript library for obfuscating and revealing text in DOM elements. :astonished:
+rive-app/rive-wasm	1032	MIT	2026-11-22	Web runtime (JS/WASM) for Rive, the agent-native 2D and 3D engine for games, apps, and int
+LottieFiles/dotlottie-web	953	MIT	2026-11-21	High-performance Lottie & dotLottie web player powered by Rust + WASM, with React, Vue, Sv
