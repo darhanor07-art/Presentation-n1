@@ -107,13 +107,14 @@ def libraries():
          "## Ескертпелер", "",
          "- **GSAP** 2025 жылғы 30 сәуірден бастап толық тегін, SplitText пен MorphSVG плагиндері де. Бірақ лицензиясы — Webflow-дың өз келісімі (MIT емес): Webflow-ға ұқсас визуалды анимация құрастырғыштарда қолдануға шектеу бар. Дереккөз: [Webflow блогы](https://webflow.com/blog/gsap-becomes-free), [GSAP лицензиясы](https://gsap.com/community/standard-license/).",
          "- **View Transitions API** (бір бет ішінде) — браузердің өзіндегі «Morph»: `view-transition-name` бірдей элементтер күйден күйге өздігінен ауысады. Қолдау: Chrome/Edge 111, Firefox 144, Safari 18. Дереккөз: [Chrome for Developers](https://developer.chrome.com/docs/web-platform/view-transitions).",
-         "- **gl-transitions** — 100-ден астам GLSL ауысу; әр ауысудың лицензиясы өз файлында (GitHub жалпы лицензияны анықтамайды), көшіргенде тексеріңіз.",
+         "- **gl-transitions** — ондаған дайын GLSL ауысу; әр ауысудың лицензиясы өз файлында көрсетіледі (GitHub жалпы лицензияны анықтамайды), көшірмес бұрын тексеріңіз.",
          "- **Manim** — 3Blue1Brown-ның математикалық видео қозғалтқышы (96,8 мың ★). Математика мұғалімдеріне тікелей пайдалы.", ""]
     for g, repos in GROUPS:
         L += [f"## {g}", "", "| Кітапхана | ★ | Лицензия | Соңғы жаңарту | Сипаттама |", "|---|---|---|---|---|"]
         for r in sorted([r for r in repos if r in rows], key=lambda r: -int(rows[r][1])):
             p = rows[r]; lic = p[2] if p[2] not in ("-", "NOASSERTION") else "өз лицензиясы"
-            L.append(f"| [{r}](https://github.com/{r}) | {int(p[1]):,} | {lic} | {p[3]} | {p[4].replace('|', '/')} |".replace(",", " "))
+            stars = f"{int(p[1]):,}".replace(",", " ")
+            L.append(f"| [{r}](https://github.com/{r}) | {stars} | {lic} | {p[3]} | {p[4].replace('|', '/')} |")
         L.append("")
     return "\n".join(L)
 
