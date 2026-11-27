@@ -109,13 +109,13 @@
     });
   }
 
-  function renderCap(it, t, hide) {
+  function renderCap(it, t, mult) {
     var st = it.st, d = it.def, box = it.box;
     var tau = Math.max(0, t - st.enterT), e = E.outCubic(clamp(tau / .35, 0, 1));
     var ex = st.vis ? 0 : clamp((t - st.exitT) / .4, 0, 1);
     if (!st.vis && ex >= 1) { box.style.display = 'none'; return; }
     var wcur = d.w * e, ty = -30 * E.outCubic(ex), left = d.side === 'r' ? d.x - wcur : d.x;
-    box.style.display = 'block'; box.style.width = wcur + 'px'; box.style.opacity = 1 - ex;
+    box.style.display = 'block'; box.style.width = wcur + 'px'; box.style.opacity = (1 - ex) * (mult == null ? 1 : mult);
     box.style.transform = 'translate(' + left + 'px,' + (d.y + ty) + 'px) rotate(' + it.rot + 'deg)';
     it.inner.style.left = d.side === 'r' ? (wcur - d.w) + 'px' : '0';
     var n = st.vis ? Math.floor(Math.max(0, tau - .3) / .018) + 1 : 1e9;
@@ -129,16 +129,19 @@
 
   /* upd = {active:[{id,p}], t, dt, ui, input, flash} */
   O.update = function (u) {
-    var t = u.t; O.now = t; var act = {}, i, k;
-    u.active.forEach(function (a) { act[a.id] = a.p; });
+    var t = u.t; O.now = t; var act = {}, role = {}, i, k;
+    u.active.forEach(function (a) { act[a.id] = a.p; if (a.role) role[a.id] = a; });
     for (var id in O.items) {
-      var list = O.items[id], p = act[id];
+      var list = O.items[id], p = act[id], r = role[id], mult = 1, gate = true;
+      /* transitions: outgoing overlays fade over q 0...35; incoming stay hidden until q>.65 (at[0]==0 items fade in .65..1) */
+      if (r && r.role === 'out') mult = 1 - clamp(r.q / .35, 0, 1);
+      else if (r && r.role === 'in') { gate = r.q > .65; mult = clamp((r.q - .65) / .35, 0, 1); }
       for (i = 0; i < list.length; i++) {
-        var it = list[i], vis = p != null && p >= it.at[0] && p <= it.at[1];
+        var it = list[i], vis = p != null && gate && p >= it.at[0] && p <= it.at[1];
         setVis(it, vis, t);
-        if (it.type === 'caption') renderCap(it, t);
+        if (it.type === 'caption') renderCap(it, t, mult);
         else {
-          var st = it.st, a = st.vis ? 1 : 1 - clamp((t - st.exitT) / .25, 0, 1);
+          var st = it.st, a = (st.vis ? 1 : 1 - clamp((t - st.exitT) / .25, 0, 1)) * mult;
           if (a <= 0) it.wrap.style.display = 'none'; else renderSfx(it, t, a);
         }
       }

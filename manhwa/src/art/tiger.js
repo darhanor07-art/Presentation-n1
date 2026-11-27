@@ -28,8 +28,8 @@
     var left = mir(right.slice(1, -1)).reverse();
     var eyes = {};
     [-1, 1].forEach(function (sx) {
-      var ci = [sx * .19, -.17], co = [sx * .54, -.27], top = [sx * .38, -.40], bot = [sx * .38, -.06];
-      eyes[sx] = { ci: ci, co: co, topCurve: quad(ci, top, co, 12), botCurve: quad(co, bot, ci, 12), cx: sx * .365, cy: -.225 };
+      var ci = [sx * .17, -.10], co = [sx * .58, -.34], top = [sx * .36, -.45], bot = [sx * .42, -.02];
+      eyes[sx] = { ci: ci, co: co, topCurve: quad(ci, top, co, 12), botCurve: quad(co, bot, ci, 12), cx: sx * .37, cy: -.23 };
       var path = new Path2D(); path.moveTo(ci[0], ci[1]); path.quadraticCurveTo(top[0], top[1], co[0], co[1]); path.quadraticCurveTo(bot[0], bot[1], ci[0], ci[1]); path.closePath();
       eyes[sx].path = path;
     });
@@ -40,12 +40,18 @@
   function stripeList() {
     var L = [];
     [-1, 1].forEach(function (sx) {
-      L.push({ k: 'cheek', pts: [[sx * .925, -.05], [sx * .78, -.06], [sx * .62, -.02]], w: [.10, 0] });
-      L.push({ k: 'cheek', pts: [[sx * .895, .18], [sx * .76, .15], [sx * .60, .16]], w: [.095, 0] });
-      L.push({ k: 'cheek', pts: [[sx * .81, .42], [sx * .70, .37], [sx * .55, .36]], w: [.085, 0] });
-      L.push({ k: 'crown', pts: [[sx * .40, -.80], [sx * .36, -.70], [sx * .30, -.62]], w: [.07, 0] });
-      L.push({ k: 'crown', pts: [[sx * .58, -.72], [sx * .52, -.65], [sx * .44, -.58]], w: [.065, 0] });
-      L.push({ k: 'brow', pts: [[sx * .18, -.34], [sx * .40, -.45], [sx * .62, -.48]], w: [.06, 0] });
+      function add(k, pts, w0) { L.push({ k: k, pts: pts.map(function (p) { return [sx * p[0], p[1]]; }), w: [w0, 0] }); }
+      add('cheek', [[.95, -.08], [.80, -.10], [.62, -.03]], .16);
+      add('cheek', [[.93, .14], [.78, .12], [.58, .18]], .16);
+      add('cheek', [[.87, .34], [.72, .30], [.54, .33]], .15);
+      add('cheek', [[.70, .57], [.58, .51], [.45, .51]], .12);
+      add('crown', [[.30, -.81], [.27, -.72], [.23, -.65]], .09);
+      add('crown', [[.46, -.80], [.42, -.70], [.36, -.60]], .10);
+      add('crown', [[.61, -.77], [.56, -.68], [.50, -.58]], .10);
+      add('crown', [[.73, -.62], [.67, -.55], [.62, -.47]], .085);
+      add('brow', [[.18, -.53], [.40, -.57], [.64, -.52]], .065);
+      add('eye', [[.60, -.33], [.76, -.38], [.90, -.34]], .07);
+      add('eye', [[.34, -.04], [.44, .02], [.47, .11]], .06);
     });
     return L;
   }
@@ -54,43 +60,47 @@
   /* one full stack of the front face in a given line colour */
   function face(P, s, o) {
     var g = geom(), ow = o.ow, ln = o.line, th = o.thick, e = s.eyeOpen, sx;
-    var faceSt = o.alive ? { c: 'paper', t: .1, h: 'grain', a: 0 } : { c: 'paper', t: .15, h: 'dots' };
+    var faceSt = o.alive ? { c: 'paper', t: .08, h: 'grain', a: 0 } : { c: 'paper', t: .1, h: 'dots' };
     var dark = { c: ln, t: 0 };
     // ears
     [-1, 1].forEach(function (sx) {
-      P.circle(sx * .68, -.86, .22, { c: ln, t: 0 });
-      P.circle(sx * .68, -.86, .12, { c: 'paper', t: 0 });
+      P.circle(sx * .72, -.78, .17, { c: ln, t: 0 });
+      P.ellipse(sx * .75, -.79, .05, .07, { c: 'paper', t: 0 });
     });
     // head
     var hs = { stroke: { w: ow, c: ln } }; for (var k in faceSt) hs[k] = faceSt[k];
     P.poly(g.head, hs);
     P.ellipse(0, .41, .40, .36, { c: 'paper', t: 0 });
     // stripes
-    STRIPES.forEach(function (st) { P.taper(st.pts, [st.w[0] * th, st.w[1]], dark, 7); });
+    [-1, 1].forEach(function (sx) { P.ellipse(sx * .41, -.455, .21, .065, { c: 'paper', t: 0 }, -sx * .3); });
+    STRIPES.forEach(function (st) { var w0 = st.w[0] * th; P.taper(st.pts, function (u) { return w0 * Math.pow(1 - u, .85) + .004; }, dark, 7); });
     // 王
-    [[-.60, .18], [-.50, .15], [-.40, .18]].forEach(function (r) {
-      P.taper([[-r[1], r[0]], [0, r[0] - .004], [r[1], r[0]]], function (u) { return .062 * th * Math.pow(Math.max(0, 1 - Math.pow(Math.abs(2 * u - 1), 2.2)), .7) + .006; }, dark, 6);
+    [[-.62, .21], [-.51, .18], [-.40, .21]].forEach(function (r) {
+      P.taper([[-r[1], r[0]], [0, r[0] - .004], [r[1], r[0]]], function (u) { return .10 * th * Math.pow(Math.max(0, 1 - Math.pow(Math.abs(2 * u - 1), 2.2)), .7) + .006; }, dark, 6);
     });
-    P.taper([[0, -.66], [0, -.51], [0, -.36]], function (u) { return .06 * th * (1 - Math.pow(Math.abs(2 * u - 1), 3)) + .008; }, dark, 6);
+    P.taper([[0, -.66], [0, -.51], [0, -.36]], function (u) { return .085 * th * (1 - Math.pow(Math.abs(2 * u - 1), 3)) + .01; }, dark, 6);
     // eyes
     [-1, 1].forEach(function (sx) {
-      var E = g.eyes[sx], lidY = MK.lerp(-.10, -.36, clamp(e, 0, 1));
+      var E = g.eyes[sx], lidY = MK.lerp(-.04, -.40, clamp(e, 0, 1));
       P.clip(E.path, function () {
         P.circle(E.cx, E.cy, .32, { c: 'paper', t: 0 });
         if (e < 1) { /* closed part = face colour */ }
         P.clip([[-1, lidY], [1, lidY], [1, 1], [-1, 1]], function () {
           if (e > .02) {
             var gold = o.alive;
-            P.circle(E.cx, E.cy, .087, { c: gold ? 'gold' : ln, t: gold ? P.rad(E.cx, E.cy, .03, .087, [[0, 0], [.7, .05], [1, .45]]) : 0, a: 90 });
-            P.ellipse(E.cx, E.cy, .012 + .042 * s.pupil, .078, { c: gold ? 'ink' : 'paper', t: 0 });
-            P.circle(E.cx + .032, E.cy - .034, .02, { c: 'paper', t: 0 });
+            P.circle(E.cx, E.cy, .095, { c: gold ? 'gold' : ln, t: gold ? P.rad(E.cx, E.cy, .03, .095, [[0, 0], [.7, .05], [1, .45]]) : 0, a: 90 });
+            P.ellipse(E.cx, E.cy, .008 + .032 * s.pupil, .09, { c: gold ? 'ink' : 'paper', t: 0 });
+            P.circle(E.cx + .034, E.cy - .03, .018, { c: 'paper', t: 0 });
           }
         });
-        if (e < 1) P.rect(-1, -.6, 2, lidY + .6, { c: 'paper', t: faceSt.t, h: faceSt.h, a: faceSt.a || 0 });
+        if (e < 1) P.rect(-1, -.7, 2, lidY + .7, { c: 'paper', t: faceSt.t, h: faceSt.h, a: faceSt.a || 0 });
+        if (e > .05) P.stroke(E.topCurve, { w: .05 * th * Math.min(1, e * 2), c: ln, closed: false });
       });
       P.stroke(E.topCurve.concat(E.botCurve), { w: ow * 1.2, c: ln, closed: true });
-      P.stroke(E.topCurve, { w: ow * 1.9 * th, c: ln });
-      if (e < .3) P.stroke(E.botCurve, { w: ow * 1.8, c: ln });
+      P.stroke(E.topCurve, { w: ow * 2.3 * th, c: ln, closed: false });
+      P.taper([E.co, [E.co[0] + sx * .06, E.co[1] - .035], [E.co[0] + sx * .13, E.co[1] - .06]], [.034 * th, .006], dark, 4);
+      P.taper([E.ci, [E.ci[0] - sx * .04, E.ci[1] + .015]], [.03, .01], dark, 3);
+      if (e < .3) P.stroke(E.botCurve, { w: ow * 1.8, c: ln, closed: false });
     });
     // nose + bridge
     P.path('M-.12 .08 L.12 .08 Q.14 .17 0 .255 Q-.14 .17 -.12 .08 Z', dark);
@@ -107,7 +117,8 @@
       var lip = [[-.25, .435], [-.12, .405], [0, .375], [.12, .405], [.25, .435]];
       var low = quad([.24, .44], [.2, .44 + .26 * m], [0, .46 + .30 * m], 8).concat(quad([0, .46 + .30 * m], [-.2, .44 + .26 * m], [-.24, .44], 8).slice(1));
       P.poly(lip.concat(low), dark);
-      [-1, 1].forEach(function (sx) { P.poly([[sx * .12 - .035, .43], [sx * .12 + .035, .43], [sx * .12, .445 + .13 * m]], { c: 'paper', t: 0 }); });
+      [-1, 1].forEach(function (sx) { P.poly([[sx * .12 - .032, .43], [sx * .12 + .032, .43], [sx * .12 + sx * .004, .445 + .19 * m]], { c: 'paper', t: 0, stroke: { w: ow * .6, c: ln } });
+        P.poly([[sx * .12 - .02, .45 + .26 * m], [sx * .12 + .02, .45 + .26 * m], [sx * .12, .43 + .26 * m - .09 * m]], { c: 'paper', t: 0 }); });
     }
     [-1, 1].forEach(function (sx) {
       P.taper([[0, .25], [0, .36], [sx * .10, .42], [sx * .21, .43]], [.03 * th, .01], dark, 6);
@@ -122,26 +133,29 @@
 
   /* sky: faint, cloud-built tiger over a red sky */
   function sky(P, s, ow) {
-    var g = geom(), e = clamp(s.eyeOpen, 0, 1);
+    var g = geom(), e = clamp(s.eyeOpen, 0, 1), al = s.skyAlpha == null ? 1 : s.skyAlpha;
     var F = { c: 'red', t: .26, a: 90 }, D = { c: 'red', t: .8, a: 90 };
-    [-1, 1].forEach(function (sx) { P.circle(sx * .68, -.86, .22, D); P.circle(sx * .68, -.86, .11, F); });
-    P.poly(g.head, F);
-    P.stroke(g.head.concat([g.head[0]]), { w: ow * 1.2, c: 'red', t: .7, a: 90 });
-    P.ellipse(0, .41, .40, .36, { c: 'red', t: .1, a: 90 });
-    STRIPES.forEach(function (st) { P.taper(st.pts, [st.w[0], st.w[1]], D, 7); });
-    [[-.60, .18], [-.50, .15], [-.40, .18]].forEach(function (r) { P.taper([[-r[1], r[0]], [0, r[0]], [r[1], r[0]]], [.06, .06], D, 4); });
-    P.taper([[0, -.66], [0, -.36]], [.06, .06], D, 2);
-    P.path('M-.12 .08 L.12 .08 Q.14 .17 0 .255 Q-.14 .17 -.12 .08 Z', { c: 'red', t: .9, a: 90 });
+    P.alpha(al, function () {
+      [-1, 1].forEach(function (sx) { P.circle(sx * .72, -.78, .17, D); P.ellipse(sx * .75, -.79, .05, .07, F); });
+      P.poly(g.head, F);
+      P.stroke(g.head.concat([g.head[0]]), { w: ow * 1.2, c: 'red', t: .7, a: 90 });
+      P.ellipse(0, .41, .40, .36, { c: 'red', t: .1, a: 90 });
+      STRIPES.forEach(function (st) { P.taper(st.pts, [st.w[0], st.w[1]], D, 7); });
+      [[-.62, .21], [-.51, .18], [-.40, .21]].forEach(function (r) { P.taper([[-r[1], r[0]], [0, r[0]], [r[1], r[0]]], [.085, .085], D, 4); });
+      P.taper([[0, -.66], [0, -.36]], [.06, .06], D, 2);
+      P.path('M-.12 .08 L.12 .08 Q.14 .17 0 .255 Q-.14 .17 -.12 .08 Z', { c: 'red', t: .9, a: 90 });
+      [-1, 1].forEach(function (sx) { P.taper([[0, .25], [0, .36], [sx * .10, .42], [sx * .21, .43]], [.03, .01], D, 6); });
+    });
     [-1, 1].forEach(function (sx) {
-      P.taper([[0, .25], [0, .36], [sx * .10, .42], [sx * .21, .43]], [.03, .01], D, 6);
       var E = g.eyes[sx];
-      P.circle(E.cx, E.cy, .30, { c: 'paper', t: P.rad(E.cx, E.cy, .05, .30, [[0, 0], [.45, .22], [1, .95]]), a: 90 });
+      P.circle(E.cx, E.cy, .27, { c: 'paper', t: P.rad(E.cx, E.cy, .05, .27, [[0, 0], [.45, .22], [1, .95]]), a: 90 });
       P.clip(E.path, function () {
         P.circle(E.cx, E.cy, .3, { c: 'gold', t: 0 });
-        if (e < 1) P.rect(-1, -.6, 2, MK.lerp(-.10, -.36, e) + .6, { c: 'red', t: .26, a: 90 });
-        P.ellipse(E.cx, E.cy, .014 + .03 * s.pupil, .074, { c: 'ink', t: 0 });
+        if (e < 1) P.rect(-1, -.7, 2, MK.lerp(-.04, -.40, e) + .7, { c: 'red', t: .26, a: 90 });
+        P.ellipse(E.cx, E.cy, .009 + .026 * s.pupil, .09, { c: 'ink', t: 0 });
       });
       P.stroke(E.topCurve.concat(E.botCurve), { w: ow * 1.6, c: 'red', t: .85, a: 90, closed: true });
+      P.stroke(E.topCurve, { w: ow * 3, c: 'red', t: .9, a: 90, closed: false });
     });
   }
 
@@ -149,13 +163,13 @@
   function carveLines(g) {
     var L = [], i;
     L.push({ pts: g.head.concat([g.head[0]]) });
-    [-1, 1].forEach(function (sx) { L.push({ pts: circ(sx * .68, -.86, .22, 22) }); });
-    L.push({ pts: [[-.18, -.60], [0, -.604], [.18, -.60]] }); L.push({ pts: [[-.15, -.50], [0, -.504], [.15, -.50]] }); L.push({ pts: [[-.18, -.40], [0, -.404], [.18, -.40]] }); L.push({ pts: [[0, -.66], [0, -.36]] });
-    STRIPES.forEach(function (st) { L.push({ pts: MK.P.smooth(st.pts, 5, false), w: st.w[0] * .45 }); });
+    [-1, 1].forEach(function (sx) { L.push({ pts: circ(sx * .72, -.78, .17, 18) }); });
+    L.push({ open: 1, pts: [[-.21, -.62], [0, -.624], [.21, -.62]] }); L.push({ open: 1, pts: [[-.18, -.51], [0, -.514], [.18, -.51]] }); L.push({ open: 1, pts: [[-.21, -.40], [0, -.404], [.21, -.40]] }); L.push({ open: 1, pts: [[0, -.66], [0, -.36]] });
+    STRIPES.forEach(function (st) { L.push({ open: 1, pts: MK.P.smooth(st.pts, 5, false), w: st.w[0] * .45 }); });
     [-1, 1].forEach(function (sx) { var E = g.eyes[sx]; L.push({ pts: E.topCurve.concat(E.botCurve) }); });
     L.push({ pts: [[-.12, .08], [.12, .08], [.07, .17], [0, .25], [-.07, .17], [-.12, .08]] });
-    [-1, 1].forEach(function (sx) { L.push({ pts: [[0, .25], [0, .36], [sx * .10, .42], [sx * .21, .43]] }); });
-    [[.29, .22], [.33, .36], [.37, .50]].forEach(function (w, k) { [-1, 1].forEach(function (sx) { L.push({ pts: [[sx * .22, w[0]], [sx * .55, (w[0] + w[1]) / 2 - .05 + k * .02], [sx * .86, w[1]]] }); }); });
+    [-1, 1].forEach(function (sx) { L.push({ open: 1, pts: [[0, .25], [0, .36], [sx * .10, .42], [sx * .21, .43]] }); });
+    [[.29, .22], [.33, .36], [.37, .50]].forEach(function (w, k) { [-1, 1].forEach(function (sx) { L.push({ open: 1, pts: [[sx * .22, w[0]], [sx * .55, (w[0] + w[1]) / 2 - .05 + k * .02], [sx * .86, w[1]]] }); }); });
     L.forEach(function (l) { l.len = 0; l.cum = [0]; for (i = 1; i < l.pts.length; i++) { l.len += Math.hypot(l.pts[i][0] - l.pts[i - 1][0], l.pts[i][1] - l.pts[i - 1][1]); l.cum.push(l.len); } });
     return L;
   }
@@ -183,13 +197,13 @@
       P.poly(g.head, red ? { c: 'red', t: 0, stroke: { w: ow, c: 'ink' } } : { c: 'paper', t: .38, h: 'grain', a: 0, stroke: { w: ow, c: 'ink' } });
       parts.forEach(function (p) {
         var w = (p.l.w ? Math.min(.06, Math.max(gw, p.l.w)) : gw);
-        P.stroke(p.pts, { w: w, c: red ? 'paper' : 'ink', t: red ? .32 : null, h: 'grain', a: 0 });
+        P.stroke(p.pts, { w: w, c: red ? 'paper' : 'ink', t: red ? .32 : null, h: 'grain', a: 0, closed: !p.l.open && p.pts.length === p.l.pts.length });
         /* chisel facets: short 60-degree arcs next to the groove */
         var r = MK.rng(p.i * 13 + 5), n = Math.floor(p.l.len / .34), k;
         for (k = 0; k < n; k++) {
           var at = r(), idx = Math.min(p.pts.length - 1, Math.floor(at * p.pts.length)), q = p.pts[idx], sd = r() < .5 ? -1 : 1, off = (.05 + .05 * r()) * sd;
           var a0 = Math.PI / 3 * (r() < .5 ? 1 : -1) * .9, len = .05 + .05 * r();
-          P.stroke([[q[0] + off, q[1] + off * .3], [q[0] + off + Math.cos(a0) * len * .5, q[1] + off * .3 + Math.sin(a0) * len * .5 - len * .12], [q[0] + off + Math.cos(a0) * len, q[1] + off * .3 + Math.sin(a0) * len]], { w: Math.max(.012, 1.8 * 2 / size), c: red ? 'paper' : 'ink' });
+          P.stroke([[q[0] + off, q[1] + off * .3], [q[0] + off + Math.cos(a0) * len * .5, q[1] + off * .3 + Math.sin(a0) * len * .5 - len * .12], [q[0] + off + Math.cos(a0) * len, q[1] + off * .3 + Math.sin(a0) * len]], { w: Math.max(.012, 1.8 * 2 / size), c: red ? 'paper' : 'ink', closed: false });
         }
       });
     }

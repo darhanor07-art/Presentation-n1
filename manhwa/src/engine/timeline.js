@@ -87,8 +87,9 @@
       if (d.hold) base.ui.holdScene = true;
     } else {
       var A = d.A, B = d.B, q = L.p;
-      if (A) { upd(A, base, 1); active.push({ id: A.id, p: 1 }); }
-      if (B) { upd(B, base, 0); active.push({ id: B.id, p: 0 }); }
+      if (A) { upd(A, base, 1); active.push({ id: A.id, p: 1, role: 'out', q: q }); }
+      if (B) { upd(B, base, 0); active.push({ id: B.id, p: 0, role: 'in', q: q }); }
+      active.push({ id: d.id, p: q, role: 'tr', q: q });   /* transition id stays active while it runs (imperative sfx dedupe) */
       var drawA = function (pp) { if (A) drw(A, base, pp == null ? 1 : pp); };
       var drawB = function (pp) { if (B) drw(B, base, pp == null ? 0 : pp); };
       var tc = Object.create(base); tc.q = q; tc.state = d.state || (d.state = {}); tc.sfx = function (text, o) { MK.overlay && MK.overlay.sfx(d.id, text, o, base.t); };

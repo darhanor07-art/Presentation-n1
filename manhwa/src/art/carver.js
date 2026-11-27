@@ -12,72 +12,96 @@
     function path(d, st) { if (sh) P.toneOnly(function () { P.path(d, { c: 'ink', t: .9 }); }); else P.path(d, st); }
     function taper(p, w, st, n) { if (sh) P.toneOnly(function () { P.taper(p, w, { c: 'ink', t: .9 }, n); }); else P.taper(p, w, st, n); }
     function circle(cx, cy, r, st) { if (sh) P.toneOnly(function () { P.circle(cx, cy, r, { c: 'ink', t: .9 }); }); else P.circle(cx, cy, r, st); }
-    function ellipse(cx, cy, rx, ry, st) { if (sh) P.toneOnly(function () { P.ellipse(cx, cy, rx, ry, { c: 'ink', t: .9 }); }); else P.ellipse(cx, cy, rx, ry, st); }
+    function ellipse(cx, cy, rx, ry, st, rot) { if (sh) P.toneOnly(function () { P.ellipse(cx, cy, rx, ry, { c: 'ink', t: .9 }, rot); }); else P.ellipse(cx, cy, rx, ry, st, rot); }
     function stroke(p, o) { if (!sh) P.stroke(p, o); }
     var OUT = { w: ow, c: 'ink' };
-    var CLOTH = function (t0) { return { c: 'paper', t: t0, a: 0, stroke: OUT }; };
+    var INK = { c: 'ink', t: 0 };
 
     P.push(); P.translate(x, y); P.scale(size);
 
-    function ribbons(kx, ky, len, wid) {
-      [-1, 1].forEach(function (sx, i) {
-        var base = [[kx + sx * .004, ky], [kx + sx * .008, ky + len * .5], [kx + sx * .014, ky + len]];
-        var pts = MK.fx.ribbon(base, wid * 2, phase + i * 1.3, wid * 1.9, 5);
-        taper(pts, [wid * 1.1, wid * .8], { c: 'blue', t: 0, stroke: OUT }, 6);
-      });
-      taper([[kx - .02, ky], [kx + .02, ky]], [.026, .026], { c: 'blue', t: 0, stroke: OUT }, 2);
+    /* wide hanbok sleeve with rounded 배래 underside; hands hidden (dark cuff mouth at the end) */
+    function sleeve(pts, w0, w1, bulge, tone) {
+      taper(pts, function (u) { return w0 + (w1 - w0) * u + bulge * Math.sin(Math.min(1, u * 1.25) * Math.PI * .5) * (1 - Math.pow(u, 6)); },
+        { c: 'paper', t: tone, a: 0, stroke: OUT }, 8);
+      var e = pts[pts.length - 1], q = pts[pts.length - 2], ang = Math.atan2(e[1] - q[1], e[0] - q[0]);
+      ellipse(e[0], e[1], w1 * .24, w1 * .5, INK, ang);
     }
-    function braidTicks(x0, y0, y1, w) {
-      for (var yy = y0; yy < y1; yy += w * .9) stroke([[x0 - w * .4, yy], [x0, yy + w * .45], [x0 + w * .4, yy]], { w: ow * .55, c: 'paper' });
+    /* daenggi: small bow + two fluttering ribbon tails (1.4 Hz) */
+    function daenggi(kx, ky, len, wid) {
+      [-1, 1].forEach(function (sx, i) {
+        var base = [[kx + sx * wid * .3, ky], [kx + sx * wid * .9, ky + len * .5], [kx + sx * wid * 1.5, ky + len]];
+        var pts = MK.fx.ribbon(base, wid * 2, phase + i * 1.3, wid * 2.4, 5);
+        taper(pts, [wid * 1.5, wid * 1.0], { c: 'blue', t: 0, stroke: OUT }, 6);
+      });
+      [-1, 1].forEach(function (sx) {
+        ellipse(kx + sx * wid * 1.5, ky + wid * .2, wid * 1.9, wid * 1.05, { c: 'blue', t: 0, stroke: OUT }, sx * .5);
+      });
+      circle(kx, ky + wid * .2, wid * .9, { c: 'blue', t: 0, stroke: OUT });
+    }
+    /* ink braid: solid tapered rope; paper chevron marks */
+    function braid(pts, w0, w1, y0, y1, step) {
+      taper(pts, [w0, w1], INK, 8);
+      var sm = P.smooth(pts, 8, false), n = sm.length, i;
+      for (var yy = y0; yy < y1; yy += step) {
+        var u = (yy - y0) / (y1 - y0), wd = (w0 + (w1 - w0) * u) * .26, cx = 0, best = 9;
+        for (i = 0; i < n; i++) { var d = Math.abs(sm[i][1] - yy); if (d < best) { best = d; cx = sm[i][0]; } }
+        stroke([[cx - wd, yy], [cx, yy + wd * .9], [cx + wd, yy]], { w: ow * .55, c: 'paper' });
+      }
+    }
+    function foldGrad(w, k0, k1) {
+      var stops = [], n = 9, i;
+      for (i = 0; i <= n; i++) stops.push([i / n, i % 2 ? k0 : k1 + (i === 0 || i === n ? .05 : 0)]);
+      return P.lin(-w, 0, w, 0, stops);
     }
 
     if (s.pose === 'seat') {
-      // torso (jeogori back)
-      poly([[-.10, -.73], [.10, -.73], [.30, -.67], [.35, -.55], [.32, -.30], [.31, 0], [-.31, 0], [-.32, -.30], [-.35, -.55], [-.30, -.67]],
-        { c: 'paper', t: P.lin(-.33, 0, .33, 0, [[0, .4], [.2, .12], [.4, .35], [.5, .1], [.6, .35], [.8, .12], [1, .4]]), a: 0, stroke: OUT });
-      stroke([[0, -.72], [0, 0]], { w: ow * .8 });
-      stroke([[-.30, -.67], [-.1, -.60], [0, -.58], [.1, -.60], [.30, -.67]], { w: ow * .9 });
-      // left arm resting
-      taper([[-.33, -.62], [-.42, -.40], [-.31, -.14]], [.2, .15], CLOTH(.22), 6);
-      circle(-.28, -.10, .042, { c: 'paper', t: 0, stroke: OUT });
-      // right arm carving
-      var a = s.arm || 0, hx = .17 + .07 * Math.sin(TAU * a), hy = -.10 + .035 * Math.cos(TAU * a * 2);
-      taper([[.33, -.62], [.45, -.40], [hx + .09, hy - .06], [hx, hy]], [.2, .13], CLOTH(.22), 6);
-      circle(hx - .01, hy + .005, .042, { c: 'paper', t: 0, stroke: OUT });
-      // braid
-      var bp = [[0, -.74], [.015, -.58], [-.01, -.40], [.012, -.24], [0, -.14]];
-      taper(bp, [.075, .052], { c: 'ink', t: 0 }, 8); braidTicks(.003, -.70, -.16, .05);
-      ribbons(0, -.13, .14, .014);
+      // chima: full skirt fanning on the floor
+      path('M-.20 -.36 C-.24 -.24 -.36 -.12 -.42 0 L.42 0 C.36 -.12 .24 -.24 .20 -.36 Z',
+        { c: 'paper', t: P.lin(-.42, 0, .42, 0, [[0, .45], [.1, .15], [.2, .42], [.32, .15], [.44, .4], [.56, .16], [.68, .42], [.8, .15], [.9, .4], [1, .42]]), a: 0, stroke: OUT });
+      [-.8, -.55, -.3, 0, .3, .55, .8].forEach(function (f) { stroke([[f * .19, -.34], [f * .3, -.17], [f * .41, -.01]], { w: ow * .55, c: 'ink' }); });
+      // jeogori back (short jacket)
+      poly([[-.03, -.80], [.03, -.80], [.19, -.76], [.215, -.60], [.225, -.36], [.10, -.335], [0, -.325], [-.10, -.335], [-.225, -.36], [-.215, -.60], [-.19, -.76]],
+        { c: 'paper', t: .1, a: 0, stroke: OUT });
+      stroke([[0, -.79], [0, -.33]], { w: ow * .8 });
+      stroke([[-.19, -.75], [-.10, -.69], [0, -.675], [.10, -.69], [.19, -.75]], { w: ow * .9 });
+      // left sleeve resting
+      sleeve([[-.17, -.74], [-.31, -.50], [-.27, -.16]], .12, .13, .08, .22);
+      // right sleeve carving
+      var a = s.arm || 0, hx = .15 + .07 * Math.sin(TAU * a), hy = -.14 + .03 * Math.cos(TAU * a * 2);
+      sleeve([[.17, -.74], [.33, -.50], [hx + .08, hy - .08], [hx, hy]], .12, .125, .08, .22);
+      // braid + daenggi
+      braid([[0, -.815], [.012, -.66], [-.008, -.52], [.008, -.42], [0, -.33]], .052, .034, -.80, -.34, .026);
+      daenggi(0, -.325, .21, .015);
       // neck + head
-      poly([[-.035, -.76], [.035, -.76], [.04, -.70], [-.04, -.70]], { c: 'paper', t: 0, stroke: OUT });
-      ellipse(0, -.865, .118, .135, { c: 'ink', t: 0 });
-      stroke([[-.075, -.95], [-.03, -.995], [.04, -.995]], { w: ow * .8, c: 'paper' });
-      stroke([[0, -.995], [0, -.80]], { w: ow * .5, c: 'paper' });
+      poly([[-.03, -.835], [.03, -.835], [.034, -.77], [-.034, -.77]], { c: 'paper', t: 0, stroke: OUT });
+      ellipse(0, -.90, .092, .105, INK);
+      poly([[-.085, -.855], [-.03, -.80], [0, -.775], [.03, -.80], [.085, -.855]], INK);
+      stroke([[-.006, -.995], [.006, -.94], [-.004, -.88]], { w: ow * .75, c: 'paper' });
     } else {
-      // chima (bell skirt)
-      path('M-.085 -.70 C-.10 -.50 -.26 -.22 -.335 -.012 Q0 .02 .335 -.012 C.26 -.22 .10 -.50 .085 -.70 Z',
-        { c: 'paper', t: P.lin(-.33, 0, .33, 0, [[0, .45], [.1, .13], [.22, .42], [.34, .12], [.46, .38], [.58, .12], [.7, .42], [.84, .13], [1, .45]]), a: 0, stroke: OUT });
-      [-.7, -.45, -.2, .1, .35, .62].forEach(function (f) {
-        stroke([[f * .085, -.69], [f * .17, -.38], [f * .33, -.02]], { w: ow * .55, c: 'ink' });
+      // chima: high waist right under the shoulder blades, full bell, long folds
+      path('M-.082 -.745 C-.10 -.52 -.25 -.24 -.34 -.014 C-.17 .012 .17 .012 .34 -.014 C.25 -.24 .10 -.52 .082 -.745 Z',
+        { c: 'paper', t: foldGrad(.34, .13, .42), a: 0, stroke: OUT });
+      [-.86, -.66, -.46, -.26, -.06, .14, .34, .54, .74, .9].forEach(function (f) {
+        stroke([[f * .082, -.73], [f * .17, -.40], [f * .33, -.04]], { w: ow * .5, c: 'ink', t: .3 });
       });
-      poly([[-.092, -.725], [.092, -.725], [.088, -.69], [-.088, -.69]], { c: 'paper', t: 0, stroke: OUT });
-      // jeogori + sleeves
-      poly([[-.09, -.86], [.09, -.86], [.098, -.78], [.088, -.715], [-.088, -.715], [-.098, -.78]], { c: 'paper', t: .2, a: 0, stroke: OUT });
-      stroke([[0, -.86], [0, -.715]], { w: ow * .8 });
+      stroke([[-.335, -.02], [-.17, .0], [0, .004], [.17, .0], [.335, -.02]], { w: ow * 1.1, c: 'ink' });   // soft hem
+      // jeogori: short jacket ending at the chest/shoulder-blade line
+      poly([[-.022, -.862], [.022, -.862], [.09, -.84], [.098, -.77], [.104, -.715], [.05, -.70], [0, -.696], [-.05, -.70], [-.104, -.715], [-.098, -.77], [-.09, -.84]],
+        { c: 'paper', t: .12, a: 0, stroke: OUT });
+      stroke([[0, -.86], [0, -.70]], { w: ow * .8 });
+      stroke([[-.09, -.835], [-.04, -.805], [0, -.80], [.04, -.805], [.09, -.835]], { w: ow * .7 });
       [-1, 1].forEach(function (sx, i) {
         var sw = Math.sin(phase * .25 + i) * .004;
-        taper([[sx * .10, -.85], [sx * .17, -.79 + sw], [sx * .205, -.68], [sx * .185, -.585]], [.075, .062], { c: 'paper', t: .26, a: 0, stroke: OUT }, 6);
-        taper([[sx * .19, -.60], [sx * .186, -.575]], [.07, .06], { c: 'ink', t: 0 }, 3);
-        circle(sx * .183, -.55, .02, { c: 'paper', t: 0, stroke: OUT });
+        sleeve([[sx * .092, -.835], [sx * .17, -.76 + sw], [sx * .205, -.65]], .068, .088, .06, .24);
       });
       // braid + daenggi
-      taper([[0, -.865], [.006, -.78], [-.004, -.68], [.004, -.58], [0, -.50]], [.034, .022], { c: 'ink', t: 0 }, 8);
-      braidTicks(.001, -.84, -.51, .022);
-      ribbons(0, -.49, .17, .011);
+      braid([[0, -.885], [.007, -.80], [-.004, -.72], [.004, -.66], [0, -.62]], .034, .022, -.87, -.63, .019);
+      daenggi(0, -.612, .17, .0095);
       // neck + head
-      poly([[-.016, -.885], [.016, -.885], [.02, -.855], [-.02, -.855]], { c: 'paper', t: 0, stroke: OUT });
-      ellipse(0, -.935, .064, .076, { c: 'ink', t: 0 });
-      stroke([[-.04, -.975], [-.015, -.995], [.02, -.995]], { w: ow * .7, c: 'paper' });
+      poly([[-.02, -.90], [.02, -.90], [.024, -.855], [-.024, -.855]], { c: 'paper', t: 0, stroke: OUT });
+      ellipse(0, -.945, .058, .066, INK);
+      poly([[-.052, -.915], [-.02, -.88], [0, -.865], [.02, -.88], [.052, -.915]], INK);
+      stroke([[-.003, -.999], [.004, -.965], [-.002, -.92]], { w: ow * .6, c: 'paper' });
     }
     P.pop();
   };
