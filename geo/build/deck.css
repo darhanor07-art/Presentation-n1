@@ -1,0 +1,315 @@
+/* =====================================================================
+   ЖЕРДІҢ ТӨРТ ҚАБЫҒЫ · ДИЗАЙН ЖҮЙЕСІ
+   Негізгі палитра: ғарыш сиясы + бор ақ + күн сарысы.
+   Төрт қабықтың өз түсі бар (мағына бойынша): литосфера — жартас-қызғылт сары, гидросфера — мұхит көгі,
+   атмосфера — аспан күлгіні (озон), биосфера — жапырақ жасылы. Қаріптер: Rubik + Caveat.
+   ===================================================================== */
+:root{
+  --ink:#0A0F1C; --ink2:#111A2E; --chalk:#F4F1EA; --sun:#F7C548;
+  --litho:#E9874E; --hydro:#3FA7F0; --atmo:#A88BFF; --bio:#5FD08A;
+  --f:'Rubik',system-ui,sans-serif; --h:'Caveat','Rubik',cursive;
+  --stage-bg:#05070D; --slide-bg:transparent;
+  --dim:rgba(244,241,234,.8); --mute:rgba(244,241,234,.6); --line:rgba(244,241,234,.14);
+  --acc:var(--sun);
+}
+.act-1{--acc:var(--litho)} .act-2{--acc:var(--hydro)} .act-3{--acc:var(--atmo)} .act-4{--acc:var(--bio)} .act-5{--acc:var(--sun)}
+/* === СЦЕНА === */
+.deck-stage{background:#05070D}
+#gl{position:absolute;left:0;top:0;width:1920px;height:1080px;display:block;z-index:0;max-width:none;max-height:none}
+.slide{background:transparent;z-index:2}
+.layer{position:absolute;inset:0;display:flex;padding:156px 96px 90px;box-sizing:border-box;color:var(--chalk);font-family:var(--f)}
+.side-L .layer{align-items:center;justify-content:flex-start}
+.side-R .layer{align-items:center;justify-content:flex-end}
+.side-T .layer{align-items:flex-start;justify-content:center;padding-top:150px}
+.side-B .layer{align-items:flex-end;justify-content:center}
+.side-C .layer{align-items:center;justify-content:center}
+
+/* === ПАНЕЛЬ (мөлдір шыны) === */
+.panel{position:relative;width:740px;padding:46px 52px 48px;border-radius:32px;box-sizing:border-box;
+  background:linear-gradient(160deg,rgba(10,15,28,.84),rgba(10,15,28,.66));
+  -webkit-backdrop-filter:blur(18px) saturate(1.2);backdrop-filter:blur(18px) saturate(1.2);
+  box-shadow:0 30px 90px rgba(0,3,10,.45),inset 0 0 0 1.5px rgba(244,241,234,.09)}
+.panel::after{content:"";position:absolute;left:52px;top:0;width:120px;height:4px;border-radius:0 0 4px 4px;background:var(--acc);opacity:.95}
+.panel.wide{width:1728px}
+.panel.mid{width:1000px}
+.panel.narrow{width:600px}
+.panel.narrow .ttl{font-size:58px}
+.panel.bare{background:none;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;padding:0}
+.panel.bare::after{display:none}
+.scrim{position:absolute;inset:0;pointer-events:none}
+.scrim.L{background:linear-gradient(90deg,rgba(4,6,12,.86) 0%,rgba(4,6,12,.5) 34%,rgba(4,6,12,0) 62%)}
+.scrim.R{background:linear-gradient(270deg,rgba(4,6,12,.86) 0%,rgba(4,6,12,.5) 34%,rgba(4,6,12,0) 62%)}
+.scrim.B{background:linear-gradient(0deg,rgba(4,6,12,.9) 0%,rgba(4,6,12,.45) 34%,rgba(4,6,12,0) 60%)}
+.scrim.T{background:linear-gradient(180deg,rgba(4,6,12,.78) 0%,rgba(4,6,12,.3) 30%,rgba(4,6,12,0) 50%)}
+.scrim.C{background:radial-gradient(ellipse at 50% 55%,rgba(4,6,12,.15),rgba(4,6,12,.7))}
+
+/* === ТИПОГРАФИКА === */
+.kick{display:inline-flex;align-items:center;gap:14px;font:600 25px/1 var(--f);letter-spacing:.14em;text-transform:uppercase;color:var(--acc);margin:0 0 16px}
+.kick::before{content:"";width:12px;height:12px;border-radius:50%;background:var(--acc);box-shadow:0 0 18px var(--acc)}
+.ttl{font:800 68px/1.04 var(--f);letter-spacing:-.015em;margin:8px 0 20px;color:var(--chalk)}
+.ttl .w{display:inline-block}
+.bd{font:400 30px/1.42 var(--f);color:var(--dim);margin:0 0 6px}
+.bd b{font-weight:600;color:var(--chalk)}
+.note{font:600 34px/1.2 var(--h);color:var(--acc);margin:22px 0 0}
+.cap{font:400 19px/1.3 var(--f);color:var(--mute);margin:8px 0 0}
+
+/* === САНДАР === */
+.stats{display:flex;gap:34px;margin:22px 0 4px;flex-wrap:wrap}
+.stat{min-width:200px}
+.stat b{display:block;font:800 92px/1 var(--f);letter-spacing:-.03em;color:var(--chalk);font-variant-numeric:tabular-nums}
+.stat span{display:block;font:400 24px/1.3 var(--f);color:var(--dim);max-width:300px;margin-top:6px}
+.facts{display:grid;gap:18px;margin:18px 0 0}
+.fact{display:grid;grid-template-columns:230px 1fr;gap:20px;align-items:baseline;padding:14px 0 0;border-top:1.5px solid var(--line)}
+.fact b{font:800 46px/1 var(--f);color:var(--acc);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.fact span{font:400 26px/1.32 var(--f);color:var(--dim)}
+
+/* === МҰҚАБА === */
+.cover .ttl{font-size:132px;line-height:.96;letter-spacing:-.03em;margin:4px 0 26px}
+.cover .bd{font-size:34px;color:var(--chalk);opacity:.86}
+.authors{display:grid;grid-template-columns:1fr 1fr;gap:16px 40px;margin-top:46px}
+.authors .au{display:flex;align-items:center;gap:16px;font:500 25px/1.2 var(--f);color:var(--dim)}
+.authors .au i{width:48px;height:48px;flex:none}
+.authors .au b{display:block;font-weight:600;color:var(--chalk);font-size:27px}
+#knock{position:absolute;inset:0;z-index:60;pointer-events:none;display:none}
+#knock.on{display:block}
+
+/* === ІЛМЕК СҰРАҚ === */
+.hook .ttl{font-size:96px;text-align:center;max-width:1300px;margin:0 auto 18px;text-shadow:0 6px 40px rgba(0,0,0,.6)}
+.hook .bd{text-align:center;font:600 40px/1.2 var(--h);color:var(--sun)}
+.hook .kick{display:flex;justify-content:center}
+
+/* === ТӨРТ КАРТА (грек түбірлері) === */
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:18px 0 0}
+.card{position:relative;height:178px;perspective:900px}
+.card .in{position:absolute;inset:0;transform-style:preserve-3d;transition:none}
+.card .fa,.card .fb{position:absolute;inset:0;border-radius:22px;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;flex-direction:column;justify-content:center;padding:0 24px 0 112px;box-sizing:border-box;overflow:hidden}
+.card .fa{background:rgba(244,241,234,.06);box-shadow:inset 0 0 0 1.5px rgba(244,241,234,.12)}
+.card .fb{background:linear-gradient(140deg,var(--c),color-mix(in srgb,var(--c) 55%,#000));transform:rotateY(180deg);color:#0A0F1C}
+.card .fa b{font:700 54px/1 var(--h);color:var(--c)}
+.card .fa span{font:500 26px/1.2 var(--f);color:var(--dim);margin-top:6px}
+.card .fb b{font:800 30px/1.1 var(--f)}
+.card .fb span{font:500 22px/1.25 var(--f);opacity:.82;margin-top:6px}
+.card .slot{position:absolute;left:20px;top:50%;width:76px;height:76px;margin-top:-38px}
+.card .shine{position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.55) 50%,transparent 65%);transform:translateX(-120%);mix-blend-mode:overlay}
+
+/* === 3D НҮКТЕЛЕРГЕ ЖАПСЫРМАЛАР === */
+.pins{position:absolute;inset:0;pointer-events:none;z-index:3}
+.pins svg{position:absolute;inset:0;width:1920px;height:1080px;max-width:none;max-height:none;overflow:visible}
+.pins path{fill:none;stroke:rgba(244,241,234,.85);stroke-width:2.5;stroke-linecap:round}
+.pins circle.dot{fill:var(--acc);stroke:#fff;stroke-width:3}
+.pins circle.halo{fill:none;stroke:var(--acc);stroke-width:2.5;opacity:.7}
+.pin{position:absolute;transform:translate(-50%,-50%);white-space:nowrap;font:600 26px/1.15 var(--f);color:var(--chalk);padding:10px 18px;border-radius:14px;
+  background:rgba(10,15,28,.82);box-shadow:0 10px 30px rgba(0,0,0,.35),inset 0 0 0 1.5px rgba(244,241,234,.12)}
+.pin small{display:block;font:400 20px/1.2 var(--f);color:var(--dim);margin-top:3px}
+.pin::before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--acc);margin-right:10px;vertical-align:middle;position:relative;top:-2px}
+
+/* === ҚЫРТЫС БАҒАНДАРЫ === */
+.crust{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin:22px 0 4px}
+.ccol{display:grid;grid-template-rows:auto 1fr;gap:10px}
+.ccol h4{margin:0;font:700 26px/1.2 var(--f);color:var(--chalk)}
+.ccol h4 small{display:block;font:400 21px/1.25 var(--f);color:var(--dim);margin-top:4px}
+.ccol .stack{height:250px;display:flex;flex-direction:column;justify-content:flex-start;border-radius:14px;overflow:hidden;box-shadow:inset 0 0 0 1.5px rgba(244,241,234,.14)}
+.ccol .lay{display:flex;align-items:center;padding:0 16px;font:600 21px/1 var(--f);color:rgba(255,255,255,.92);transform-origin:top}
+
+/* === ФОТО ЖӘНЕ ГАЛЕРЕЯ === */
+.photo{position:relative;border-radius:22px;overflow:hidden;margin:22px 0 0;box-shadow:0 18px 50px rgba(0,0,0,.45),inset 0 0 0 1.5px rgba(244,241,234,.12)}
+.photo img{display:block;width:100%;height:100%;object-fit:cover;max-width:none;max-height:none}
+.photo figcaption{position:absolute;left:0;right:0;bottom:0;padding:34px 18px 12px;font:500 20px/1.25 var(--f);color:#fff;background:linear-gradient(0deg,rgba(0,0,0,.72),rgba(0,0,0,0))}
+.ph-float{position:absolute;z-index:4;border-radius:22px;overflow:hidden;box-shadow:0 26px 70px rgba(0,0,0,.55),inset 0 0 0 2px rgba(255,255,255,.14)}
+.ph-float img{display:block;width:100%;height:100%;object-fit:cover;max-width:none;max-height:none}
+.ph-float figcaption{position:absolute;left:0;right:0;bottom:0;padding:30px 16px 10px;font:500 19px/1.25 var(--f);color:#fff;background:linear-gradient(0deg,rgba(0,0,0,.75),rgba(0,0,0,0))}
+.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:20px 0 0}
+.gallery figure{margin:0;position:relative;height:250px;border-radius:18px;overflow:hidden;box-shadow:inset 0 0 0 1.5px rgba(244,241,234,.12)}
+.gallery figure img{width:100%;height:100%;object-fit:cover;max-width:none;max-height:none}
+.gallery figure b{position:absolute;left:14px;top:12px;font:800 28px/1 var(--f);color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.6)}
+.gallery figure figcaption{position:absolute;left:0;right:0;bottom:0;padding:26px 14px 10px;font:500 18px/1.25 var(--f);color:#fff;background:linear-gradient(0deg,rgba(0,0,0,.75),rgba(0,0,0,0))}
+
+/* === ТАУ ЖЫНЫСТАРЫ === */
+.rocks{display:grid;gap:14px;margin:16px 0 0}
+.rock{display:grid;grid-template-columns:64px 1fr;gap:18px;align-items:center;padding:14px 18px;border-radius:18px;background:rgba(244,241,234,.05);box-shadow:inset 0 0 0 1.5px rgba(244,241,234,.1)}
+.rock i{width:64px;height:64px;border-radius:14px;display:block}
+.rock b{display:block;font:700 28px/1.1 var(--f);color:var(--chalk)}
+.rock span{display:block;font:400 22px/1.3 var(--f);color:var(--dim);margin-top:4px}
+#jar{position:absolute;z-index:4;border-radius:0 0 26px 26px}
+
+/* === ЖЕР СІЛКІНІСІ === */
+.pairs{display:grid;gap:12px;margin:14px 0 0}
+.pair{display:grid;grid-template-columns:190px 1fr;gap:18px;align-items:baseline}
+.pair b{font:700 30px/1 var(--f);color:var(--acc)}
+.pair span{font:400 26px/1.3 var(--f);color:var(--dim)}
+.safety{margin:22px 0 0;padding:20px 24px;border-radius:20px;background:rgba(247,197,72,.1);box-shadow:inset 0 0 0 1.5px rgba(247,197,72,.35)}
+.safety h4{margin:0 0 10px;font:700 24px/1 var(--f);letter-spacing:.08em;text-transform:uppercase;color:var(--sun)}
+.safety li{font:400 24px/1.3 var(--f);color:var(--chalk);margin:6px 0}
+.safety ul{margin:0;padding-left:26px}
+
+/* === СУ ЫДЫСТАРЫ === */
+.vessels{position:relative;display:flex;align-items:flex-end;gap:26px;height:420px;margin:26px 0 0}
+.vessel{position:relative;display:flex;flex-direction:column;align-items:center;gap:10px}
+.vessel .tank{position:relative;border-radius:10px 10px 26px 26px;overflow:hidden;box-shadow:inset 0 0 0 3px rgba(244,241,234,.55);background:rgba(244,241,234,.04)}
+.vessel .water{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(180deg,var(--wc),color-mix(in srgb,var(--wc) 60%,#000));}
+.vessel .water::before{content:"";position:absolute;left:-10%;right:-10%;top:-8px;height:16px;border-radius:50%;background:inherit;filter:brightness(1.25)}
+.vessel b{font:800 34px/1 var(--f);color:var(--chalk)}
+.vessel span{font:400 20px/1.2 var(--f);color:var(--dim);text-align:center;max-width:170px}
+
+/* === МҰХИТ ДИАГРАММАСЫ === */
+.bars{display:grid;gap:12px;margin:18px 0 0}
+.bar{display:grid;grid-template-columns:200px 1fr 120px;gap:14px;align-items:center}
+.bar span{font:500 24px/1 var(--f);color:var(--dim)}
+.bar .tr{height:30px;border-radius:15px;background:rgba(244,241,234,.07);overflow:hidden}
+.bar .fl{height:100%;border-radius:15px;background:linear-gradient(90deg,#1F6FB8,var(--hydro));transform-origin:left;transform:scaleX(0)}
+.bar b{font:700 26px/1 var(--f);color:var(--chalk);text-align:right;font-variant-numeric:tabular-nums}
+#everest{position:absolute;z-index:4}
+
+/* === СУ АЙНАЛЫМЫ (жоғарғы жолақ) === */
+.cycle .panel{width:1500px;display:grid;grid-template-columns:auto 1fr;gap:10px 44px;align-items:center;padding:30px 44px}
+.cycle .panel .ttl{font-size:56px;margin:0}
+.steps{display:flex;gap:10px;grid-column:1/3}
+.step{flex:1;padding:14px 16px;border-radius:16px;background:rgba(244,241,234,.05);box-shadow:inset 0 0 0 1.5px rgba(244,241,234,.1)}
+.step b{display:block;font:700 25px/1.1 var(--f);color:var(--chalk)}
+.step span{display:block;font:400 19px/1.25 var(--f);color:var(--dim);margin-top:4px}
+.step em{font-style:normal;font:800 22px/1 var(--f);color:var(--hydro);margin-right:8px}
+#cyclepath{position:absolute;inset:0;z-index:3;pointer-events:none;width:1920px;height:1080px;max-width:none;max-height:none}
+#cyclepath path{fill:none;stroke:rgba(140,205,255,.6);stroke-width:3;stroke-dasharray:2 14;stroke-linecap:round}
+
+/* === АТМОСФЕРА: ҚҰМЫРА, РӨЛДЕР, ҚАБАТТАР === */
+.gasrow{display:flex;gap:16px;margin:16px 0 0}
+.gas{display:flex;align-items:center;gap:10px;font:500 24px/1 var(--f);color:var(--dim)}
+.gas i{width:20px;height:20px;border-radius:50%}
+.gas b{font:800 34px/1 var(--f);color:var(--chalk);margin-right:4px}
+.roles{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0 0}
+.arole{padding:14px 18px;border-radius:16px;background:rgba(168,139,255,.1);box-shadow:inset 0 0 0 1.5px rgba(168,139,255,.3);font:500 23px/1.25 var(--f);color:var(--chalk)}
+#airjar{position:absolute;z-index:4}
+.layers2{display:grid;gap:12px;margin:16px 0 0}
+.l2{display:grid;grid-template-columns:24px 1fr;gap:16px;padding:14px 18px;border-radius:16px;background:rgba(244,241,234,.04);box-shadow:inset 0 0 0 1.5px rgba(244,241,234,.08);transition:none}
+.l2 i{width:24px;height:24px;border-radius:50%;margin-top:4px;background:var(--lc)}
+.l2 b{font:700 27px/1.1 var(--f);color:var(--chalk)}
+.l2 b small{font:500 22px/1 var(--f);color:var(--lc);margin-left:10px}
+.l2 span{display:block;font:400 22px/1.3 var(--f);color:var(--dim);margin-top:4px}
+.legend{display:flex;gap:26px;margin:16px 0 0;flex-wrap:wrap}
+.legend span{display:flex;align-items:center;gap:10px;font:400 22px/1.2 var(--f);color:var(--dim)}
+.legend i{width:34px;height:6px;border-radius:3px;background:var(--lc)}
+
+/* === ӨЛШЕУІШ (тереңдік / биіктік) === */
+#gauge{position:absolute;right:60px;top:170px;width:220px;height:760px;z-index:5;pointer-events:none;opacity:0}
+#gauge svg{width:220px;height:760px;max-width:none;max-height:none;overflow:visible}
+#gauge .rd{position:absolute;right:0;top:-92px;text-align:right;font:800 54px/1 var(--f);color:var(--chalk);font-variant-numeric:tabular-nums;white-space:nowrap}
+#gauge .rd small{font:500 22px/1 var(--f);color:var(--dim);margin-left:6px}
+#gauge .rd2{position:absolute;right:0;top:-34px;text-align:right;font:700 30px/1 var(--f);color:#8fd0ff;font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* === БИОСФЕРА === */
+.timeline{position:relative;display:flex;gap:30px;margin:20px 0 6px;padding-top:26px}
+.timeline::before{content:"";position:absolute;left:0;right:0;top:8px;height:3px;border-radius:2px;background:var(--line)}
+.tl{position:relative;flex:1}
+.tl::before{content:"";position:absolute;left:0;top:-24px;width:16px;height:16px;border-radius:50%;background:var(--bio);box-shadow:0 0 16px var(--bio)}
+.tl b{display:block;font:800 40px/1 var(--f);color:var(--bio)}
+.tl span{display:block;font:400 22px/1.3 var(--f);color:var(--dim);margin-top:6px}
+.parts{display:grid;gap:14px;margin:18px 0 0}
+.part{padding:16px 20px;border-radius:18px;background:rgba(95,208,138,.08);box-shadow:inset 0 0 0 1.5px rgba(95,208,138,.28)}
+.part b{display:block;font:700 28px/1.1 var(--f);color:var(--chalk)}
+.part span{display:block;font:400 22px/1.3 var(--f);color:var(--dim);margin-top:4px}
+.zones{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0 0;height:150px}
+.zone{position:relative;border-radius:16px;overflow:hidden;box-shadow:inset 0 0 0 1.5px rgba(244,241,234,.12)}
+.zone img{width:100%;height:100%;object-fit:cover;max-width:none;max-height:none;filter:saturate(1.05)}
+.zone b{position:absolute;left:12px;bottom:28px;font:700 22px/1 var(--f);color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.7)}
+.zone span{position:absolute;left:12px;bottom:8px;font:400 16px/1 var(--f);color:rgba(255,255,255,.85)}
+.zone::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.6),rgba(0,0,0,0) 60%)}
+.zone b,.zone span{z-index:1}
+.belts{display:grid;gap:8px;margin:18px 0 0}
+.belt{display:grid;grid-template-columns:200px 1fr;gap:14px;align-items:baseline;padding:8px 14px;border-radius:12px;transition:none}
+.belt b{font:700 24px/1 var(--f);color:var(--bio)}
+.belt span{font:400 23px/1.2 var(--f);color:var(--dim)}
+.belt.on{background:rgba(95,208,138,.16);box-shadow:inset 0 0 0 1.5px rgba(95,208,138,.5)}
+.soils{display:grid;gap:12px;margin:18px 0 0}
+.soil{display:grid;grid-template-columns:54px 1fr;gap:16px;align-items:center}
+.soil i{width:54px;height:54px;border-radius:12px;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.2)}
+.soil b{display:block;font:700 26px/1.1 var(--f);color:var(--chalk)}
+.soil span{display:block;font:400 21px/1.2 var(--f);color:var(--dim)}
+
+/* === БІРТҰТАС ЖЕР === */
+.laws{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 0}
+.laws span{padding:10px 18px;border-radius:30px;font:600 23px/1 var(--f);color:#0A0F1C;background:var(--sun)}
+.links{display:grid;gap:10px;margin:16px 0 0}
+.link{display:flex;align-items:center;gap:12px;font:400 24px/1.25 var(--f);color:var(--dim)}
+.link i{width:20px;height:20px;border-radius:50%;flex:none}
+.link em{font-style:normal;color:var(--mute)}
+.chain{display:grid;gap:12px;margin:16px 0 0}
+.ch{display:grid;grid-template-columns:70px 1fr;gap:16px;align-items:center;padding:12px 16px;border-radius:18px;background:rgba(244,241,234,.04);box-shadow:inset 0 0 0 1.5px rgba(244,241,234,.1)}
+.ch .slot{width:62px;height:62px}
+.ch b{display:block;font:700 26px/1.1 var(--f);color:var(--c)}
+.ch span{display:block;font:400 22px/1.3 var(--f);color:var(--dim);margin-top:3px}
+.cause{font:500 24px/1.3 var(--f);color:var(--chalk);margin:6px 0 0}
+.hope{margin:16px 0 0;padding:14px 18px;border-radius:16px;font:600 24px/1.3 var(--f);color:#0A0F1C;background:var(--bio)}
+
+/* === ЖАУАП === */
+.answer .q{font:700 44px/1.15 var(--f);color:var(--dim);margin:0 0 14px;max-width:820px}
+.answer .ans{font:800 112px/1 var(--f);letter-spacing:-.03em;color:var(--chalk);margin:0 0 34px;text-shadow:0 10px 50px rgba(0,0,0,.6);max-width:860px}
+.answer .lines{display:grid;grid-template-columns:1fr;gap:12px;max-width:760px}
+.answer .ln{display:flex;align-items:center;gap:16px;padding:16px 22px;border-radius:20px;background:rgba(10,15,28,.72);box-shadow:inset 0 0 0 1.5px rgba(244,241,234,.12);font:600 30px/1.2 var(--f);color:var(--chalk)}
+.answer .ln i{width:22px;height:22px;border-radius:50%;flex:none}
+.answer{width:860px}
+#you{position:absolute;z-index:4;font:800 40px/1 var(--f);color:#0A0F1C;background:var(--chalk);padding:10px 18px;border-radius:30px;transform:translate(-50%,-50%);box-shadow:0 0 0 6px rgba(244,241,234,.25),0 10px 30px rgba(0,0,0,.4);opacity:0}
+
+/* === ТИТРЛАР === */
+.credits-win{position:absolute;left:0;right:0;top:0;bottom:0;overflow:hidden;z-index:3;
+  -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 14%,#000 86%,transparent 100%);mask-image:linear-gradient(180deg,transparent 0,#000 14%,#000 86%,transparent 100%)}
+.credits{position:absolute;left:50%;top:1080px;width:1100px;margin-left:-550px;text-align:center;color:var(--chalk);font-family:var(--f)}
+.credits .ct{font:800 110px/1 var(--f);letter-spacing:-.03em;margin:0 0 20px}
+.credits .thx{font:700 64px/1 var(--h);color:var(--sun);margin:0 0 90px}
+.credits .role{font:600 24px/1 var(--f);letter-spacing:.16em;text-transform:uppercase;color:var(--mute);margin:56px 0 16px}
+.credits .name{display:flex;align-items:center;justify-content:center;gap:18px;font:700 52px/1.1 var(--f)}
+.credits .name .slot{width:58px;height:58px;display:inline-block}
+.credits .all{font:500 30px/1.3 var(--f);color:var(--dim);margin:50px 0 0}
+.credits .srcs{font:400 22px/1.5 var(--f);color:var(--dim);max-width:1000px;margin:0 auto}
+.credits .end{font:800 76px/1 var(--f);margin:120px 0 0;color:var(--chalk)}
+.credits .end small{display:block;font:700 46px/1.2 var(--h);color:var(--sun);margin-top:16px}
+
+/* === КӨШЕТІН ДЕТАЛЬДАР === */
+#props{position:absolute;inset:0;z-index:6;pointer-events:none}
+.tok{position:absolute;left:0;top:0;width:120px;height:120px;opacity:0;will-change:transform}
+.tok svg{width:100%;height:100%;overflow:visible;max-width:none;max-height:none}
+.tok .lbl{position:absolute;left:50%;top:100%;transform:translateX(-50%);margin-top:6px;font:700 26px/1 var(--f);white-space:nowrap;color:var(--chalk);opacity:0}
+#drop{position:absolute;left:0;top:0;width:70px;height:96px;opacity:0;z-index:7;will-change:transform}
+#drop svg{width:100%;height:100%;overflow:visible;max-width:none;max-height:none}
+#venn{position:absolute;inset:0;z-index:5;pointer-events:none}
+#venn svg{position:absolute;inset:0;width:1920px;height:1080px;max-width:none;max-height:none}
+
+/* === HUD (сол жақ жоғарғы бұрыш) === */
+#hud{position:absolute;left:96px;top:56px;z-index:8;display:flex;align-items:center;gap:20px;color:var(--chalk);font-family:var(--f);transition:opacity .6s}
+#hud.off{opacity:0}
+#hud .slots{width:300px;height:64px}
+#hud .act{font:700 26px/1 var(--f);letter-spacing:.06em;text-transform:uppercase}
+#hud .q{font:600 30px/1 var(--h);color:var(--dim)}
+#hud .sep{width:2px;height:30px;background:var(--line)}
+
+/* === СПИКЕР ЖАЗБАЛАРЫ (N) === */
+#notes{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);width:min(1100px,92vw);max-height:42vh;overflow:auto;z-index:2000;display:none;
+  background:rgba(8,11,20,.94);color:#F4F1EA;font:400 19px/1.5 'Rubik',system-ui,sans-serif;padding:18px 24px;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.5),inset 0 0 0 1px rgba(255,255,255,.1)}
+#notes.on{display:block}
+#notes .who{display:inline-block;font-weight:700;margin-right:8px;padding:2px 10px;border-radius:10px;color:#0A0F1C}
+#notes .rm{color:#9aa3b5;font-style:italic}
+#notes .hd{font-weight:700;color:#F7C548;margin-bottom:8px}
+#notes p{margin:6px 0}
+
+/* === ЖҮКТЕУ ЭКРАНЫ === */
+#loader{position:fixed;inset:0;z-index:3000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:#05070D;color:#F4F1EA;font-family:'Rubik',sans-serif;transition:opacity .9s}
+#loader b{font:800 64px/1 'Rubik',sans-serif;letter-spacing:-.02em}
+#loader span{font:400 22px/1 'Rubik',sans-serif;opacity:.7}
+#loader i{display:block;width:240px;height:4px;border-radius:2px;background:rgba(255,255,255,.12);overflow:hidden;position:relative}
+#loader i::after{content:"";position:absolute;inset:0;width:40%;background:linear-gradient(90deg,#E9874E,#3FA7F0,#A88BFF,#5FD08A);animation:ld 1.4s ease-in-out infinite}
+@keyframes ld{0%{transform:translateX(-100%)}100%{transform:translateX(250%)}}
+#loader.done{opacity:0;pointer-events:none}
+
+/* === ӨҢДЕУ РЕЖИМІ === */
+.edit-hotzone{position:fixed;top:0;left:0;width:80px;height:80px;z-index:10000;cursor:pointer}
+.edit-toggle{position:fixed;top:16px;left:16px;z-index:10001;width:44px;height:44px;border-radius:50%;border:0;background:rgba(10,15,28,.85);color:#F7C548;font:700 22px/44px system-ui;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .3s}
+.edit-toggle.show,.edit-toggle.active{opacity:1;pointer-events:auto}
+.edit-toggle.active{background:#F7C548;color:#0A0F1C}
+body.editing [data-edit]{outline:2px dashed rgba(247,197,72,.65);outline-offset:4px;cursor:text}
+.toast{position:fixed;left:50%;top:24px;transform:translateX(-50%) translateY(-200px);z-index:10002;background:#F7C548;color:#0A0F1C;font:600 18px/1 'Rubik',sans-serif;padding:14px 22px;border-radius:12px;transition:transform .4s}
+.toast.on{transform:translateX(-50%) translateY(0)}
+
+/* === ҚОЗҒАЛЫССЫЗ РЕЖИМ === */
+@media (prefers-reduced-motion: reduce){
+  .tok,#drop,.card .in,.bar .fl{transition:none!important}
+}
+body.static #loader{display:none}

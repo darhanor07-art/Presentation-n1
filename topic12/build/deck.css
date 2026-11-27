@@ -1,0 +1,227 @@
+/* =====================================================================
+   x ≠ 0 · ДИЗАЙН ЖҮЙЕСІ
+   «Бор» палитрасы (интерфейс): сия, бор, бор-сары, бор-маржан, бор-жалбыз.
+   «Сынып» палитрасы 3D-сахнада (world.js).  Қаріптер: Rubik + Caveat.
+   ===================================================================== */
+:root{
+  --ink:#12161F; --chalk:#F5F0E6; --yel:#F4C95D; --cor:#F28B6C; --min:#8FD3B6;
+  --board:#26443A; --wood:#C8925A;
+  --f:'Rubik',system-ui,sans-serif; --h:'Caveat','Rubik',cursive;
+  --stage-bg:#0B0E14; --slide-bg:transparent;
+  --dim:rgba(245,240,230,.78); --line:rgba(245,240,230,.16);
+}
+/* === СЦЕНА === */
+.deck-stage{background:#0B0E14}
+#gl{position:absolute;left:0;top:0;width:1920px;height:1080px;display:block;z-index:0;max-width:none;max-height:none}
+.slide{background:transparent;z-index:2}
+.layer{position:absolute;inset:0;display:flex;padding:150px 96px 96px;box-sizing:border-box;color:var(--chalk);font-family:var(--f)}
+.side-L .layer{align-items:center;justify-content:flex-start}
+.side-R .layer{align-items:center;justify-content:flex-end}
+.side-T .layer{align-items:flex-start;justify-content:center}
+.side-B .layer{align-items:flex-end;justify-content:center}
+.side-C .layer{align-items:center;justify-content:center}
+
+/* === ТАҚТАЙША (ПАНЕЛЬ) === */
+.panel{position:relative;width:760px;padding:50px 56px 52px;border-radius:34px;box-sizing:border-box;
+  background:linear-gradient(158deg,rgba(18,22,31,.9),rgba(18,22,31,.8));
+  -webkit-backdrop-filter:blur(16px) saturate(1.15);backdrop-filter:blur(16px) saturate(1.15);
+  box-shadow:0 34px 90px rgba(4,6,10,.42),inset 0 0 0 1.5px rgba(245,240,230,.10)}
+.panel::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:.5;mix-blend-mode:screen;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .96 0 0 0 0 .94 0 0 0 0 .9 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E")}
+.panel.wide{width:1728px}
+.panel.mid{width:980px}
+.panel.bare{background:none;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;padding:0}
+.panel.bare::before{display:none}
+.scrim{position:absolute;inset:0;pointer-events:none}
+.scrim.L{background:linear-gradient(90deg,rgba(9,11,16,.86) 0%,rgba(9,11,16,.55) 36%,rgba(9,11,16,0) 64%)}
+.scrim.R{background:linear-gradient(270deg,rgba(9,11,16,.86) 0%,rgba(9,11,16,.55) 36%,rgba(9,11,16,0) 64%)}
+.scrim.C{background:radial-gradient(ellipse at 50% 50%,rgba(9,11,16,.25),rgba(9,11,16,.75))}
+
+/* === ТИПОГРАФИКА === */
+.kick{display:inline-block;position:relative;font:700 46px/1 var(--h);color:var(--yel);margin:0 0 14px;letter-spacing:.005em}
+.kick svg{position:absolute;left:-4px;right:-4px;bottom:-12px;width:calc(100% + 8px);height:14px;overflow:visible}
+.kick svg path{fill:none;stroke:var(--yel);stroke-width:3.2;stroke-linecap:round;opacity:.8}
+.ttl{font:800 76px/1.03 var(--f);letter-spacing:-.012em;margin:12px 0 22px;color:var(--chalk)}
+.ttl em{font-style:normal;color:var(--yel)}
+.ttl .ph{display:inline-block;vertical-align:baseline}
+.gx{color:transparent!important;-webkit-text-fill-color:transparent}
+.sub{font:500 30px/1.3 var(--f);color:var(--min);margin:-8px 0 20px}
+.bd{font:400 31px/1.42 var(--f);color:rgba(245,240,230,.9);margin:0}
+.bd b{font-weight:600;color:var(--chalk)}
+.ask{font:700 40px/1.16 var(--h);color:var(--min);margin:26px 0 0;padding-left:26px;position:relative}
+.ask::before{content:"";position:absolute;left:0;top:6px;bottom:6px;width:5px;border-radius:3px;background:var(--min)}
+.note{font:500 26px/1.35 var(--f);color:rgba(245,240,230,.62);margin:18px 0 0;font-style:italic}
+.src{font:400 26px/1.3 var(--f);color:rgba(245,240,230,.55);margin:22px 0 0}
+.chalkq{font:700 50px/1.12 var(--h);color:var(--chalk);margin:0 0 18px}
+
+/* === ТІЗІМДЕР ЖӘНЕ ФИГУРАЛЫ МАРКЕРЛЕР === */
+.list{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:16px}
+.list .nlslot{display:block;height:74px;margin-top:6px}
+.list li{position:relative;padding-left:52px;font:400 30px/1.34 var(--f);color:rgba(245,240,230,.92)}
+.list li::before{content:"";position:absolute;left:0;top:8px;width:26px;height:26px;background:var(--yel);border-radius:50%}
+.list li:nth-child(3n+2)::before{border-radius:0;background:var(--cor);clip-path:polygon(50% 4%,98% 92%,2% 92%)}
+.list li:nth-child(3n)::before{border-radius:4px;background:var(--min);width:23px;height:23px;top:10px;left:2px}
+.pairs{display:grid;gap:14px;margin:8px 0 0}
+.pair{display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:baseline;padding:14px 0;border-top:1.5px solid var(--line)}
+.pair:first-child{border-top:none}
+.pair .k{font:700 28px/1.2 var(--f);color:var(--ink);background:var(--yel);padding:8px 16px 9px;border-radius:12px;white-space:nowrap}
+.pair:nth-child(3n+2) .k{background:var(--cor)}
+.pair:nth-child(3n) .k{background:var(--min)}
+.pair .v{font:400 30px/1.35 var(--f);color:rgba(245,240,230,.92)}
+.pair .ic{width:56px;height:56px;display:inline-block}
+
+/* === АРНАЙЫ БЛОКТАР === */
+/* 1 · мұқаба */
+.cover .ttl{font:800 300px/.86 var(--f);margin:6px 0 26px;letter-spacing:-.02em;white-space:nowrap}
+.panel.cover{width:1060px}
+.cover .bd{max-width:860px;font:400 34px/1.38 var(--f)}
+.authors{display:flex;gap:40px;margin-top:44px;font:500 30px/1.2 var(--f);color:var(--chalk);white-space:nowrap}
+.authors span{display:flex;align-items:center;gap:14px}
+.authors i{display:inline-block;width:46px;height:46px}
+.authors b{font-weight:500}
+/* 7 · ілмек-сұрақ, 29 · жауап */
+.hook .ttl{font:800 230px/.9 var(--f);margin:0 0 30px;white-space:nowrap}
+.hook .q{font:700 64px/1.08 var(--h);color:var(--chalk);max-width:760px}
+.answer .ttl{font:800 230px/.9 var(--f);margin:0 0 26px;white-space:nowrap}
+.answer .q{font:500 32px/1.3 var(--f);color:rgba(245,240,230,.7);text-decoration:line-through;text-decoration-color:var(--cor);text-decoration-thickness:3px}
+.answer .ans{font:700 72px/1.05 var(--h);color:var(--yel);margin:18px 0 24px}
+.formula{font:600 30px/1.4 var(--f);color:var(--chalk);padding:18px 24px;border-radius:18px;background:rgba(245,240,230,.08);box-shadow:inset 0 0 0 1.5px rgba(245,240,230,.14)}
+.formula b{color:var(--min);font-weight:700}
+/* 9 · шешу жоспары */
+.steps{display:grid;grid-template-columns:1fr 1fr;gap:14px 26px;margin-top:10px}
+.step{display:grid;grid-template-columns:62px 1fr;align-items:center;gap:14px;padding:12px 14px;border-radius:18px;background:rgba(245,240,230,.05)}
+.step .who{width:52px;height:52px;display:grid;place-items:center}
+.step b{display:block;font:700 30px/1.1 var(--f);color:var(--chalk)}
+.step span{display:block;font:400 26px/1.25 var(--f);color:rgba(245,240,230,.72)}
+/* 11 · алты түр */
+.grid6{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:10px}
+.cell{padding:22px 24px 24px;border-radius:22px;background:rgba(245,240,230,.06);box-shadow:inset 0 0 0 1.5px rgba(245,240,230,.1)}
+.cell b{display:block;font:700 34px/1.1 var(--f);color:var(--yel);margin-bottom:8px}
+.cell:nth-child(3n+2) b{color:var(--cor)}
+.cell:nth-child(3n) b{color:var(--min)}
+.cell span{font:400 27px/1.32 var(--f);color:rgba(245,240,230,.88)}
+/* 13 · статистика */
+.stats{display:grid;gap:18px;margin-top:6px}
+.stat{display:grid;grid-template-columns:330px 1fr;gap:22px;align-items:center;padding:14px 0;border-top:1.5px solid var(--line)}
+.stat:first-child{border-top:none}
+.stat b{font:800 62px/1 var(--f);white-space:nowrap;color:var(--yel);letter-spacing:-.01em}
+.stat:nth-child(2) b{color:var(--cor)}
+.stat:nth-child(3) b{color:var(--min)}
+.stat span{font:400 28px/1.3 var(--f);color:rgba(245,240,230,.9)}
+/* 14 · ғалым */
+.facts{display:grid;gap:12px;margin-top:8px;position:relative;padding-left:30px}
+.facts::before{content:"";position:absolute;left:8px;top:14px;bottom:14px;width:3px;background:rgba(245,240,230,.2);border-radius:2px}
+.fact{position:relative;display:grid;grid-template-columns:150px 1fr;gap:16px;align-items:baseline}
+.fact::before{content:"";position:absolute;left:-29px;top:12px;width:17px;height:17px;border-radius:50%;background:var(--yel)}
+.fact b{font:700 30px/1.2 var(--f);color:var(--yel)}
+.fact span{font:400 28px/1.3 var(--f);color:rgba(245,240,230,.9)}
+/* 15 · UDL */
+.udl{display:grid;grid-template-columns:1fr;gap:14px;margin-top:10px}
+.ucol{display:grid;grid-template-columns:86px 1fr;grid-template-rows:auto auto;column-gap:18px;align-items:center;padding:16px 20px 18px;border-radius:22px;background:rgba(245,240,230,.06);box-shadow:inset 0 0 0 1.5px rgba(245,240,230,.1)}
+.ucol .ico{width:78px;height:78px;grid-row:1 / span 2}
+.ucol .q{grid-column:2}
+.ucol .bx{grid-column:2}
+.ucol .q{font:700 42px/1 var(--h);color:var(--yel)}
+.ucol:nth-child(2) .q{color:var(--cor)}
+.ucol:nth-child(3) .q{color:var(--min)}
+.ucol b{display:block;font:700 30px/1.2 var(--f);margin:2px 0 2px}
+.ucol span{font:400 26px/1.3 var(--f);color:rgba(245,240,230,.86)}
+/* 17 · Выготский: сан түзуі экран астында */
+.s-17 .panel{width:1180px}
+/* 18 · екі нұсқау */
+.steps2{display:grid;gap:16px;margin-top:6px}
+.st2{display:grid;grid-template-columns:72px 1fr;gap:18px;align-items:start;padding:18px 20px;border-radius:20px;background:rgba(245,240,230,.06)}
+.st2 i{font:800 46px/1 var(--f);font-style:normal;color:var(--ink);background:var(--yel);width:64px;height:64px;border-radius:16px;display:grid;place-items:center}
+.st2:nth-child(2) i{background:var(--min)}
+.st2 b{display:block;font:700 34px/1.15 var(--h);font-size:44px;color:var(--chalk)}
+.st2 span{font:400 28px/1.3 var(--f);color:rgba(245,240,230,.85)}
+/* 21 · күту уақыты */
+.wait{display:flex;align-items:center;gap:34px;margin:6px 0 26px}
+.ring{width:190px;height:190px;position:relative;flex:none}
+.ring svg{width:190px;height:190px;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:12}
+.ring .bg{stroke:rgba(245,240,230,.14)}
+.ring .fg{stroke:var(--yel);stroke-linecap:round}
+.ring b{position:absolute;inset:0;display:grid;place-items:center;text-align:center;font:800 86px/1 var(--f);color:var(--chalk)}
+.wait .q{font:700 50px/1.1 var(--h);color:var(--chalk)}
+/* 22 · диалог */
+.dialog{display:grid;gap:18px;margin:4px 0 6px}
+.bub{position:relative;padding:20px 28px 22px;border-radius:26px;max-width:600px}
+.bub small{display:block;font:600 26px/1 var(--f);letter-spacing:.06em;margin-bottom:8px;opacity:.8}
+.bub span{font:700 50px/1.08 var(--h)}
+.bub.kid{background:rgba(242,139,108,.18);box-shadow:inset 0 0 0 2px rgba(242,139,108,.55);color:var(--cor);justify-self:start}
+.bub.tch{background:rgba(143,211,182,.16);box-shadow:inset 0 0 0 2px rgba(143,211,182,.55);color:var(--min);justify-self:end}
+/* 25 · төрт жол */
+.ways{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:12px}
+.way{padding:22px 24px 24px;border-radius:24px;background:rgba(245,240,230,.06);box-shadow:inset 0 0 0 1.5px rgba(245,240,230,.1);min-height:190px}
+.way b{display:block;font:700 34px/1.1 var(--f);color:var(--yel);margin-bottom:10px}
+.way:nth-child(2) b{color:var(--cor)}
+.way:nth-child(3) b{color:var(--min)}
+.way:nth-child(4) b{color:var(--chalk)}
+.way span{font:700 42px/1.1 var(--h);color:var(--chalk)}
+.way .slot{display:block;height:96px;margin-top:8px}
+/* 28 · құндылықтар */
+.values{display:grid;gap:12px;margin-top:8px}
+.val{display:grid;grid-template-columns:76px 1fr;gap:18px;align-items:center;padding:12px 0;border-top:1.5px solid var(--line)}
+.val:first-child{border-top:none}
+.val .slot{width:64px;height:64px}
+.val b{display:block;font:700 32px/1.15 var(--f);color:var(--chalk)}
+.val span{font:700 38px/1.1 var(--h);color:var(--min)}
+/* 30 · титрлар */
+.credits-win{position:absolute;left:0;right:0;top:0;bottom:0;overflow:hidden;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 18%,#000 80%,transparent 100%);mask-image:linear-gradient(180deg,transparent 0,#000 18%,#000 80%,transparent 100%)}
+.credits{position:absolute;left:50%;top:0;width:1100px;margin-left:-550px;text-align:center;padding-top:1080px}
+.credits .ct{font:800 190px/1 var(--f);color:var(--chalk);margin-bottom:40px;white-space:nowrap}
+.credits .thx{font:700 72px/1.1 var(--h);color:var(--yel);margin-bottom:120px}
+.credits .role{font:600 28px/1.2 var(--f);letter-spacing:.18em;text-transform:uppercase;color:rgba(245,240,230,.62);margin-top:70px}
+.credits .name{display:flex;justify-content:center;align-items:center;gap:22px;font:700 60px/1.15 var(--f);color:var(--chalk);margin-top:16px}
+.credits .name .slot{width:70px;height:70px;flex:none}
+.credits .all{font:500 32px/1.4 var(--f);color:var(--min);margin-top:90px}
+.credits .fic{font:400 28px/1.4 var(--f);color:rgba(245,240,230,.7);margin-top:70px}
+.credits .srcs{font:400 26px/1.55 var(--f);color:rgba(245,240,230,.6);margin-top:60px}
+.credits .end{font:800 120px/1 var(--f);color:var(--chalk);margin:160px 0 0}
+
+/* === БӨЛІМ ЖОЛЫ (жоғарғы сол жақ) === */
+#hud{position:absolute;left:80px;top:40px;z-index:40;display:flex;align-items:center;gap:24px;pointer-events:none;color:var(--chalk);font-family:var(--f);padding:14px 26px 14px 22px;border-radius:40px;background:rgba(12,14,20,.58);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:inset 0 0 0 1.5px rgba(245,240,230,.1);transition:opacity .6s}
+#hud .segs{display:flex;gap:9px;align-items:center}
+#hud .segs i{display:block;width:26px;height:5px;border-radius:3px;background:rgba(245,240,230,.32);transition:all .6s cubic-bezier(.2,.8,.2,1)}
+#hud .segs i.past{background:rgba(245,240,230,.7)}
+#hud .segs i.on{width:66px;background:var(--yel)}
+#hud .act{font:700 26px/1 var(--f);letter-spacing:.16em;text-transform:uppercase}
+#hud .q{font:700 34px/1 var(--h);color:var(--yel)}
+#hud{text-shadow:0 2px 12px rgba(0,0,0,.45)}
+#hud.off{opacity:0}
+
+/* === СЛАЙДТАН СЛАЙДҚА КӨШЕТІН ДЕТАЛЬДАР === */
+#props{position:absolute;inset:0;z-index:30;pointer-events:none}
+.prop{position:absolute;left:0;top:0;transform-origin:50% 50%;opacity:0;will-change:transform,opacity}
+.prop svg{display:block;width:100%;height:100%;overflow:visible}
+#p-x{width:200px;height:200px}
+#p-x b{display:grid;place-items:center;width:100%;height:100%;font:700 250px/1 var(--h);color:var(--yel);transform:translateY(-6%);text-shadow:0 6px 22px rgba(10,12,18,.45)}
+#p-eq{width:200px;height:200px}
+#p-card{width:150px;height:200px}
+#p-c,#p-t,#p-s{width:140px;height:140px}
+#p-nl{width:1400px;height:170px}
+#leaders{position:absolute;inset:0;z-index:29;pointer-events:none;overflow:visible}
+#leaders path{fill:none;stroke:var(--chalk);stroke-width:3;stroke-linecap:round;stroke-dasharray:2 9;opacity:.85}
+#leaders circle{fill:none;stroke:var(--yel);stroke-width:3.5}
+
+/* === ЖҮКТЕЛУ ЭКРАНЫ === */
+#loader{position:fixed;inset:0;z-index:2000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:#0B0E14;color:#F5F0E6;transition:opacity .8s ease}
+#loader b{font:800 120px/1 'Rubik',sans-serif;letter-spacing:-.02em}
+#loader span{font:700 34px/1 'Caveat',cursive;color:#F4C95D;animation:ldp 1.6s ease-in-out infinite alternate}
+#loader.done{opacity:0;pointer-events:none}
+@keyframes ldp{from{opacity:.35}to{opacity:1}}
+body.static #loader{display:none}
+/* === СПИКЕР ЖАЗБАЛАРЫ, РЕДАКЦИЯ === */
+#notes{position:fixed;left:24px;right:24px;bottom:20px;z-index:1200;display:none;padding:18px 24px;border-radius:16px;background:rgba(12,14,20,.94);color:#F5F0E6;font:400 18px/1.5 'Rubik',sans-serif;box-shadow:0 10px 40px rgba(0,0,0,.5);max-height:38vh;overflow:auto}
+#notes.on{display:block}
+#notes b{color:#F4C95D}
+.edit-hotzone{position:fixed;top:0;left:0;width:80px;height:80px;z-index:10000;cursor:pointer}
+.edit-toggle{position:fixed;top:16px;left:16px;z-index:10001;width:46px;height:46px;border-radius:14px;border:0;background:#F4C95D;color:#12161F;font:700 20px/1 'Rubik',sans-serif;opacity:0;pointer-events:none;transition:opacity .3s ease;cursor:pointer}
+.edit-toggle.show,.edit-toggle.active{opacity:1;pointer-events:auto}
+body.editing [data-edit]{outline:2px dashed rgba(244,201,93,.6);outline-offset:6px;cursor:text}
+.toast{position:fixed;right:24px;top:20px;z-index:10002;padding:12px 18px;border-radius:12px;background:#F4C95D;color:#12161F;font:600 16px/1.2 'Rubik',sans-serif;opacity:0;transition:opacity .3s}
+.toast.on{opacity:1}
+
+@media (prefers-reduced-motion:reduce){#hud .segs i{transition:none}}
+body.static *{transition:none!important}

@@ -1,0 +1,502 @@
+{
+ "collected": "2026-11-22",
+ "method": {
+  "youtube": "YouTube іздеуі қаралым саны бойынша сұрыпталды (powerpoint animation · powerpoint morph transition · presentation animation tutorial). Әр видеоның метадерегі, storyboard кадрлары және maxres кадрлары yt-dlp арқылы алынды.",
+  "instagram": "Instagram-да лайк бойынша жалпы іздеу жоқ. Үміткер reels Pinterest түйреуіштері мен веб-іздеу арқылы табылды, лайк саны yt-dlp арқылы әр reel-дің өз бетінен алынды. Видеолар жүктеліп, 1,2–1,5 кадр/с жиілікпен қаралды."
+ },
+ "youtube": [
+  {
+   "platform": "YouTube",
+   "id": "mO7yyvJDDEU",
+   "url": "https://www.youtube.com/watch?v=mO7yyvJDDEU",
+   "creator": "fastppt_",
+   "title": "Morph PowerPoint tutorial #powerpoint #tutorial",
+   "views": 34687322,
+   "likes": 1986620,
+   "duration": 49,
+   "date": "20230928",
+   "technique": "Көкжидек PNG көшірмелері әртүрлі өлшемде, үлкендері бұлыңғыр (тереңдік). Келесі слайдта топтар әртүрлі қашықтыққа көтеріледі → Morph параллакс.",
+   "combos": [
+    "parallaxDepth"
+   ]
+  },
+  {
+   "platform": "YouTube",
+   "id": "DPzukVw07-o",
+   "url": "https://www.youtube.com/watch?v=DPzukVw07-o",
+   "creator": "Luis Urrutia",
+   "title": "Easy PowerPoint Presentation Idea 💡🤗 #powerpoint #viral",
+   "views": 20932635,
+   "likes": 1176401,
+   "duration": 33,
+   "date": "20231102",
+   "technique": "Портрет + «FRIDA KAHLO» мәтіні Merge Shapes арқылы суретке «тесік» болады; Fly In анимациясы.",
+   "combos": [
+    "textMaskFill",
+    "knockoutZoom"
+   ]
+  },
+  {
+   "platform": "YouTube",
+   "id": "6XCrMQea2Y0",
+   "url": "https://www.youtube.com/watch?v=6XCrMQea2Y0",
+   "creator": "Jacobppt",
+   "title": "PowerPoint Tutorial For Beginners!✨",
+   "views": 17967969,
+   "likes": 581852,
+   "duration": 46,
+   "date": "20240816",
+   "technique": "«CHINA» мәтіні ақ тіктөртбұрыштан қиылады (Subtract); көшірме слайдта тіктөртбұрыш алып үлкейеді → Morph әріп ішінен суретке ұшып кіреді.",
+   "combos": [
+    "knockoutZoom"
+   ]
+  },
+  {
+   "platform": "YouTube",
+   "id": "MkMtfLZ7IFE",
+   "url": "https://www.youtube.com/watch?v=MkMtfLZ7IFE",
+   "creator": "Luis Urrutia",
+   "title": "Easy Power Point Trick to make a stunning presentation 😍 #powerpoint",
+   "views": 16155697,
+   "likes": 715130,
+   "duration": 42,
+   "date": "20240117",
+   "technique": "«VAN GOGH» + тіктөртбұрыш Combine, градиент мөлдірлік → портрет мәтінге ағып кіреді; Fly In.",
+   "combos": [
+    "textMaskFill"
+   ]
+  },
+  {
+   "platform": "YouTube",
+   "id": "eldhDbYBDoE",
+   "url": "https://www.youtube.com/watch?v=eldhDbYBDoE",
+   "creator": "Luis Urrutia",
+   "title": "Professional SLIDE DESIGN in PowerPoint  in 31 seconds 🤯 #powerpoint #tutorial #presentation",
+   "views": 15646946,
+   "likes": 459074,
+   "duration": 31,
+   "date": "20230926",
+   "technique": "Ақ шекаралы 6×5 кесте, артында қала суреті; кейбір ұяшықтар ақ мәтін қорабы — «витраж».",
+   "combos": [
+    "gridReveal"
+   ]
+  },
+  {
+   "platform": "YouTube",
+   "id": "F2xt7o1JqNw",
+   "url": "https://www.youtube.com/watch?v=F2xt7o1JqNw",
+   "creator": "Luis Urrutia",
+   "title": "How to use the Match & Move Transition in Canva #canva #presentation",
+   "views": 15114159,
+   "likes": 735573,
+   "duration": 33,
+   "date": "20250116",
+   "technique": "Canva Match & Move: экраннан асып тұрған алып сөз бен сурет беттер арасында бірге жылжиды.",
+   "combos": [
+    "knockoutZoom",
+    "parallaxDepth"
+   ]
+  },
+  {
+   "platform": "YouTube",
+   "id": "82iJe5EfKGY",
+   "url": "https://www.youtube.com/watch?v=82iJe5EfKGY",
+   "creator": "Luis Urrutia",
+   "title": "this powerpoint tutorial saved my presentation fr 😮‍💨 #presentation #powerpoint #f1",
+   "views": 14748705,
+   "likes": 309527,
+   "duration": 29,
+   "date": "20260123",
+   "technique": "Екі дөңгелектің бірігуі — «8» пішінді контейнер; әр слайдта түс пен суреті ауысатын карточка-карусель (Morph).",
+   "combos": [
+    "shapeMorph",
+    "accordionTabs"
+   ]
+  },
+  {
+   "platform": "YouTube",
+   "id": "XiNlmV01ow4",
+   "url": "https://www.youtube.com/watch?v=XiNlmV01ow4",
+   "creator": "Luis Urrutia",
+   "title": "PowerPoint before and after ✨ #powerpoint #presentation #students",
+   "views": 14066093,
+   "likes": 794130,
+   "duration": 12,
+   "date": "20240320",
+   "technique": "«Бұрын/қазір» ілмегі: жай уақыт сызығы → кинематографиялық «The Roman Empire»: бұлттар, серифті тақырып, нүктелі уақыт сызығы.",
+   "combos": [
+    "cinematicClouds",
+    "timelineDot"
+   ]
+  },
+  {
+   "platform": "YouTube",
+   "id": "Vn_bR1AlV-s",
+   "url": "https://www.youtube.com/watch?v=Vn_bR1AlV-s",
+   "creator": "PowerPoint School",
+   "title": "Animated PowerPoint Slide Design Tutorial",
+   "views": 12642821,
+   "likes": 244166,
+   "duration": 377,
+   "date": "20171114",
+   "technique": "Кітап бетбелгілері сияқты D-C-B-A түрлі түсті бүйір табтар; Morph арқылы бір таб ашылып, инфографика көрсетеді.",
+   "combos": [
+    "accordionTabs"
+   ]
+  },
+  {
+   "platform": "YouTube",
+   "id": "Gjev8RkqO1k",
+   "url": "https://www.youtube.com/watch?v=Gjev8RkqO1k",
+   "creator": "PowerPoint School",
+   "title": "Make Animated PowerPoint Slide",
+   "views": 11513428,
+   "likes": 264368,
+   "duration": 628,
+   "date": "20180510",
+   "technique": "Оң жиектегі жарты шеңбер-табтар (follow · tweets · share) ашылып мазмұнға айналады; уақыт сызығы белгілері.",
+   "combos": [
+    "accordionTabs",
+    "hubZoom"
+   ]
+  },
+  {
+   "platform": "YouTube",
+   "id": "BJ4ePOMaL6o",
+   "url": "https://www.youtube.com/watch?v=BJ4ePOMaL6o",
+   "creator": "Slides by Sander",
+   "title": "🔥 PRO Animated PowerPoint - Easy tutorial",
+   "views": 9922990,
+   "likes": 432296,
+   "duration": 58,
+   "date": "20231018",
+   "technique": "A-B-C-D көк градиент панельдер, үшбұрыш таб; Morph әр панельді кезекпен кеңейтеді.",
+   "combos": [
+    "accordionTabs"
+   ]
+  },
+  {
+   "platform": "YouTube",
+   "id": "fBp2iSx4RlY",
+   "url": "https://www.youtube.com/watch?v=fBp2iSx4RlY",
+   "creator": "Slides by Sander",
+   "title": "CREATIVE 🔥 Animated PowerPoint Title Slide 🔥",
+   "views": 9463534,
+   "likes": 346565,
+   "duration": 54,
+   "date": "20230627",
+   "technique": "«ROME» әрпі арқылы Колизей; келесі слайдта әріп ішіне зум, сурет толық ашылады.",
+   "combos": [
+    "knockoutZoom"
+   ]
+  },
+  {
+   "platform": "YouTube",
+   "id": "eog6CwB5wUs",
+   "url": "https://www.youtube.com/watch?v=eog6CwB5wUs",
+   "creator": "One Skill PPT",
+   "title": "PowerPoint Slide Zoom Tutorial 🔥Free Template🔥",
+   "views": 6825129,
+   "likes": 141723,
+   "duration": 1458,
+   "date": "20201222",
+   "technique": "Slide Zoom хабы: орман фонында шеңбер белгішелер (Opportunity, Market, Solution, Business model) — басқанда бөлімге кіріп, қайта шығады.",
+   "combos": [
+    "hubZoom"
+   ]
+  },
+  {
+   "platform": "YouTube",
+   "id": "nzH4KPz_cIs",
+   "url": "https://www.youtube.com/watch?v=nzH4KPz_cIs",
+   "creator": "Leila Gharani",
+   "title": "3 Cool Effects You Did NOT Think are Possible in PowerPoint | Morph",
+   "views": 6816239,
+   "likes": 212635,
+   "duration": 676,
+   "date": "20210413",
+   "technique": "Үш Morph эффект: суреттің детальына зум; Morph & Crop — сұр топтық фотода адамдарды кезекпен «прожектормен» бөлу; белгішелі уақыт сызығы.",
+   "combos": [
+    "spotlightCrop",
+    "timelineDot",
+    "frameZoom"
+   ]
+  },
+  {
+   "platform": "YouTube",
+   "id": "uHGtf4NFSWA",
+   "url": "https://www.youtube.com/watch?v=uHGtf4NFSWA",
+   "creator": "Tony PowerPoint",
+   "title": "Numbers animation in PowerPoint  #ppt  #presentation",
+   "views": 6016763,
+   "likes": 367259,
+   "duration": 55,
+   "date": "20231030",
+   "technique": "0–9 цифр бағаналары маска артында; Morph бағаналарды жылжытып жылдарды «айналдырады» (BCE 10000 → 2000 → 1804 → 1908).",
+   "combos": [
+    "odometer"
+   ]
+  },
+  {
+   "platform": "YouTube",
+   "id": "T3gf6MlkcbE",
+   "url": "https://www.youtube.com/watch?v=T3gf6MlkcbE",
+   "creator": "Luis Urrutia",
+   "title": "How I created these VIRAL POWERPOINTS 🥵🥵🥵",
+   "views": 4793471,
+   "likes": 93617,
+   "duration": 455,
+   "date": "20230219",
+   "technique": "Үш вирустық слайд: суреті бар қиғаш параллелограмдар (Сидней), жапырақтар рамасы қозғалатын Вьетнам, қараңғы бағаналы Ұлы Қытай қорғаны.",
+   "combos": [
+    "diagonalStripes",
+    "parallaxDepth"
+   ]
+  },
+  {
+   "platform": "YouTube",
+   "id": "aQlTPUvVH5E",
+   "url": "https://www.youtube.com/watch?v=aQlTPUvVH5E",
+   "creator": "Luis Urrutia",
+   "title": "Cinematic presentations in POWERPOINT 🤯 Step-by-step",
+   "views": 3165345,
+   "likes": 81412,
+   "duration": 657,
+   "date": "20240322",
+   "technique": "Кинематографиялық Рим: картина фоны, екі жақтағы бұлт PNG-лері Morph-пен ашылады, серифті тақырып, жылдары бар нүктелі уақыт сызығы.",
+   "combos": [
+    "cinematicClouds",
+    "timelineDot"
+   ]
+  }
+ ],
+ "instagram": [
+  {
+   "platform": "Instagram",
+   "id": "Dd8SU_DArOK",
+   "url": "https://www.instagram.com/reel/Dd8SU_DArOK/",
+   "creator": "Mix Slides",
+   "title": "bro did NOT make this🥀 #powerpoint #presentation #school #history #ww1",
+   "views": null,
+   "likes": 1946404,
+   "comments": 5350,
+   "date": "20261001",
+   "technique": "Сыныптағы теледидар: қағаз ұшақтар аспанмен ұшады, «The First World War» тақырыбы қызыл карта бойымен жылжиды, жыртық қағаздағы фото, жалаулар стикер болып түседі.",
+   "combos": [
+    "flyby",
+    "tornPaper",
+    "squashDrop"
+   ]
+  },
+  {
+   "platform": "Instagram",
+   "id": "C2MnMPXPkFw",
+   "url": "https://www.instagram.com/reel/C2MnMPXPkFw/",
+   "creator": "Luis Urrutia",
+   "title": "Follow @lourrutiappt 👈🏼 for more Power Point Tricks😍 #powerpoint #design #powerpointtutori",
+   "views": null,
+   "likes": 1754163,
+   "comments": 2146,
+   "date": "20240117",
+   "technique": "Видео тіркелусіз ашылмады — тек сипаттамасы мен лайк саны алынды.",
+   "combos": []
+  },
+  {
+   "platform": "Instagram",
+   "id": "CowxXpSvIoE",
+   "url": "https://www.instagram.com/reel/CowxXpSvIoE/",
+   "creator": "Luis Urrutia",
+   "title": "You must follow me to level up your presentations!! 🥵🥵🥵 #powerpoint #tutorial #presentatio",
+   "views": null,
+   "likes": 371875,
+   "comments": 628,
+   "date": "20230217",
+   "technique": "Бразилия туының түстеріндегі 5 тік жолақ + бөлім атаулары; бірінші жолақта сурет; Morph топты солға жылжытып, жолақтарды кезекпен ашады.",
+   "combos": [
+    "accordionTabs"
+   ]
+  },
+  {
+   "platform": "Instagram",
+   "id": "CuUv7EiLeWN",
+   "url": "https://www.instagram.com/reel/CuUv7EiLeWN/",
+   "creator": "The PowerPoint Guy",
+   "title": "STOP making boring PowerPoint slides🥱‼️  #powerpoint #presentation #excel #studygram",
+   "views": null,
+   "likes": 215950,
+   "comments": 253,
+   "date": "20230705",
+   "technique": "Алтыбұрыштар торы қызғылт сары тіктөртбұрыштан қиылады (Subtract); артында жолбарыс видеосы ойнайды.",
+   "combos": [
+    "mosaicMask"
+   ]
+  },
+  {
+   "platform": "Instagram",
+   "id": "CxpzS5dBQG7",
+   "url": "https://www.instagram.com/reel/CxpzS5dBQG7/",
+   "creator": "Luis Urrutia",
+   "title": "Follow @lourrutiappt 👈🏼 for PowerPoint Tutorials and Templates 🤗 #powerpoint #design #pres",
+   "views": null,
+   "likes": 134504,
+   "comments": 108,
+   "date": "20230926",
+   "technique": "Кесте-витраж тәсілі (түнгі қала): ақ шекаралы кесте, кейбір ұяшықтар мәтін қорабы.",
+   "combos": [
+    "gridReveal"
+   ]
+  },
+  {
+   "platform": "Instagram",
+   "id": "CneqAPDBN38",
+   "url": "https://www.instagram.com/reel/CneqAPDBN38/",
+   "creator": "The PowerPoint Guy",
+   "title": "This is a great feature to start off your next PowerPoint presentation with✨  Change the v",
+   "views": null,
+   "likes": 81561,
+   "comments": 116,
+   "date": "20230116",
+   "technique": "«NATURE» мәтіні ішінде видео (Intersect), градиент фон.",
+   "combos": [
+    "textMaskFill"
+   ]
+  },
+  {
+   "platform": "Instagram",
+   "id": "Cwk3mvkBhgo",
+   "url": "https://www.instagram.com/reel/Cwk3mvkBhgo/",
+   "creator": "The PowerPoint Guy",
+   "title": "10x your PowerPoint presentations this semester with this trick✨‼️  Do you want to see mor",
+   "views": null,
+   "likes": 57572,
+   "comments": 61,
+   "date": "20230830",
+   "technique": "«DUBAI»: сары тіктөртбұрыштан мәтін қиылады; көшірмеде тіктөртбұрыш алып үлкейеді → әріп ішінен суретке Morph.",
+   "combos": [
+    "knockoutZoom"
+   ]
+  },
+  {
+   "platform": "Instagram",
+   "id": "DA8J1K1vFK_",
+   "url": "https://www.instagram.com/reel/DA8J1K1vFK_/",
+   "creator": "Luis Urrutia",
+   "title": "I wish I knew this before! 😮‍💨 #powerpoint #presentation #studygram #student",
+   "views": null,
+   "likes": 47999,
+   "comments": 57,
+   "date": "20241010",
+   "technique": "Донат-сақина, сегменттері белгішелі, ортасында фото; Morph сақинаны бұрып келесі бөлімге өтеді (Pumpkins · Costumes · Candy).",
+   "combos": [
+    "wheelMenu"
+   ]
+  },
+  {
+   "platform": "Instagram",
+   "id": "C_LGiAIAnE-",
+   "url": "https://www.instagram.com/reel/C_LGiAIAnE-/",
+   "creator": "The PowerPoint Guy",
+   "title": "Learn the PowerPoint morph transition in 40 seconds✨",
+   "views": null,
+   "likes": 33339,
+   "comments": 8956,
+   "date": "20240827",
+   "technique": "3D ұшақ моделі кадрдан тыс шығарылып, бұрылады; Morph ұшып кіру/шығуды жасайды.",
+   "combos": [
+    "flyby"
+   ]
+  },
+  {
+   "platform": "Instagram",
+   "id": "Dfw2CYuoX3f",
+   "url": "https://www.instagram.com/reel/Dfw2CYuoX3f/",
+   "creator": "Yerassyl | Presentation Designer",
+   "title": "The Link to download all the Templates is in the Bio✨ #powerpoint #presentation #template",
+   "views": null,
+   "likes": 32709,
+   "comments": 55,
+   "date": "20261115",
+   "technique": "Ван Гог: рамалы картинаның ішіне зум, жұлдызды аспан фоны, есік-рамалар, прожекторлы галерея қабырғасы, ұшып келетін картиналар.",
+   "combos": [
+    "frameZoom",
+    "parallaxDepth"
+   ]
+  },
+  {
+   "platform": "Instagram",
+   "id": "DABDQ5pP_9Z",
+   "url": "https://www.instagram.com/reel/DABDQ5pP_9Z/",
+   "creator": "Luis Urrutia",
+   "title": "10x your PowerPoint Presentation in only 33 seconds 🤓 #powerpoint #presentation #student #",
+   "views": null,
+   "likes": 10534,
+   "comments": 19,
+   "date": "20240917",
+   "technique": "Маркерлі тізім → 4 түсті тік панель нөмірімен; әр панель төменнен Fly In (On Click).",
+   "combos": [
+    "accordionTabs"
+   ]
+  },
+  {
+   "platform": "Instagram",
+   "id": "DBV0qVwPmrJ",
+   "url": "https://www.instagram.com/reel/DBV0qVwPmrJ/",
+   "creator": "Luis Urrutia",
+   "title": "You won't believe the result... 😨 #powerpoint #presentation #studygram #study",
+   "views": null,
+   "likes": 10048,
+   "comments": 21,
+   "date": "20241020",
+   "technique": "Үшбұрыштар мозаикасы (Merge Shapes · Fragment/Intersect), артында видео автоматты ойнайды; «Pop culture».",
+   "combos": [
+    "mosaicMask"
+   ]
+  },
+  {
+   "platform": "Instagram",
+   "id": "C2w1229tOeT",
+   "url": "https://www.instagram.com/reel/C2w1229tOeT/",
+   "creator": "ClassPoint",
+   "title": "Running out of ideas on how you can animate your PowerPoint slides? Here's a quick Morph d",
+   "views": null,
+   "likes": 5427,
+   "comments": 11,
+   "date": "20240131",
+   "technique": "45° бұрылған дөңгеленген шаршы-фото әр слайдта орнын, өлшемін, бұрышын өзгертеді (Morph); Picture fill «rotate with shape» өшірілген.",
+   "combos": [
+    "shapeMorph"
+   ]
+  },
+  {
+   "platform": "Instagram",
+   "id": "C0l1cQCrsVN",
+   "url": "https://www.instagram.com/reel/C0l1cQCrsVN/",
+   "creator": "なおたろ｜パソコン＆スマホ便利術",
+   "title": "パワポでこのスライドを作る方法！  【手順】 ①パワーポイントで画像を挿入 ②すべての画像を1対1にトリミング ③画像を動画のように間隔を開けて並べる ④図形を画像に重なるように追",
+   "views": null,
+   "likes": 2101,
+   "comments": 6,
+   "date": "20231208",
+   "technique": "Сипаттамасы бойынша: суреттер 1:1 кесіліп, фильм таспасы сияқты тізіледі (видеосы жүктелмеді).",
+   "combos": [
+    "conveyorCounter"
+   ]
+  },
+  {
+   "platform": "Instagram",
+   "id": "CyLO-OYPqiD",
+   "url": "https://www.instagram.com/reel/CyLO-OYPqiD/",
+   "creator": "Canva",
+   "title": "Need a presentation makeover? Look no further! Introducing the Match and Move transition t",
+   "views": null,
+   "likes": 1297,
+   "comments": 51,
+   "date": "20231009",
+   "technique": "Canva: цифр бағаналары + маска-тіктөртбұрыштар → анимацияланған санауыш; сурет пен мәтін жұптарының тік «конвейері»; Match & Move.",
+   "combos": [
+    "odometer",
+    "conveyorCounter"
+   ]
+  }
+ ]
+}

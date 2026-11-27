@@ -1,0 +1,74 @@
+# Презентация анимациясы: не вирусқа айналды және неге
+
+Жиналған күні: 22.11.2026. Барлығы **17 YouTube видео** және **15 Instagram reel** қаралды.
+
+## Қалай жиналды
+
+- **YouTube.** YouTube іздеуі қаралым саны бойынша сұрыпталды (powerpoint animation · powerpoint morph transition · presentation animation tutorial). Әр видеоның метадерегі, storyboard кадрлары және maxres кадрлары yt-dlp арқылы алынды.
+- **Instagram.** Instagram-да лайк бойынша жалпы іздеу жоқ. Үміткер reels Pinterest түйреуіштері мен веб-іздеу арқылы табылды, лайк саны yt-dlp арқылы әр reel-дің өз бетінен алынды. Видеолар жүктеліп, 1,2–1,5 кадр/с жиілікпен қаралды.
+- **Сандар.** Қаралым мен лайк — жиналған күнгі мән. Instagram қаралым санын тіркелусіз бермейді, сондықтан reels лайк бойынша реттелген.
+- **Авторлық құқық.** Видео кадрлары репозиторийге салынбады: тек сілтеме мен тәсілдің сипаттамасы бар. Комболар — тәсілдің өз іске асыруымыз, суреттері — x ≠ 0 презентациясының 3D рендерлері.
+
+## YouTube: ең көп қаралғандар
+
+| # | Видео | Автор | Қаралым | ♥ | Ұзақтығы | Тәсіл | Біздің комбо |
+|---|---|---|---|---|---|---|---|
+| 1 | [Morph PowerPoint tutorial #powerpoint #tutorial](https://www.youtube.com/watch?v=mO7yyvJDDEU) | fastppt_ | 34,7 млн | 2,0 млн | 0:49 | Көкжидек PNG көшірмелері әртүрлі өлшемде, үлкендері бұлыңғыр (тереңдік). Келесі слайдта топтар әртүрлі қашықтыққа көтеріледі → Morph параллакс. | [Тереңдік қабаттары](COMBOS.md#parallaxdepth) |
+| 2 | [Easy PowerPoint Presentation Idea 💡🤗 #powerpoint #viral](https://www.youtube.com/watch?v=DPzukVw07-o) | Luis Urrutia | 20,9 млн | 1,2 млн | 0:33 | Портрет + «FRIDA KAHLO» мәтіні Merge Shapes арқылы суретке «тесік» болады; Fly In анимациясы. | [Контур → суретпен толу](COMBOS.md#textmaskfill), [Мәтін-терезе → әріптің ішіне зум](COMBOS.md#knockoutzoom) |
+| 3 | [PowerPoint Tutorial For Beginners!✨](https://www.youtube.com/watch?v=6XCrMQea2Y0) | Jacobppt | 18,0 млн | 581,9 мың | 0:46 | «CHINA» мәтіні ақ тіктөртбұрыштан қиылады (Subtract); көшірме слайдта тіктөртбұрыш алып үлкейеді → Morph әріп ішінен суретке ұшып кіреді. | [Мәтін-терезе → әріптің ішіне зум](COMBOS.md#knockoutzoom) |
+| 4 | [Easy Power Point Trick to make a stunning presentation 😍 #po](https://www.youtube.com/watch?v=MkMtfLZ7IFE) | Luis Urrutia | 16,2 млн | 715,1 мың | 0:42 | «VAN GOGH» + тіктөртбұрыш Combine, градиент мөлдірлік → портрет мәтінге ағып кіреді; Fly In. | [Контур → суретпен толу](COMBOS.md#textmaskfill) |
+| 5 | [Professional SLIDE DESIGN in PowerPoint  in 31 seconds 🤯 #po](https://www.youtube.com/watch?v=eldhDbYBDoE) | Luis Urrutia | 15,6 млн | 459,1 мың | 0:31 | Ақ шекаралы 6×5 кесте, артында қала суреті; кейбір ұяшықтар ақ мәтін қорабы — «витраж». | [Кесте-витраж](COMBOS.md#gridreveal) |
+| 6 | [How to use the Match & Move Transition in Canva #canva #pres](https://www.youtube.com/watch?v=F2xt7o1JqNw) | Luis Urrutia | 15,1 млн | 735,6 мың | 0:33 | Canva Match & Move: экраннан асып тұрған алып сөз бен сурет беттер арасында бірге жылжиды. | [Мәтін-терезе → әріптің ішіне зум](COMBOS.md#knockoutzoom), [Тереңдік қабаттары](COMBOS.md#parallaxdepth) |
+| 7 | [this powerpoint tutorial saved my presentation fr 😮‍💨 #prese](https://www.youtube.com/watch?v=82iJe5EfKGY) | Luis Urrutia | 14,7 млн | 309,5 мың | 0:29 | Екі дөңгелектің бірігуі — «8» пішінді контейнер; әр слайдта түс пен суреті ауысатын карточка-карусель (Morph). | [Пішіннің өзгеруі](COMBOS.md#shapemorph), [Бетбелгі-аккордеон](COMBOS.md#accordiontabs) |
+| 8 | [PowerPoint before and after ✨ #powerpoint #presentation #stu](https://www.youtube.com/watch?v=XiNlmV01ow4) | Luis Urrutia | 14,1 млн | 794,1 мың | 0:12 | «Бұрын/қазір» ілмегі: жай уақыт сызығы → кинематографиялық «The Roman Empire»: бұлттар, серифті тақырып, нүктелі уақыт сызығы. | [Кино атмосферасы](COMBOS.md#cinematicclouds), [Уақыт сызығы](COMBOS.md#timelinedot) |
+| 9 | [Animated PowerPoint Slide Design Tutorial](https://www.youtube.com/watch?v=Vn_bR1AlV-s) | PowerPoint School | 12,6 млн | 244,2 мың | 6:17 | Кітап бетбелгілері сияқты D-C-B-A түрлі түсті бүйір табтар; Morph арқылы бір таб ашылып, инфографика көрсетеді. | [Бетбелгі-аккордеон](COMBOS.md#accordiontabs) |
+| 10 | [Make Animated PowerPoint Slide](https://www.youtube.com/watch?v=Gjev8RkqO1k) | PowerPoint School | 11,5 млн | 264,4 мың | 10:28 | Оң жиектегі жарты шеңбер-табтар (follow · tweets · share) ашылып мазмұнға айналады; уақыт сызығы белгілері. | [Бетбелгі-аккордеон](COMBOS.md#accordiontabs), [Хаб: шеңберден ішке кіру](COMBOS.md#hubzoom) |
+| 11 | [🔥 PRO Animated PowerPoint - Easy tutorial](https://www.youtube.com/watch?v=BJ4ePOMaL6o) | Slides by Sander | 9,9 млн | 432,3 мың | 0:58 | A-B-C-D көк градиент панельдер, үшбұрыш таб; Morph әр панельді кезекпен кеңейтеді. | [Бетбелгі-аккордеон](COMBOS.md#accordiontabs) |
+| 12 | [CREATIVE 🔥 Animated PowerPoint Title Slide 🔥](https://www.youtube.com/watch?v=fBp2iSx4RlY) | Slides by Sander | 9,5 млн | 346,6 мың | 0:54 | «ROME» әрпі арқылы Колизей; келесі слайдта әріп ішіне зум, сурет толық ашылады. | [Мәтін-терезе → әріптің ішіне зум](COMBOS.md#knockoutzoom) |
+| 13 | [PowerPoint Slide Zoom Tutorial 🔥Free Template🔥](https://www.youtube.com/watch?v=eog6CwB5wUs) | One Skill PPT | 6,8 млн | 141,7 мың | 24:18 | Slide Zoom хабы: орман фонында шеңбер белгішелер (Opportunity, Market, Solution, Business model) — басқанда бөлімге кіріп, қайта шығады. | [Хаб: шеңберден ішке кіру](COMBOS.md#hubzoom) |
+| 14 | [3 Cool Effects You Did NOT Think are Possible in PowerPoint ](https://www.youtube.com/watch?v=nzH4KPz_cIs) | Leila Gharani | 6,8 млн | 212,6 мың | 11:16 | Үш Morph эффект: суреттің детальына зум; Morph & Crop — сұр топтық фотода адамдарды кезекпен «прожектормен» бөлу; белгішелі уақыт сызығы. | [Прожектор](COMBOS.md#spotlightcrop), [Уақыт сызығы](COMBOS.md#timelinedot), [Сурет рамасының ішіне](COMBOS.md#framezoom) |
+| 15 | [Numbers animation in PowerPoint  #ppt  #presentation](https://www.youtube.com/watch?v=uHGtf4NFSWA) | Tony PowerPoint | 6,0 млн | 367,3 мың | 0:55 | 0–9 цифр бағаналары маска артында; Morph бағаналарды жылжытып жылдарды «айналдырады» (BCE 10000 → 2000 → 1804 → 1908). | [Санауыш-барабан](COMBOS.md#odometer) |
+| 16 | [How I created these VIRAL POWERPOINTS 🥵🥵🥵](https://www.youtube.com/watch?v=T3gf6MlkcbE) | Luis Urrutia | 4,8 млн | 93,6 мың | 7:35 | Үш вирустық слайд: суреті бар қиғаш параллелограмдар (Сидней), жапырақтар рамасы қозғалатын Вьетнам, қараңғы бағаналы Ұлы Қытай қорғаны. | [Қиғаш жолақтар](COMBOS.md#diagonalstripes), [Тереңдік қабаттары](COMBOS.md#parallaxdepth) |
+| 17 | [Cinematic presentations in POWERPOINT 🤯 Step-by-step](https://www.youtube.com/watch?v=aQlTPUvVH5E) | Luis Urrutia | 3,2 млн | 81,4 мың | 10:57 | Кинематографиялық Рим: картина фоны, екі жақтағы бұлт PNG-лері Morph-пен ашылады, серифті тақырып, жылдары бар нүктелі уақыт сызығы. | [Кино атмосферасы](COMBOS.md#cinematicclouds), [Уақыт сызығы](COMBOS.md#timelinedot) |
+
+## Instagram: ең көп лайк жинағандар
+
+| # | Reel | Автор | ♥ | Күні | Тәсіл | Біздің комбо |
+|---|---|---|---|---|---|---|
+| 1 | [bro did NOT make this🥀 #powerpoint #presentation #](https://www.instagram.com/reel/Dd8SU_DArOK/) | Mix Slides | 1,9 млн | 01.10.2026 | Сыныптағы теледидар: қағаз ұшақтар аспанмен ұшады, «The First World War» тақырыбы қызыл карта бойымен жылжиды, жыртық қағаздағы фото, жалаулар стикер болып түседі. | [Ұшақ ұшып өтеді](COMBOS.md#flyby), [Жыртылған қағаз](COMBOS.md#tornpaper), [Секіріп түсу](COMBOS.md#squashdrop) |
+| 2 | [Follow @lourrutiappt 👈🏼 for more Power Point Trick](https://www.instagram.com/reel/C2MnMPXPkFw/) | Luis Urrutia | 1,8 млн | 17.01.2024 | Видео тіркелусіз ашылмады — тек сипаттамасы мен лайк саны алынды. | — |
+| 3 | [You must follow me to level up your presentations!](https://www.instagram.com/reel/CowxXpSvIoE/) | Luis Urrutia | 371,9 мың | 17.02.2023 | Бразилия туының түстеріндегі 5 тік жолақ + бөлім атаулары; бірінші жолақта сурет; Morph топты солға жылжытып, жолақтарды кезекпен ашады. | [Бетбелгі-аккордеон](COMBOS.md#accordiontabs) |
+| 4 | [STOP making boring PowerPoint slides🥱‼️  #powerpoi](https://www.instagram.com/reel/CuUv7EiLeWN/) | The PowerPoint Guy | 215,9 мың | 05.07.2023 | Алтыбұрыштар торы қызғылт сары тіктөртбұрыштан қиылады (Subtract); артында жолбарыс видеосы ойнайды. | [Ұяшықты маска](COMBOS.md#mosaicmask) |
+| 5 | [Follow @lourrutiappt 👈🏼 for PowerPoint Tutorials a](https://www.instagram.com/reel/CxpzS5dBQG7/) | Luis Urrutia | 134,5 мың | 26.09.2023 | Кесте-витраж тәсілі (түнгі қала): ақ шекаралы кесте, кейбір ұяшықтар мәтін қорабы. | [Кесте-витраж](COMBOS.md#gridreveal) |
+| 6 | [This is a great feature to start off your next Pow](https://www.instagram.com/reel/CneqAPDBN38/) | The PowerPoint Guy | 81,6 мың | 16.01.2023 | «NATURE» мәтіні ішінде видео (Intersect), градиент фон. | [Контур → суретпен толу](COMBOS.md#textmaskfill) |
+| 7 | [10x your PowerPoint presentations this semester wi](https://www.instagram.com/reel/Cwk3mvkBhgo/) | The PowerPoint Guy | 57,6 мың | 30.08.2023 | «DUBAI»: сары тіктөртбұрыштан мәтін қиылады; көшірмеде тіктөртбұрыш алып үлкейеді → әріп ішінен суретке Morph. | [Мәтін-терезе → әріптің ішіне зум](COMBOS.md#knockoutzoom) |
+| 8 | [I wish I knew this before! 😮‍💨 #powerpoint #presen](https://www.instagram.com/reel/DA8J1K1vFK_/) | Luis Urrutia | 48,0 мың | 10.10.2024 | Донат-сақина, сегменттері белгішелі, ортасында фото; Morph сақинаны бұрып келесі бөлімге өтеді (Pumpkins · Costumes · Candy). | [Айналмалы дөңгелек](COMBOS.md#wheelmenu) |
+| 9 | [Learn the PowerPoint morph transition in 40 second](https://www.instagram.com/reel/C_LGiAIAnE-/) | The PowerPoint Guy | 33,3 мың | 27.08.2024 | 3D ұшақ моделі кадрдан тыс шығарылып, бұрылады; Morph ұшып кіру/шығуды жасайды. | [Ұшақ ұшып өтеді](COMBOS.md#flyby) |
+| 10 | [The Link to download all the Templates is in the B](https://www.instagram.com/reel/Dfw2CYuoX3f/) | Yerassyl | Presentation Designer | 32,7 мың | 15.11.2026 | Ван Гог: рамалы картинаның ішіне зум, жұлдызды аспан фоны, есік-рамалар, прожекторлы галерея қабырғасы, ұшып келетін картиналар. | [Сурет рамасының ішіне](COMBOS.md#framezoom), [Тереңдік қабаттары](COMBOS.md#parallaxdepth) |
+| 11 | [10x your PowerPoint Presentation in only 33 second](https://www.instagram.com/reel/DABDQ5pP_9Z/) | Luis Urrutia | 10,5 мың | 17.09.2024 | Маркерлі тізім → 4 түсті тік панель нөмірімен; әр панель төменнен Fly In (On Click). | [Бетбелгі-аккордеон](COMBOS.md#accordiontabs) |
+| 12 | [You won't believe the result... 😨 #powerpoint #pre](https://www.instagram.com/reel/DBV0qVwPmrJ/) | Luis Urrutia | 10,0 мың | 20.10.2024 | Үшбұрыштар мозаикасы (Merge Shapes · Fragment/Intersect), артында видео автоматты ойнайды; «Pop culture». | [Ұяшықты маска](COMBOS.md#mosaicmask) |
+| 13 | [Running out of ideas on how you can animate your P](https://www.instagram.com/reel/C2w1229tOeT/) | ClassPoint | 5,4 мың | 31.01.2024 | 45° бұрылған дөңгеленген шаршы-фото әр слайдта орнын, өлшемін, бұрышын өзгертеді (Morph); Picture fill «rotate with shape» өшірілген. | [Пішіннің өзгеруі](COMBOS.md#shapemorph) |
+| 14 | [パワポでこのスライドを作る方法！  【手順】 ①パワーポイントで画像を挿入 ②すべての画像を1対1に](https://www.instagram.com/reel/C0l1cQCrsVN/) | なおたろ｜パソコン＆スマホ便利術 | 2,1 мың | 08.12.2023 | Сипаттамасы бойынша: суреттер 1:1 кесіліп, фильм таспасы сияқты тізіледі (видеосы жүктелмеді). | [Конвейер + санауыш](COMBOS.md#conveyorcounter) |
+| 15 | [Need a presentation makeover? Look no further! Int](https://www.instagram.com/reel/CyLO-OYPqiD/) | Canva | 1,3 мың | 09.10.2023 | Canva: цифр бағаналары + маска-тіктөртбұрыштар → анимацияланған санауыш; сурет пен мәтін жұптарының тік «конвейері»; Match & Move. | [Санауыш-барабан](COMBOS.md#odometer), [Конвейер + санауыш](COMBOS.md#conveyorcounter) |
+
+## 12 заңдылық
+
+1. **Мәтін — терезе.** Алып әріптердің ішінен сурет көрінеді, келесі слайдта камера әріптің ішіне кіреді. CHINA — 18 млн, FRIDA KAHLO — 20,9 млн, VAN GOGH — 16,2 млн, ROME — 9,5 млн қаралым; DUBAI — 57,6 мың ♥, NATURE — 81,6 мың ♥. Комбо: «Мәтін-терезе», «Контур → суретпен толу».
+2. **Тереңдік қабаттары.** Бір нысанның көп көшірмесі: жақыны үлкен әрі бұлыңғыр, қабаттар әр жылдамдықпен жылжиды. Ең көп қаралған видео (34,7 млн) дәл осы тәсілге арналған. Комбо: «Тереңдік қабаттары», «Кино атмосферасы».
+3. **Бір объект — көп күй.** Барлық дерлік видеода бір нысан келесі слайдта басқа орында, өлшемде, бұрышта тұрады, ал ауысуды PowerPoint Morph өзі салады. HTML-де бұл — FLIP (anime.js `createLayout`) немесе браузердің View Transitions API-і. Комбо: «Диаграмма + қайта тізу», «Пішіннің өзгеруі».
+4. **Панельдер мен бетбелгілер.** Маркерлі тізімнің орнына түрлі түсті тік панельдер; біреуі ашылып, қалғаны тарылады. A-B-C-D — 9,9 млн, PowerPoint School — 12,6 млн, Brazil — 371,9 мың ♥. Комбо: «Бетбелгі-аккордеон», «Қиғаш жолақтар».
+5. **Маска-мозаика.** Сурет немесе видео алтыбұрыш, үшбұрыш не кесте ұяшықтары арқылы көрінеді. Tigers — 216 мың ♥, кесте тәсілі — 15,6 млн. Комбо: «Ұяшықты маска», «Кесте-витраж».
+6. **Камера кеңістікте жүреді.** Шеңбер-хаб, рамалы сурет, айналмалы мәзір — көрермен слайдтың «ішіне кіріп-шығады». Slide Zoom — 6,8 млн, Van Gogh — 32,7 мың ♥, дөңгелек — 48 мың ♥. Комбо: «Хаб», «Сурет рамасының ішіне», «Айналмалы дөңгелек».
+7. **Сандар қозғалады.** Цифр бағаналары барабан сияқты айналады, санауыш сурет таспасымен бірге жүреді (6 млн). Комбо: «Санауыш-барабан», «Конвейер + санауыш».
+8. **Кино атмосферасы.** Картина немесе фото фоны, бұлттар, серифті тақырып, баяу камера. «Бұрын/қазір» видеосы — 14 млн. Комбо: «Кино атмосферасы», «Уақыт сызығы».
+9. **Физика және оқиға.** Ұшақтар ұшады, қағаз жыртылады, жалаулар түседі. Ең көп лайк жинаған reel (1,95 млн ♥) — нақты сыныпта көрсетілген осындай презентация. Комбо: «Ұшақ ұшып өтеді», «Жыртылған қағаз», «Секіріп түсу».
+10. **Прожектор.** Сұр фотода бір адам түсті шеңбермен бөлінеді (6,8 млн). Комбо: «Прожектор».
+11. **Ілмек формуласы.** Reels-тің бәрі бір құрылыммен басталады: «Мұндай слайд жасама!» → «орнына...» → нәтиже алғашқы 1–3 секундта көрінеді. Презентацияда да алғашқы секундтарда сұрақ немесе нәтиже керек (x ≠ 0-дегі «x = 0 ?» сияқты).
+12. **Шектеулі палитра, жуан қаріп, сапалы фото.** 2–3 түс, жуан sans-serif немесе кинематографиялық serif қаріп, толық экранды фото. Әсер көп анимациядан емес, бір ойға бағынған бірнеше қозғалыстан шығады.
+
+## Қорытынды: емтихан презентациясына
+
+- **Ең көп қаралғаны — тереңдік, ең көп ұнағаны — сыныптағы оқиға.** Ең тиімді формула: бір оқиға + физикалық қозғалыс + Morph.
+- **Бір слайдқа бір «вау».** Вирустық видеолардың әрқайсысы бір ғана тәсілге құрылған. Бір слайдқа 3–5 бір мезеттегі қозғалыс жеткілікті, бірақ олардың бәрі бір мағынаға қызмет етуі керек.
+- **Ауысу — мағынаның жалғасы.** Әріптің ішіне кіру, рамаға кіру, шеңберге кіру — бәрі «тереңірек кіреміз» деген ойды көрсетеді.
+- **PowerPoint-те де болады.** Әр комбоның PowerPoint рецепті [COMBOS.md](COMBOS.md) ішінде (Merge Shapes, Morph, Zoom, Motion Path).
