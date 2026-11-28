@@ -1,0 +1,16 @@
+{
+  "hook_city": {
+    "file": "hook_city.webp",
+    "w": 1080,
+    "h": 1512,
+    "alpha": true,
+    "kind": "layer"
+  },
+  "hook_roofs": {
+    "file": "hook_roofs.webp",
+    "w": 1080,
+    "h": 1512,
+    "alpha": true,
+    "kind": "layer"
+  }
+}

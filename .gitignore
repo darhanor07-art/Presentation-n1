@@ -9,3 +9,4 @@ manhwa/build/_raw/
 manhwa/build/_*/
 manhwa/assets/audio/*.wav
 manhwa/build/vendor/node_modules/
+manhwa-rain/assets/_review/
