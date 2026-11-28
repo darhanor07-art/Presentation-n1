@@ -29,10 +29,9 @@
       var ink = range(p, 0, .35);
       var open = p < .35 ? 0 : E.outBack(range(p, .35, .47));
       var pupil = MK.lerp(1, .35, range(p, .42, .55));
-      var mouth = E.outCubic(range(p, .85, .95));
       var sc = 1 + 1.4 * E.inOutCubic(range(p, .55, .85));
       P.push(); P.translate(PUSH[0], PUSH[1]); P.scale(sc); P.translate(-PUSH[0], -PUSH[1]);
-      MK.art.tiger(P, TX, TY, TS, { mode: 'print', mirror: false, eyeOpen: open, pupil: pupil, mouthOpen: mouth, ink: ink });
+      MK.art.tiger(P, TX, TY, TS, { mode: 'print', mirror: false, eyeOpen: open, pupil: pupil, mouthOpen: 0, ink: ink, action: { scene: 's06', clock: p * 4, t: t } });
       P.pop();
       /* roar strokes radiating from the mouth (screen space after the push-in) */
       var my = PUSH[1] + (MOUTH[1] - PUSH[1]) * sc, g = E.outCubic(range(p, .86, .99));

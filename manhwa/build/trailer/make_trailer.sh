@@ -13,7 +13,9 @@ CARD=3.0
 
 # 1. timeline + score (+ stings)
 node build/trailer/timeline.js
+# (assets/audio/*.wav are gitignored: score.py always regenerates them deterministically, so a fresh clone works)
 python3 build/sound/score.py
+ffmpeg -v error -y -i "$A/score.wav" -c:a aac -b:a 192k -movflags +faststart "$A/score.m4a"
 
 # 2. cards (HyperFrames, local CLI)
 for d in open end; do

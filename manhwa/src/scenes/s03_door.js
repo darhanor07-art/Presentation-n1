@@ -25,7 +25,7 @@
       ' C' + (fx + 9) + ' ' + (gy - fh * .45) + ' ' + (fx + 15) + ' ' + (gy + 6) + ' ' + (fx) + ' ' + (gy + 16) + ' Z', { c: 'red', t: 0, stroke: { w: 2, c: 'ink' } });
   }
 
-  function interior(P, t, arm) {
+  function interior(P, t, p) {
     var i, ox = OPEN.x, oy = OPEN.y, ow = OPEN.w;
     /* back wall: vertical lines, light near the lamp, dark at the edges */
     P.rect(ox, oy, ow, FLOOR - oy + 4, { c: 'red', t: P.rad(720, 840, 40, 620, [[0, .2], [.55, .5], [1, .82]]), a: 0 });
@@ -48,7 +48,7 @@
     /* seat shadow on the floor */
     P.ellipse(470, 1004, 300, 36, { c: 'ink', t: .3, h: 'line', a: 90 });
     /* the carver, back view (first blue) */
-    MK.art.carver(P, 470, 1000, 620, { pose: 'seat', arm: arm, t: t });
+    MK.art.carver(P, 470, 1000, 620, { pose: 'seat', t: t, action: { scene: 's03', clock: p * 4, t: t } });   /* rig: breathing + carving loop + braid follow-through */
     P.stroke([[212, 1000], [300, 1008], [470, 1011], [640, 1008], [728, 1000]], { w: 4, c: 'ink' });
   }
 
@@ -71,7 +71,7 @@
       P.push();
       if (push !== 1) { P.translate(520, 980); P.scale(push); P.translate(-520, -980); }
       /* interior (only needed once the doors part) */
-      if (slide > .01) interior(P, t, .5 + .5 * Math.sin(t * TAU * 1.1));
+      if (slide > .01) interior(P, t, p);
       /* leaves, sliding behind the wall */
       var shA = 1 - MK.range(p, .3, .5);
       LEAVES.forEach(function (L) {
@@ -86,7 +86,7 @@
             P.alpha(shA, function () {
               P.blur(7, function () {
                 P.push(); P.translate(cx, 980); P.scale(sc); P.translate(-cx, -980);
-                MK.art.carver(P, cx, 980, 620, { pose: 'seat', shadow: true, arm: .5 + .5 * Math.sin(t * TAU * 1.1), t: t });
+                MK.art.carver(P, cx, 980, 620, { pose: 'seat', shadow: true, t: t, action: { scene: 's03', clock: p * 4, t: t } });
                 P.pop();
               });
             });

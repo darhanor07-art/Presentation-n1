@@ -29,9 +29,10 @@
         P.circle(mx, my, R, { c: 'red', t: P.rad(mx - 90, my - 90, 150, R * 1.15, [[0, 0], [.5, 0], [1, .5]]), h: 'dots' });
         CRATERS.forEach(function (c) { P.circle(mx + c[0], my + c[1], c[2], { c: 'red', t: .34, h: 'dots', stroke: { w: 2.4, c: 'ink' } }); });
       });
-      /* sky tiger: faint and huge; one slow blink around p 0.3 */
-      var bl = Math.pow(Math.sin(Math.PI * range(p, .22, .4)), 2), eo = 1 - bl;
-      MK.art.tiger(P, 500, 420 + sSky, 1100, { mode: 'sky', eyeOpen: eo, pupil: .3, skyAlpha: .55 });
+      /* sky tiger: faint and huge; rig: slow lazy blink (periodic overlay) + breathing */
+      MK.art.tiger(P, 500, 420 + sSky, 1100, { mode: 'sky', eyeOpen: 1, pupil: .3, skyAlpha: .55, action: { scene: 's09', clock: p * 4, t: t } });
+      /* far layer: 3D-rendered mountains behind the roofline (D1: MK.art.ridges), only when available */
+      if (typeof MK.art.ridges === 'function') MK.art.ridges(P, 's09', p * 23, { x: b.x0, y: ry - 420, w: b.x1 - b.x0, h: 440 });
       /* roofline: eave (ink) + wall + ground */
       var gy = 1112 + sRoof;
       P.rect(b.x0 - 4, ry + 40, b.x1 - b.x0 + 8, b.y1 + TILT - ry, { c: 'ink', t: 0 });
@@ -45,8 +46,14 @@
       }
       P.rect(b.x0 - 4, gy, b.x1 - b.x0 + 8, b.y1 + TILT - gy, { c: 'paper', t: .26, a: 90, stroke: { w: 5, c: 'ink' } });
       for (i = 1; i < 6; i++) P.stroke([[b.x0 - 4, gy + i * i * 11 + 12], [b.x1 + 4, gy + i * i * 11 + 12]], { w: 2.2, c: 'ink' });
-      /* carver from behind, daenggi fluttering */
-      MK.art.carver(P, 500, 1200 + sCar, 620, { pose: 'stand', t: t });
+      /* gate in the wall (she walks toward it) */
+      var gx = 500, gw = 150;
+      P.rect(gx - gw / 2 - 14, ry + 96, gw + 28, gy - ry - 96, { c: 'ink', t: 0 });
+      P.rect(gx - gw / 2, ry + 124, gw, gy - ry - 124, { c: 'red', t: .55, a: 0, stroke: { w: 3, c: 'paper' } });
+      P.rect(gx - gw / 2 - 30, ry + 96, gw + 60, 16, { c: 'ink', t: 0 });
+      /* carver from behind (rig + CMU walk): looks up at the sky tiger -> turns head -> ~5 steps toward the gate, moving up-screen and shrinking */
+      var wk = E.inOutQuad(range(p, .45, 1));
+      MK.art.carver(P, 500, 1200 + sCar - 78 * wk, 620 - 70 * wk, { pose: 'stand', t: t, action: { scene: 's09', clock: p * 4, t: t } });
       /* end seal */
       var tau = MK.event(st, 'slam', p, .5, t, 2.5);
       if (tau >= 0) {

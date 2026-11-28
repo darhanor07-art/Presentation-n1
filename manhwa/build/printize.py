@@ -60,18 +60,21 @@ def process_seq(name, sc, cfg):
     for f in glob.glob(os.path.join(outdir, '*.png')): os.remove(f)
     frames = []; horizon = {n: [] for n in names if alphas_c[names.index(n)]}
     for fi, (idc, lum) in enumerate(zip(ids, lums)):
-        h, w = idc.shape
-        rk = ranks[idc]
+        H0, W0 = idc.shape; fd = int(sc.get('fill_div', cfg.get('fill_div', 1)))
+        idf = idc[fd // 2::fd, fd // 2::fd] if fd > 1 else idc          # fill map resolution = raw / fill_div
+        h, w = idf.shape; rkf = ranks[idf]
         # fill palette: index 0 transparent, 1 outline, 2+k class fill
         fidx = np.zeros((h, w), np.uint8)
         for k, n in enumerate(names):
-            if alphas_c[k]: fidx[idc == k] = 2 + k
+            if alphas_c[k]: fidx[idf == k] = 2 + k
+        edge = np.zeros((h, w), bool)
         if olw > 0:
-            rim = Image.fromarray(rk.astype(np.uint8)).filter(ImageFilter.MinFilter(2 * olw + 1))
-            minr = np.asarray(rim); edge = (rk > minr) & (fidx > 0)
+            rim = Image.fromarray(rkf.astype(np.uint8)).filter(ImageFilter.MinFilter(2 * olw + 1))
+            minr = np.asarray(rim); edge = (rkf > minr) & (fidx > 0)
             for k, n in enumerate(names):          # outline only where the class opts in
-                if not cl[n].get('outline', True): edge &= ~(idc == k)
+                if not cl[n].get('outline', True): edge &= ~(idf == k)
             fidx[edge] = 1
+        h, w = H0, W0; rk = ranks[idc]
         pal = [(0, 0, 0), rgb(ol.get('fill', 'ink'))] + [rgb(cl[n].get('fill', 'paper')) for n in names]
         al = [0, 255] + [255 if alphas_c[k] else 0 for k in range(len(names))]
         fn = '%03d.f.png' % fi; save_pal(os.path.join(outdir, fn), fidx, pal, al)
@@ -91,8 +94,10 @@ def process_seq(name, sc, cfg):
         tval = np.clip(bs / bc, 0, 1)
         lvl = np.rint(tval * (Q - 1)).astype(np.int32)
         # outline blocks -> tone 0 (flat ink)
-        eb = blocksum(edge.astype(np.float32), div) >= (div * div) * .25 if olw > 0 else np.zeros((H, W), bool)
-        lvl[eb] = 0
+        if olw > 0:
+            eu = np.kron(edge.astype(np.uint8), np.ones((fd, fd), np.uint8))[:h, :w].astype(np.float32)
+            eb = blocksum(eu, div) >= (div * div) * .25
+            lvl[eb] = 0
         tidx = np.where(cover, 1 + best * Q + lvl, 0).astype(np.uint8)
         tp = [(0, 0, 0)]; ta = [0]
         for k, n in enumerate(names):
@@ -106,7 +111,7 @@ def process_seq(name, sc, cfg):
                 if not alphas_c[k]: continue
                 m = rk >= ranks[k]; first = np.where(m.any(0), m.argmax(0), h)
                 horizon[n].append(round(float(np.median(first)) / h, 4))
-    return {'w': w, 'h': h, 'tw': W, 'th': H, 'frames': frames, 'horizon': horizon if sc.get('horizon') else None, 'levels': lv}
+    return {'w': W0 // fd, 'h': H0 // fd, 'fd': fd, 'tw': W, 'th': H, 'frames': frames, 'horizon': horizon if sc.get('horizon') else None, 'levels': lv}
 
 def main():
     world = sys.argv[1]

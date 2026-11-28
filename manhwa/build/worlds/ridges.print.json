@@ -1,6 +1,6 @@
 {
-  "tone_div": 3, "levels": 40,
-  "outline": { "w": 2, "fill": "ink" },
+  "tone_div": 3, "fill_div": 2, "levels": 40,
+  "outline": { "w": 1, "fill": "ink" },
   "sequences": {
     "ridges_s02": { "raw": "ridges_s02", "horizon": true, "classes": {
       "sky":  { "key": [0, 0, 0],   "rank": 0, "alpha": 0 },
