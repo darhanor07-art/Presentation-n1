@@ -39,10 +39,12 @@
   MS.plateFor = sc => {
     const key = sc.plate.key, r = MS.findReal('plate', key)[0];
     if (r) return { img: r, real: true };
+    const alt = sc.plate.alt && MS.findReal('plate', sc.plate.alt)[0]; if (alt) return { img: alt, real: false };
     const ph = ASSETS['ph_' + sc.plate.ph]; return { img: ph ? ph.img : mkc(8, 8), real: false };
   };
   MS.eyeImg = (name, alts) => {
     const r = MS.real(name); if (r) return r;
+    if (/_pair_\d/.test(name) && MS.phPair) return MS.phPair(name);
     for (const a of alts || []) { const q = MS.real(a); if (q) return q; }
     return MS.phEye(name);
   };
@@ -53,8 +55,10 @@
   };
   MS.usingPlaceholders = () => {
     const out = [];
-    for (let i = 0; i < MS.scenes.length; i++) if (!MS.plateFor(MS.scenes[i]).real) out.push('plate:' + MS.scenes[i].plate.key);
-    ['aiaru_open', 'aiaru_wide', 'aiaru_half', 'aiaru_closed', 'aiaru_glance_up', 'tair_open', 'tair_narrow', 'tair_glance', 'aiaru_pupil_0'].forEach(n => { if (!MS.real(n)) out.push('eye:' + n); });
+    for (let i = 0; i < MS.scenes.length; i++) if (!MS.plateFor(MS.scenes[i]).real) if (!MS.scenes[i].plate.nolist) out.push('plate:' + MS.scenes[i].plate.key);
+    ['aiaru_closed', 'aiaru_half', 'aiaru_open', 'tair_open', 'aiaru_pair_0', 'aiaru_pair_1', 'aiaru_pair_2', 'aiaru_pair_3'].forEach(n => { if (!MS.real(n)) out.push('eye:' + n); });
+    if (MS.findReal('seq', 'feet').length < 12) out.push('seq:feet_00..11');
+    ['hall_back', 'hall_fg'].forEach(n => { if (!MS.real(n)) out.push('layer:' + n); });
     ['aiaru', 'tair'].forEach(n => { if (!MS.findReal('char', n).length) out.push('char:' + n); });
     return out;
   };
@@ -286,62 +290,115 @@
 
   /* ---------------- transitions ---------------- */
   const TR = MS.transitions = {};
-  TR.flash = (c, A, B, tt, t, s) => {          // 1->2 moonlight floods the screen, white flash
+  let tcv = null; const tmask = () => { if (!tcv || tcv.width !== W || tcv.height !== H) tcv = mkc(W, H); const g = tcv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1; g.clearRect(0, 0, W, H); return g; };
+  /* 1->2 radial: moon-white -> lavender -> transparent. Light cracks from the moon, floods the screen, then fades */
+  TR.moonburst = (c, A, B, tt, t) => {
     c.drawImage(tt < .5 ? A : B, 0, 0);
-    const mx = W * .7, my = H * .22, k = sm(tt * 2);
-    if (tt < .5) MS.glow(c, mx, my, lerp(.2, 1.6, k) * H, '236,233,255', k * 1.2, 'screen');
-    const f = Math.pow(sm(1 - Math.abs(tt - .5) * 2), 1.4); c.fillStyle = 'rgba(244,242,255,' + clamp(f * 1.05) + ')'; c.fillRect(0, 0, W, H);
+    const mx = W * .68, my = H * .24, k = sm(tt * 2), R = lerp(.04, 2.1, k) * H, fade = 1 - sm((tt - .55) / .45);
+    c.save(); c.globalCompositeOperation = 'lighter'; c.globalAlpha = Math.min(1, k * 1.4) * (tt < .5 ? 1 : fade);
+    for (let i = 0; i < 16; i++) {          // cracks / rays
+      const a = i / 16 * TAU + .2 + Math.sin(i * 3.1) * .1, wdt = .035 + .03 * Math.sin(i * 1.7 + 1), L = R * (.8 + .5 * Math.sin(i * 2.3) * .3);
+      const g = c.createLinearGradient(mx, my, mx + Math.cos(a) * L, my + Math.sin(a) * L); g.addColorStop(0, 'rgba(236,233,255,.8)'); g.addColorStop(1, 'rgba(236,233,255,0)');
+      c.fillStyle = g; c.beginPath(); c.moveTo(mx, my); c.lineTo(mx + Math.cos(a - wdt) * L, my + Math.sin(a - wdt) * L); c.lineTo(mx + Math.cos(a + wdt) * L, my + Math.sin(a + wdt) * L); c.fill();
+    }
+    c.restore();
+    c.save(); c.globalAlpha = tt < .5 ? 1 : fade;
+    const g = c.createRadialGradient(mx, my, 0, mx, my, R); g.addColorStop(0, 'rgba(236,233,255,1)'); g.addColorStop(.45, 'rgba(236,233,255,.96)'); g.addColorStop(.75, 'rgba(169,166,232,.8)'); g.addColorStop(1, 'rgba(169,166,232,0)');
+    c.fillStyle = g; c.fillRect(0, 0, W, H); c.restore();
   };
-  function edgeX(y, fx, tt) { return fx + Math.sin(y * .011 + tt * 7) * 46 * u + Math.sin(y * .027 - tt * 4) * 18 * u + (y - H / 2) * .22; }
-  TR.petal = (c, A, B, tt, t) => {             // 2->3 petals sweep across
+  /* 2->3 linear 135deg indigo -> periwinkle, soft-edged diagonal wipe */
+  TR.diag = (c, A, B, tt) => {
+    const f = lerp(-.3, 1.3, sm(tt)), x0 = 0, y0 = 0, x1 = W, y1 = H, k = .3;   // gradient axis = the 135deg diagonal
     c.drawImage(A, 0, 0);
-    const fx = lerp(-.45 * W, 1.45 * W, eo(tt * .9 + .1 * tt));
-    c.save(); c.beginPath(); c.moveTo(-10, -10); for (let y = -10; y <= H + 30; y += 24) c.lineTo(edgeX(y, fx, tt), y); c.lineTo(-10, H + 30); c.closePath(); c.clip(); c.drawImage(B, 0, 0); c.restore();
-    c.save(); const gr = c.createLinearGradient(fx - 70 * u, 0, fx + 40 * u, 0); gr.addColorStop(0, 'rgba(236,233,255,0)'); gr.addColorStop(.7, 'rgba(236,233,255,.38)'); gr.addColorStop(1, 'rgba(236,233,255,0)');
-    c.fillStyle = gr; c.globalCompositeOperation = 'screen'; c.fillRect(fx - 80 * u - H * .25, 0, 130 * u + H * .5, H); c.restore();
-    const r = rng(5), spr = petalSprites(), N = 70;
+    const g = tmask(); g.drawImage(B, 0, 0); g.globalCompositeOperation = 'destination-in';
+    const m = g.createLinearGradient(x0, y0, x1, y1); m.addColorStop(clamp(f - k), 'rgba(0,0,0,1)'); m.addColorStop(clamp(f), 'rgba(0,0,0,0)'); g.fillStyle = m; g.fillRect(0, 0, W, H);
+    c.drawImage(tcv, 0, 0);
+    const band = c.createLinearGradient(x0, y0, x1, y1), e = sm(1 - Math.abs(tt - .5) * 2);
+    const st = (p, col) => band.addColorStop(clamp(p), col);
+    st(f - k - .12, 'rgba(38,42,102,0)'); st(f - k * .6, 'rgba(38,42,102,' + .85 * e + ')'); st(f - k * .2, 'rgba(75,76,154,' + .9 * e + ')'); st(f, 'rgba(143,163,255,' + .95 * e + ')'); st(f + .06, 'rgba(143,163,255,0)');
+    c.save(); c.fillStyle = band; c.fillRect(0, 0, W, H); c.restore();
+  };
+  /* 3->4 seven vertical blinds, lavender -> amber, staggered */
+  TR.blinds = (c, A, B, tt) => {
+    const N = 7, sw = W / N;
     for (let i = 0; i < N; i++) {
-      const y = (i / N * 1.15 - .08) * H + (r() - .5) * 40 * u, off = (r() - .62) * 360 * u, sz = (34 + r() * 100) * u * (r() > .8 ? 1.7 : 1), sp = r() * 1.3 + .4;
-      const x = edgeX(y, fx, tt) + off * (1 + tt * .4) + Math.sin(t * 3 + i) * 12 * u, flip = Math.cos(t * (2 + r() * 3) + i);
-      c.save(); c.globalAlpha = clamp(.95 - Math.abs(off) / (440 * u)); c.translate(x, y - (tt * 90 * sp) * u); c.rotate(i + t * 2 * sp + tt * 5); c.scale(.5 + .5 * Math.abs(flip), 1);
-      c.drawImage(spr[(i % 4) + (i % 5 === 0 ? 4 : 0)], -sz / 2, -sz / 2, sz, sz); c.restore();
+      const k = clamp((tt - i * .075) / .55), cover = 1 - Math.abs(k * 2 - 1), x = i * sw;
+      c.save(); c.beginPath(); c.rect(x, 0, sw + 1, H); c.clip(); c.drawImage(k < .5 ? A : B, 0, 0);
+      const cw2 = sw * cover; if (cw2 > .5) {
+        const g = c.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#A9A6E8'); g.addColorStop(.55, '#C9B8D6'); g.addColorStop(1, '#FFCF8A');
+        c.fillStyle = g; c.fillRect(x + (sw - cw2) / 2, 0, cw2, H);
+        c.fillStyle = 'rgba(255,255,255,.55)'; c.fillRect(x + (sw - cw2) / 2, 0, 2 * u, H); c.fillStyle = 'rgba(38,42,102,.35)'; c.fillRect(x + (sw + cw2) / 2 - 2 * u, 0, 2 * u, H);
+      }
+      c.restore();
     }
   };
-  TR.mist = (c, A, B, tt, t, s) => {           // 3->4 mist crossfade
-    c.drawImage(A, 0, 0); c.save(); c.globalAlpha = sm((tt - .2) / .6); c.drawImage(B, 0, 0); c.restore();
-    const k = Math.sin(Math.PI * tt);
-    MS.mist(c, t, s, { y: .62, h: .8, par: .4, vx: 22, alpha: .95 * k }); MS.mist(c, t, s + 3, { y: .3, h: .7, par: .7, vx: -16, alpha: .8 * k }); MS.mist(c, t, s + 7, { y: .88, h: .6, par: .9, vx: 30, alpha: .9 * k });
-    c.save(); c.fillStyle = 'rgba(184,182,240,' + (.18 * k) + ')'; c.fillRect(0, 0, W, H); c.restore();
-  };
-  TR.slide = (c, A, B, tt) => {                // 4->5 frame slides up
-    const e = eo(tt), by = (1 - e) * H;
-    c.save(); c.translate(0, -e * H * .35); c.drawImage(A, 0, 0); c.restore();
-    c.fillStyle = 'rgba(10,12,48,' + (.55 * e) + ')'; c.fillRect(0, 0, W, H * (1 - e) * .0 + H * Math.max(0, 1 - by / H) * 0 + 0);
-    c.save(); c.fillStyle = 'rgba(8,10,40,' + (.5 * e) + ')'; c.fillRect(0, 0, W, by); c.restore();
-    c.save(); c.shadowColor = 'rgba(8,10,40,.7)'; c.shadowBlur = 40 * u; c.shadowOffsetY = -10 * u; c.fillStyle = '#000'; c.fillRect(0, by, W, H); c.restore();
-    c.save(); c.beginPath(); c.rect(0, by, W, H - by); c.clip(); c.drawImage(B, 0, 0); c.restore();
-    c.fillStyle = 'rgba(236,233,255,' + (.75 * (1 - Math.abs(e - .5) * 2) + .15) + ')'; c.fillRect(0, by - u, W, 2 * u);
-  };
-  TR.zoom = (c, A, B, tt, t, s, sA) => {       // 5->6 eye window grows to full screen
+  /* 4->5 conic sweep from the gate centre, clockwise */
+  TR.conic = (c, A, B, tt) => {
+    const cx = W / 2, cy = H * .56, ang = -Math.PI / 2 + sm(tt) * TAU, R = Math.hypot(W, H);
     c.drawImage(A, 0, 0);
-    const w = sA.windows[0], R0 = rectPx(w, 1, sA.X), e = eo(clamp(tt / .82));
-    c.fillStyle = 'rgba(8,10,44,' + (.55 * e) + ')'; c.fillRect(0, 0, W, H);
-    const R = { cx: lerp(R0.cx, W / 2, e), cy: lerp(R0.cy, H / 2, e), w: lerp(R0.w, W * 1.04, e), h: lerp(R0.h, H * 1.04, e), rot: lerp(R0.rot, 0, e) };
-    drawWindow(c, w, R, 1, tt > .62 ? clamp((tt - .62) * 2.2) * .5 : 0, 1.2 + tt, t, sA.X);
-    c.save(); c.globalAlpha = sm((tt - .7) / .3); c.drawImage(B, 0, 0); c.restore();
+    if (tt > .003) { c.save(); c.beginPath(); c.moveTo(cx, cy); c.arc(cx, cy, R, -Math.PI / 2, ang, false); c.closePath(); c.clip(); c.drawImage(B, 0, 0); c.restore(); }
+    if (!c.createConicGradient) return;
+    const env = Math.sin(Math.PI * clamp(tt)), g = c.createConicGradient(ang - 1.15, cx, cy);
+    g.addColorStop(0, 'rgba(38,42,102,0)'); g.addColorStop(.06, 'rgba(38,42,102,' + .75 * env + ')'); g.addColorStop(.12, 'rgba(75,76,154,' + .85 * env + ')'); g.addColorStop(.16, 'rgba(169,166,232,' + .95 * env + ')'); g.addColorStop(.1835, 'rgba(236,233,255,' + env + ')'); g.addColorStop(.19, 'rgba(169,166,232,0)'); g.addColorStop(1, 'rgba(169,166,232,0)');
+    c.save(); c.fillStyle = g; c.fillRect(0, 0, W, H); c.restore();
+    MS.glow(c, cx, cy, H * .25 * env, '169,166,232', .8 * env, 'screen');
   };
-  TR.split = (c, A, B, tt) => {                // 6->7 frame splits into split-screen
-    const e = eo(tt), hh = H / 2, gap = e * hh;
-    c.drawImage(B, 0, 0);
-    c.fillStyle = 'rgba(236,233,255,' + (.9 * (1 - e) + .1) + ')'; c.fillRect(0, hh - gap - 2 * u, W, gap * 2 + 4 * u);
-    c.save(); c.beginPath(); c.rect(0, 0, W, hh); c.clip(); c.drawImage(A, 0, -gap); c.restore();
-    c.save(); c.beginPath(); c.rect(0, hh, W, hh); c.clip(); c.drawImage(A, 0, gap); c.restore();
-    c.fillStyle = 'rgba(255,255,255,.9)'; c.fillRect(0, hh - gap - 1.5 * u, W, 3 * u); c.fillRect(0, hh + gap - 1.5 * u, W, 3 * u);
+  /* 5->6 vertical slide up with a warm edge line (amber -> indigo) */
+  TR.slideup = (c, A, B, tt) => {
+    const e = eo(tt), by = (1 - e) * H;
+    c.save(); c.translate(0, -e * H * .3); c.drawImage(A, 0, 0); c.restore();
+    c.fillStyle = 'rgba(10,12,48,' + (.5 * e) + ')'; c.fillRect(0, 0, W, by);
+    c.save(); c.beginPath(); c.rect(0, by, W, H - by); c.clip(); c.drawImage(B, 0, by); c.restore();
+    const gh = 150 * u, g = c.createLinearGradient(0, by - gh, 0, by + 4 * u); g.addColorStop(0, 'rgba(38,42,102,0)'); g.addColorStop(.55, 'rgba(38,42,102,.6)'); g.addColorStop(.92, 'rgba(255,207,138,.85)'); g.addColorStop(1, 'rgba(255,207,138,1)');
+    c.save(); c.fillStyle = g; c.fillRect(0, by - gh, W, gh + 4 * u); c.restore();
+    const ln = c.createLinearGradient(0, by, W, by); ln.addColorStop(0, 'rgba(255,207,138,0)'); ln.addColorStop(.5, 'rgba(255,224,170,1)'); ln.addColorStop(1, 'rgba(255,207,138,0)');
+    c.save(); c.fillStyle = ln; c.shadowColor = 'rgba(255,207,138,.9)'; c.shadowBlur = 16 * u; c.fillRect(0, by - 1.5 * u, W, 3 * u); c.restore();
   };
-  TR.flash2 = (c, A, B, tt) => {               // 7->8 white flash, then wide frame
+  /* 6->7 radial iris: periwinkle ring, night outside; closes like a pupil, opens on the new page */
+  TR.iris = (c, A, B, tt) => {
+    c.drawImage(tt < .5 ? A : B, 0, 0);
+    const k = tt < .5 ? 1 - sm(tt * 2) : sm((tt - .5) * 2), R = Math.hypot(W, H) * .56 * k, cx = W / 2, cy = H * .47;
+    if (k < .01) { c.fillStyle = '#080a28'; c.fillRect(0, 0, W, H); return; }
+    const r1 = R + 26 * u, g = c.createRadialGradient(cx, cy, Math.max(0, R - 30 * u), cx, cy, r1);
+    g.addColorStop(0, 'rgba(143,163,255,0)'); g.addColorStop(.35, 'rgba(143,163,255,.9)'); g.addColorStop(.62, 'rgba(60,66,160,.95)'); g.addColorStop(1, 'rgba(8,10,40,1)');
+    c.save(); c.fillStyle = g; c.fillRect(0, 0, W, H); c.restore();
+  };
+  /* 7->8 mesh gradient: drifting lavender / periwinkle blobs dissolve the page like mist */
+  TR.meshmist = (c, A, B, tt, t) => {
+    c.drawImage(A, 0, 0); c.save(); c.globalAlpha = sm((tt - .25) / .5); c.drawImage(B, 0, 0); c.restore();
+    const k = Math.sin(Math.PI * clamp(tt)), cols = ['169,166,232', '143,163,255', '75,76,154', '236,233,255', '169,166,232', '143,163,255', '110,106,190'];
+    c.save(); c.fillStyle = 'rgba(143,163,255,' + .35 * k + ')'; c.fillRect(0, 0, W, H);
+    for (let i = 0; i < cols.length; i++) {
+      const ph = i * 1.9 + tt * 3.2 + t * .6, x = W * (.5 + .46 * Math.sin(ph * .8 + i)), y = H * (.5 + .5 * Math.cos(ph * .6 + i * 2.1)), r = H * (.38 + .12 * Math.sin(ph + i));
+      const g = c.createRadialGradient(x, y, 0, x, y, r); g.addColorStop(0, 'rgba(' + cols[i] + ',' + .95 * k + ')'); g.addColorStop(.55, 'rgba(' + cols[i] + ',' + .5 * k + ')'); g.addColorStop(1, 'rgba(' + cols[i] + ',0)');
+      c.fillStyle = g; c.fillRect(0, 0, W, H);
+    }
+    c.restore();
+  };
+  /* 8->9 two door leaves: night gradient, amber inner edge; they close, then slide apart */
+  TR.doors = (c, A, B, tt) => {
+    const closing = tt < .42, open = tt > .56;
+    c.drawImage(tt < .5 ? A : B, 0, 0);
+    const g = closing ? sm(tt / .42) : open ? 1 - sm((tt - .56) / .44) : 1, half = W / 2, w = half * g;
+    if (w < 1) return;
+    const leaf = side => {
+      c.save(); const x = side < 0 ? 0 : W - w; c.translate(x, 0);
+      const gr = c.createLinearGradient(side < 0 ? 0 : w, 0, side < 0 ? w : 0, 0); gr.addColorStop(0, '#0a0b30'); gr.addColorStop(.55, '#262A66'); gr.addColorStop(.93, '#4B4C9A'); gr.addColorStop(1, '#FFCF8A');
+      c.fillStyle = gr; c.fillRect(0, 0, w, H);
+      c.strokeStyle = 'rgba(169,166,232,.3)'; c.lineWidth = 1.5 * u; const m = 22 * u; if (w > 60 * u) { c.strokeRect(side < 0 ? m : m * .5, m * 2, w - m * 1.5, H - m * 4); c.strokeRect(side < 0 ? m * 2 : m, m * 3.5, w - m * 3, H * .38); }
+      const ex = side < 0 ? w : 0, eg = c.createLinearGradient(ex - 40 * u * side, 0, ex, 0); eg.addColorStop(0, 'rgba(255,207,138,0)'); eg.addColorStop(1, 'rgba(255,207,138,.55)');
+      c.fillStyle = eg; c.fillRect(side < 0 ? w - 40 * u : 0, 0, 40 * u, H);
+      c.fillStyle = '#FFCF8A'; c.shadowColor = 'rgba(255,207,138,.9)'; c.shadowBlur = 18 * u; c.fillRect(side < 0 ? w - 4 * u : 0, 0, 4 * u, H); c.restore();
+    };
+    leaf(-1); leaf(1);
+  };
+  /* 9->10 white flash with a 180deg white -> lavender bloom */
+  TR.bloom = (c, A, B, tt) => {
     c.drawImage(tt < .45 ? A : B, 0, 0);
     const f = tt < .45 ? sm(tt / .45) : 1 - sm((tt - .45) / .55);
-    c.fillStyle = 'rgba(255,255,255,' + clamp(f * 1.02) + ')'; c.fillRect(0, 0, W, H);
+    const g = c.createLinearGradient(0, 0, 0, H); g.addColorStop(0, 'rgba(255,255,255,' + clamp(f * 1.05) + ')'); g.addColorStop(.55, 'rgba(236,233,255,' + clamp(f * 1.02) + ')'); g.addColorStop(1, 'rgba(169,166,232,' + clamp(f * .95) + ')');
+    c.fillStyle = g; c.fillRect(0, 0, W, H);
+    MS.glow(c, W / 2, H * .5, H * .7 * f, '255,255,255', .8 * f, 'lighter');
   };
 
   /* ---------------- post ---------------- */
@@ -383,12 +440,20 @@
   const GR0 = { grade: 1, bloom: .38, leak: .8, grain: 1 };
 
   /* ---------------- DOM items ---------------- */
+  /* Text is split into spans ONCE (mkItem); every style is computed per frame from (t - it.t0) -> deterministic, no CSS keyframes. */
   let ui; const ITEMS = [];
-  const NS = 'http://www.w3.org/2000/svg';
   function orn(cls) { return '<svg class="orn ' + cls + '" viewBox="0 0 30 30"><path d="M2 28V8Q2 2 8 2h20M7 28V13Q7 7 13 7h15" fill="none" stroke="currentColor" stroke-width="1.1"/><path d="M12 12l3-3 3 3-3 3z" fill="currentColor"/></svg>'; }
   function bubbleSvg(d) {
     const ell = 'M2 32A48 29 0 1 1 98 32A48 29 0 1 1 2 32Z', tail = d.tail || 'br';
     let t = '';
+    if (d.cls && /voice/.test(d.cls)) {          // off-screen voice: jagged rectangular edge, no tail
+      const P = [], n = 16, mm = 8;
+      for (let i = 0; i <= n; i++) P.push((2 + i * 96 / n).toFixed(1) + ',' + (i % 2 ? 5 : 1.5));
+      for (let i = 1; i <= mm; i++) P.push((i % 2 ? 94.5 : 98.5) + ',' + (2 + i * 70 / mm).toFixed(1));
+      for (let i = n - 1; i >= 0; i--) P.push((2 + i * 96 / n).toFixed(1) + ',' + (i % 2 ? 69 : 72.5));
+      for (let i = mm - 1; i >= 1; i--) P.push((i % 2 ? 5.5 : 1.5) + ',' + (2 + i * 70 / mm).toFixed(1));
+      return '<svg class="bg" viewBox="0 0 100 74" preserveAspectRatio="none"><polygon points="' + P.join(' ') + '" class="fill"/></svg>';
+    }
     if (d.type === 'thought') return '<svg class="bg" viewBox="0 0 100 64" preserveAspectRatio="none"><path d="' + ell + '" class="fz"/><path d="' + ell + '" class="fill"/></svg>';
     if (d.type === 'shock') {
       let pts = []; for (let i = 0; i < 20; i++) { const a = i / 20 * TAU, r = i % 2 ? 32 : 47; pts.push((50 + Math.cos(a) * r * (i % 2 ? 1.1 : 1.05)).toFixed(1) + ',' + (32 + Math.sin(a) * r * .66).toFixed(1)); }
@@ -398,13 +463,27 @@
     if (T) { const pp = T[0].split(' '); t = '<polygon points="' + T[0] + ' ' + (tail[tail.length - 1] === 'r' ? '66,52' : '34,52') + '" class="fillo"/><polyline points="' + pp.join(' ') + '" class="stk"/>'; }
     return '<svg class="bg" viewBox="0 0 100 74" preserveAspectRatio="none"><path d="' + ell + '" class="fill"/>' + t + '</svg>';
   }
+  const mkSpan = (cls, txt, tag) => { const e = document.createElement(tag || 'span'); e.className = cls; e.textContent = txt; return e; };
+  function wrapLines(text, lc) {                 // greedy word wrap into short lines (bubble lines appear one after another)
+    const out = []; let cur = '';
+    text.split(/\s+/).filter(Boolean).forEach(w => { if (cur && (cur + ' ' + w).length > lc) { out.push(cur); cur = w; } else cur = cur ? cur + ' ' + w : w; });
+    if (cur) out.push(cur); return out;
+  }
   function mkItem(sc, d) {
-    const el = document.createElement('div'); el.className = 'it ' + d.type + (d.cls ? ' ' + d.cls : '');
-    const tx = '<div class="tx"><span class="v"></span><span class="h"></span></div>';
-    if (d.type === 'cap') el.innerHTML = orn('o1') + orn('o2') + orn('o3') + orn('o4') + tx;
-    else if (d.type === 'bub' || d.type === 'thought' || d.type === 'shock') el.innerHTML = bubbleSvg(d) + tx;
-    else el.innerHTML = tx;
-    ui.appendChild(el); return { el, sc, d, vis: false, t0: 0, n: -1, v: el.querySelector('.v'), h: el.querySelector('.h'), tx: el.querySelector('.tx') };
+    const el = document.createElement('div'), T = d.type, cls = d.cls || ''; el.className = 'it ' + T + (cls ? ' ' + cls : '');
+    if (T === 'cap') el.innerHTML = orn('o1') + orn('o2') + orn('o3') + orn('o4');
+    else if (T === 'bub' || T === 'thought' || T === 'shock') el.innerHTML = bubbleSvg(d);
+    const tx = document.createElement('div'); tx.className = 'tx'; el.appendChild(tx);
+    const mode = (T === 'cap' && /hook3|iffy/.test(cls)) ? 'letters' : T === 'cap' ? 'words' : (T === 'bub' || T === 'thought') ? 'lines' : T === 'sfx' ? 'tremble' : T;
+    const sp = [];
+    if (mode === 'words') { const ws = d.text.split(/\s+/).filter(Boolean); ws.forEach((w, i) => { const e = mkSpan('wd', w); tx.appendChild(e); sp.push(e); if (i < ws.length - 1) tx.appendChild(document.createTextNode(' ')); }); }
+    else if (mode === 'letters' || mode === 'tremble') {
+      const ws = d.text.split(/\s+/).filter(Boolean); ws.forEach((w, i) => { const g = mkSpan('wg', ''); [...w].forEach(ch => { const e = mkSpan('lt', ch); g.appendChild(e); sp.push(e); }); tx.appendChild(g); if (i < ws.length - 1) tx.appendChild(document.createTextNode(' ')); });
+    }
+    else if (mode === 'lines') (d.lines || wrapLines(d.text, d.lc || 17)).forEach(l => { const e = mkSpan('ln', l, 'div'); tx.appendChild(e); sp.push(e); });
+    else { const e = mkSpan('v', d.text); tx.appendChild(e); }
+    let pen = null; if (T === 'end') { pen = document.createElement('i'); pen.className = 'pen'; el.appendChild(pen); }
+    ui.appendChild(el); return { el, sc, d, mode, vis: false, t0: 0, tx, sp, pen };
   }
   function layoutItems() {
     ITEMS.forEach(it => {
@@ -412,22 +491,52 @@
       it.el.style.left = (d.x * cw) + 'px'; it.el.style.top = (d.y * ch) + 'px';
     });
   }
+  const spring = a => { const x = Math.max(0, a - .04); return .55 + .45 * (1 - Math.exp(-9 * x) * Math.cos(16 * x)); };   // 0.55 -> ~1.08 overshoot -> 1
+  function animText(it, a, t, k) {
+    const sp = it.sp, md = it.mode, d = it.d;
+    if (md === 'words') {
+      const stg = d.stg || .14;
+      for (let i = 0; i < sp.length; i++) { const e = eo((a - .1 - i * stg) / .55), st = sp[i].style; st.opacity = e.toFixed(3); st.transform = 'translateY(' + ((1 - e) * 12 * k).toFixed(1) + 'px)'; st.filter = e < .999 ? 'blur(' + ((1 - e) * 6 * k).toFixed(1) + 'px)' : 'none'; }
+    } else if (md === 'letters') {
+      const stg = d.stg || .045;
+      for (let i = 0; i < sp.length; i++) {
+        const t0 = .15 + i * stg, x = a - t0, st = sp[i].style;
+        if (x < 0) { st.opacity = '0'; st.textShadow = 'none'; continue; }
+        const pop = eo(x / .14), g = Math.max(0, 1 - x / .5);
+        st.opacity = Math.min(1, x / .04).toFixed(3); st.transform = 'scale(' + (1 + (1 - pop) * .55).toFixed(3) + ')';
+        st.color = g > .02 ? 'rgb(' + Math.round(236 + 19 * g) + ',' + Math.round(233 + 22 * g) + ',255)' : '';
+        st.textShadow = '0 ' + (2 * k).toFixed(1) + 'px ' + (8 * k).toFixed(1) + 'px rgba(8,10,40,.95),0 0 ' + (g * 26 * k).toFixed(1) + 'px rgba(255,255,255,' + g.toFixed(2) + '),0 0 ' + (g * 10 * k).toFixed(1) + 'px #fff';
+      }
+    } else if (md === 'lines') {
+      for (let i = 0; i < sp.length; i++) { const e = eo((a - .18 - i * .5) / .35), st = sp[i].style; st.opacity = e.toFixed(3); st.transform = 'translateY(' + ((1 - e) * 7 * k).toFixed(1) + 'px)'; }
+    } else if (md === 'tremble') {
+      for (let i = 0; i < sp.length; i++) { const e = eo((a - .05 - i * .07) / .3), st = sp[i].style; st.opacity = e.toFixed(3); st.transform = 'translate(' + (Math.sin(t * 31 + i * 1.9) * 1.4 * k).toFixed(2) + 'px,' + (Math.sin(t * 27 + i * 2.7) * 1.4 * k).toFixed(2) + 'px)'; }
+    } else if (md === 'title') {
+      const r = eo(a / 1.8) * 116 - 8, m = 'linear-gradient(90deg,#000 ' + (r - 12).toFixed(1) + '%,transparent ' + r.toFixed(1) + '%)';
+      it.tx.style.webkitMaskImage = m; it.tx.style.maskImage = m;
+    } else if (md === 'end') {
+      const x = clamp((a - .15) / 2.2), kk = lerp(x, sm(x), .35) + Math.sin(x * 38) * .004 * (1 - x);
+      it.tx.style.clipPath = 'inset(-25% ' + ((1 - clamp(kk)) * 100).toFixed(2) + '% -25% 0)';
+      if (it.pen) {
+        const tx = it.tx, glow = x <= 0 ? 0 : x < 1 ? 1 : Math.max(0, 1 - (a - 2.4) * 1.5);
+        it.pen.style.left = (tx.offsetLeft + clamp(kk) * tx.offsetWidth).toFixed(1) + 'px'; it.pen.style.top = (tx.offsetTop + tx.offsetHeight * (.58 + .1 * Math.sin(x * 25))).toFixed(1) + 'px'; it.pen.style.opacity = glow.toFixed(3);
+      }
+    } else if (md === 'hint') it.el.style.setProperty('--bob', (.5 + .5 * Math.sin(t * 4.4)).toFixed(3));
+  }
   function updItems(s, t, weights) {
+    const k = cw / 720;
     ITEMS.forEach(it => {
       const sc = it.sc, d = it.d, p = (s - sc.start) / sc.len, wgt = weights[sc.i] || 0;
       const e = d.edge || .05, op = sm((p - d.a) / e) * sm((d.b - p) / e) * wgt;
-      const on = op > .02; if (on && !it.vis) { it.t0 = t; it.n = -1; } it.vis = on;
+      const on = op > .02; if (on && !it.vis) it.t0 = t; it.vis = on;
       if (!on) { if (it.el.style.opacity !== '0') { it.el.style.opacity = '0'; it.el.style.visibility = 'hidden'; } return; }
-      const mid = (d.a + d.b) / 2, dy = (mid - p) * sc.len * (d.par || 0) * .32 * ch, dx = (d.parx ? (mid - p) * sc.len * d.parx * cw : 0);
+      const a = t - it.t0, mid = (d.a + d.b) / 2, dy = (mid - p) * sc.len * (d.par || 0) * .32 * ch, dx = (d.parx ? (mid - p) * sc.len * d.parx * cw : 0);
+      let sc2 = 1, sx = 0, sy = 0;
+      if (it.mode === 'lines' || d.type === 'shock') sc2 = spring(a);
+      if (d.cls && /voice/.test(d.cls)) { const dk = Math.exp(-a * 2.2) * 2.4 * k + .5 * k; sx = Math.sin(a * 63) * dk; sy = Math.cos(a * 51) * dk * .6; }
       it.el.style.visibility = 'visible'; it.el.style.opacity = op.toFixed(3);
-      it.el.style.transform = 'translate(-50%,-50%) translate(' + dx.toFixed(1) + 'px,' + dy.toFixed(1) + 'px) rotate(' + (d.rot || 0) + 'deg) scale(' + (1 + (1 - op) * .04).toFixed(3) + ')';
-      if (d.type === 'end') {
-        const k = eo((t - it.t0) / 2.8); it.tx.style.clipPath = 'inset(-10% ' + ((1 - k) * 100).toFixed(1) + '% -10% 0)';
-        if (it.n < 0) { it.v.textContent = d.text; it.n = 1; }
-      } else {
-        const full = d.text.length, n = d.notype ? full : Math.min(full, Math.max(0, Math.floor((t - it.t0 - .12) * (d.cps || 26))));
-        if (n !== it.n) { it.n = n; it.v.textContent = d.text.slice(0, n); it.h.textContent = d.text.slice(n); }
-      }
+      it.el.style.transform = 'translate(-50%,-50%) translate(' + (dx + sx).toFixed(1) + 'px,' + (dy + sy).toFixed(1) + 'px) rotate(' + (d.rot || 0) + 'deg) scale(' + ((1 + (1 - op) * .04) * sc2).toFixed(3) + ')';
+      animText(it, a, t, k);
     });
   }
 

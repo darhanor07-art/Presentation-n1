@@ -33,7 +33,7 @@ async function stills() {
   const only = (process.env.MS_ONLY || '').split(',').filter(Boolean);
   for (let i = 0; i < segs.length; i++) {
     const g = segs[i];
-    for (const pp of [.12, .35, .6, .88]) { const n = g.id + '_' + pad(pp * 100); if (!only.length || only.includes(g.id)) await shot(g.start + pp * g.len, n); }
+    for (const pp of [.12, .35, .6, .88]) { const n = g.id + '_' + pad(pp * 100); if (!only.length || only.includes(g.id)) await shot(g.start + pp * g.len, n, i === segs.length - 1 && pp > .8 ? 34 : 14); }
     if (g.tr && (!only.length || only.includes(g.id))) for (const tt of [.3, .55, .8]) await shot(g.start + g.len - .35 + tt * .7, 'tr_' + g.id + '_' + pad(tt * 100), 0);
   }
   const ok = await check(page, errs, 'stills');

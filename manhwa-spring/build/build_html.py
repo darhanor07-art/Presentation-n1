@@ -2,7 +2,7 @@
 """Build manhwa-spring/index.html — one self-contained file (fonts, css, js, assets as base64 WebP).
 Assets: assets/manifest.json (written by the Blender render step) is read tolerantly:
   {"assets":[{"name","kind","file"}...]}  |  [{...}]  |  {"name":{"kind","file"}}   (file relative to assets/)
-kinds: plate | layer | char | eye.  Anything not found falls back to placeholders (blender/moonlit-castle/renders/*)
+kinds: plate | layer | char | eye | seq (frame sequence, e.g. feet_00..11).  Anything not found falls back to placeholders (blender/moonlit-castle/renders/*)
 or to procedurally drawn stand-ins at runtime, so re-running this script after new renders land needs no code change."""
 import os, re, io, json, base64, glob
 from PIL import Image
@@ -10,11 +10,11 @@ from PIL import Image
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(HERE); SRC = os.path.join(ROOT, 'src')
 REPO = os.path.dirname(ROOT); FONTS = os.path.join(REPO, 'manhwa', 'fonts'); REN = os.path.join(REPO, 'blender', 'moonlit-castle', 'renders')
 JS = ['engine.js', 'placeholders.js', 'scenes.js', 'main.js']
-KEYS = ['moon', 'macro', 'hero', 'gate', 'tower', 'garden', 'wide']
+KEYS = ['moon', 'macro', 'gate', 'tower', 'garden', 'ots_castle', 'ots_tair', 'hall', 'hero', 'wide']
 # placeholder plates: name -> (file, max long side)
 PH = {'hero': ('hero.png', 1080), 'wide': ('wide.png', 1600), 'f001': ('_frames/f0001.png', 540), 'f060': ('_frames/f0060.png', 540),
       'f090': ('_frames/f0090.png', 540), 'f120': ('_frames/f0120.png', 540), 'f144': ('_frames/f0144.png', 540)}
-LIMIT = {'plate': 1260, 'layer': 1400, 'char': 1100, 'eye': 1200}
+LIMIT = {'plate': 1260, 'layer': 1400, 'char': 1100, 'eye': 1600, 'seq': 900}   # seq = frame sequence (feet_00..11)
 
 def webp(img, q, maxside):
     if max(img.size) > maxside:
@@ -25,8 +25,9 @@ def kind_of(e, name, path):
     k = (e.get('kind') or e.get('type') or '').lower()
     if k in LIMIT: return k
     s = (name + ' ' + path).lower()
-    for k in ('plate', 'layer', 'char', 'eye'):
+    for k in ('plate', 'layer', 'char', 'eye', 'seq'):
         if k in s: return k
+    if re.match(r'feet_\d+', name): return 'seq'
     return 'layer'
 
 def read_manifest():
@@ -56,7 +57,7 @@ def assets_script():
     items = []; real = read_manifest(); have_plate = set()
     for name, kind, p in real:
         img = Image.open(p); img = img.convert('RGBA' if kind in ('layer', 'char') or 'A' in img.getbands() else 'RGB')
-        data, sz = webp(img, 80 if kind in ('plate', 'eye') else 86, LIMIT[kind])
+        data, sz = webp(img, 78 if kind == 'seq' else 80 if kind in ('plate', 'eye') else 86, LIMIT[kind])
         items.append({'name': name, 'kind': kind, 'w': sz[0], 'h': sz[1], 'data': 'data:image/webp;base64,' + base64.b64encode(data).decode()})
         if kind == 'plate':
             for k in KEYS:

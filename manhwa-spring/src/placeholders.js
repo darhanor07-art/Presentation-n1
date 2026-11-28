@@ -19,6 +19,7 @@
     let open = .8, gx = 0, gy = 0, pupil = .42;
     const m = /^pupil_(\d)$/.exec(st);
     if (m) { open = .86; pupil = .24 + (+m[1]) * .075; }
+    else if (/^pair_\d$/.test(st)) { open = .9; pupil = .56 - .1 * (+st.slice(5)); }
     else if (st === 'wide') { open = 1.08; pupil = .3; }
     else if (st === 'half') open = .42;
     else if (st === 'closed') open = .03;
@@ -66,6 +67,16 @@
     }
     label(g, 'placeholder · ' + name, 600, 404, 22);
     return cache[name] = c;
+  };
+
+  /* two-eye strip 1600x560 (aiaru_pair_k): two phEye side by side. Larger k = narrower pupils */
+  MS.phPair = function (name) {
+    const key = 'P:' + name; if (cache[key]) return cache[key];
+    const c = mk(1600, 560), g = c.getContext('2d'), e = MS.phEye(name.replace(/^.*?(aiaru)/, 'aiaru'));
+    const sk = g.createLinearGradient(0, 0, 0, 560); sk.addColorStop(0, '#8C86C4'); sk.addColorStop(.5, '#E6DFF4'); sk.addColorStop(1, '#C9C0E6'); g.fillStyle = sk; g.fillRect(0, 0, 1600, 560);
+    g.drawImage(e, 0, 140, 800, 280); g.save(); g.translate(1600, 0); g.scale(-1, 1); g.drawImage(e, 0, 140, 800, 280); g.restore();
+    label(g, 'placeholder · ' + name, 800, 540, 26);
+    return cache[key] = c;
   };
 
   /* ---------- characters: 640x1100, bottom-anchored ---------- */
