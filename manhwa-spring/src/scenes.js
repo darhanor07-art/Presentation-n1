@@ -129,7 +129,7 @@
     id: 'ots_castle', len: 3.6, tr: 'conic', plate: { key: 'ots_castle', ph: 'hero', alt: 'moon' },
     draw(c, p, t, s, X) {
       const u = U(), h = H(), w = W();
-      const map = MS.drawPlate(c, X.plate, { zoom: lerp(1.08, 1.3, eo(p)), fx: .5, fy: X.real ? lerp(.6, .42, eo(p)) : lerp(.8, .62, eo(p)), dx: (p - .5) * -24 * u });
+      const map = MS.drawPlate(c, X.plate, { zoom: lerp(1.04, 1.16, eo(p)), fx: .5, fy: X.real ? lerp(.66, .5, eo(p)) : lerp(.8, .62, eo(p)), dx: (p - .5) * -24 * u });
       if (!X.real) phShoulder(c, p, t, -1);
       sparkle(c, X, map, t, X.spots.length * sm((p + .1) / .6));
       MS.mist(c, t, s, { y: .84, h: .4, par: .6, vx: 10, alpha: .4 });

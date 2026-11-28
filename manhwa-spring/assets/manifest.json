@@ -34,6 +34,27 @@
     "alpha": false,
     "kind": "eye"
   },
+  "aiaru_pair_1": {
+    "file": "aiaru_pair_1.webp",
+    "w": 1600,
+    "h": 560,
+    "alpha": false,
+    "kind": "eye"
+  },
+  "aiaru_pair_2": {
+    "file": "aiaru_pair_2.webp",
+    "w": 1600,
+    "h": 560,
+    "alpha": false,
+    "kind": "eye"
+  },
+  "aiaru_pair_3": {
+    "file": "aiaru_pair_3.webp",
+    "w": 1600,
+    "h": 560,
+    "alpha": false,
+    "kind": "eye"
+  },
   "aiaru_pupil_0": {
     "file": "aiaru_pupil_0.webp",
     "w": 1200,
@@ -195,6 +216,20 @@
     "alpha": false,
     "kind": "plate"
   },
+  "plate_ots_castle": {
+    "file": "plate_ots_castle.webp",
+    "w": 900,
+    "h": 1260,
+    "alpha": false,
+    "kind": "plate"
+  },
+  "plate_ots_tair": {
+    "file": "plate_ots_tair.webp",
+    "w": 900,
+    "h": 1260,
+    "alpha": false,
+    "kind": "plate"
+  },
   "plate_tower": {
     "file": "plate_tower.webp",
     "w": 900,
@@ -250,5 +285,89 @@
     "h": 1260,
     "alpha": false,
     "kind": "layer"
+  },
+  "feet_00": {
+    "file": "feet_00.webp",
+    "w": 900,
+    "h": 1260,
+    "alpha": false,
+    "kind": "seq"
+  },
+  "feet_01": {
+    "file": "feet_01.webp",
+    "w": 900,
+    "h": 1260,
+    "alpha": false,
+    "kind": "seq"
+  },
+  "feet_02": {
+    "file": "feet_02.webp",
+    "w": 900,
+    "h": 1260,
+    "alpha": false,
+    "kind": "seq"
+  },
+  "feet_03": {
+    "file": "feet_03.webp",
+    "w": 900,
+    "h": 1260,
+    "alpha": false,
+    "kind": "seq"
+  },
+  "feet_04": {
+    "file": "feet_04.webp",
+    "w": 900,
+    "h": 1260,
+    "alpha": false,
+    "kind": "seq"
+  },
+  "feet_05": {
+    "file": "feet_05.webp",
+    "w": 900,
+    "h": 1260,
+    "alpha": false,
+    "kind": "seq"
+  },
+  "feet_06": {
+    "file": "feet_06.webp",
+    "w": 900,
+    "h": 1260,
+    "alpha": false,
+    "kind": "seq"
+  },
+  "feet_07": {
+    "file": "feet_07.webp",
+    "w": 900,
+    "h": 1260,
+    "alpha": false,
+    "kind": "seq"
+  },
+  "feet_08": {
+    "file": "feet_08.webp",
+    "w": 900,
+    "h": 1260,
+    "alpha": false,
+    "kind": "seq"
+  },
+  "feet_09": {
+    "file": "feet_09.webp",
+    "w": 900,
+    "h": 1260,
+    "alpha": false,
+    "kind": "seq"
+  },
+  "feet_10": {
+    "file": "feet_10.webp",
+    "w": 900,
+    "h": 1260,
+    "alpha": false,
+    "kind": "seq"
+  },
+  "feet_11": {
+    "file": "feet_11.webp",
+    "w": 900,
+    "h": 1260,
+    "alpha": false,
+    "kind": "seq"
   }
 }

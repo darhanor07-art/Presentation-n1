@@ -352,7 +352,7 @@ def build_face_base():
         for x in xs:
             rl = min(math.hypot(x - IOD, z), math.hypot(x + IOD, z))
             xl = min(x - IOD, x + IOD, key=abs)
-            y = pair_yb(x, z) + 0.03 * (1 - SMOOTH(1.2, 1.6, rl))
+            y = pair_yb(x, z) + 0.004 + 0.03 * (1 - SMOOTH(1.2, 2.6, rl))
             verts.append((x, y, z)); glow.append(glow_fn(xl, z))
     faces = [(j * nx + i, j * nx + i + 1, (j + 1) * nx + i + 1, (j + 1) * nx + i) for j in range(nz - 1) for i in range(nx - 1)]
     ob = mesh_obj("FaceBase", verts, faces, [SKIN_MAT], smooth=True)
@@ -438,7 +438,7 @@ def build_lids(who, up, low, pitch):
             else:
                 y += (0.017 if PAIR else 0.03) * math.exp(-((s - 0.55) / 0.12) ** 2)
             if PAIR:    # the outer part of the lid patch sinks behind the shared face surface
-                y += 0.05 * SMOOTH(1.1, 1.55, s)        # outer edge of the patch tucks well under the shared face surface
+                y += 0.03 * SMOOTH(0.5, 1.55, s)        # patch sinks gently under the shared face surface (shallow crossing angle)
             return (px, y, pz)
         return fn
 

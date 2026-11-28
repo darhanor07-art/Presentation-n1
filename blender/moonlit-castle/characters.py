@@ -418,7 +418,7 @@ def build_foot(side, name, mats, parent):
         objs.append(blob(f"Bow{name}", np.array([sg * 0.0085, 0.098, bz + 0.0]), (0.0085, 0.006, 0.0042), shoe, (0, 0, sg * 0.35), seg=12))
     objs.append(blob(f"BowKnot{name}", np.array([0.0, 0.098, bz]), (0.0036, 0.0036, 0.0036), shoe, seg=10))
     # ankle bones (medial / lateral malleolus)
-    for xs_, ys_, zs_, rr in ((0.0255, 0.003, 0.004, 0.0105), (-0.0250, -0.006, -0.008, 0.0095)):
+    for xs_, ys_, zs_, rr in ((0.0215, 0.003, 0.004, 0.0066), (-0.0212, -0.006, -0.008, 0.0060)):
         objs.append(blob(f"Malleolus{name}", np.array([xs_ * side, ys_, zs_]), (rr, rr * 1.15, rr * 1.05), skin, seg=14))
     for o in objs:
         o.parent = parent

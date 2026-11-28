@@ -328,7 +328,8 @@ def place_char(who, P, loc, yaw_deg):
     root.location = loc
     root.rotation_euler = (0, 0, math.radians(yaw_deg))
     for o in new:
-        o.parent = root
+        if o.parent is None:
+            o.parent = root
     return root, new
 
 
@@ -390,7 +391,7 @@ def prep_ots_castle(name):
 
 
 OTS_C = dict(back=0.88, right=0.15, up=-0.03, yaw=0.0, el=7.0)
-TAIR_C = dict(look_az=-17.0, tair_off=4.5, dist=4.4, cam_up=-0.30, el=7.0, moon_up=3.5)
+TAIR_C = dict(back=0.98, right=0.25, look_az=-17.0, tair_off=4.5, dist=4.4, cam_up=-0.30, el=7.0, moon_up=3.5)
 
 
 def set_moon(cp, az, el):
@@ -420,7 +421,7 @@ def prep_ots_tair(name):
     a = math.radians(yawA)
     fwd = Vector((-math.sin(a), math.cos(a), 0)); right = Vector((math.cos(a), math.sin(a), 0))
     hd = Vector((ax, ay, az0 + 1.575))
-    cp = hd - fwd * OTS_C["back"] + right * OTS_C["right"] + Vector((0, 0, T["cam_up"]))
+    cp = hd - fwd * T["back"] + right * T["right"] + Vector((0, 0, T["cam_up"]))
     cam = O["CAM_OTS_TAIR"]
     cam.location = cp
     tgt = dirpt(cp, look, T["el"])
@@ -465,7 +466,7 @@ def prep_ots_tair(name):
 
 
 # ---------------------------------------------------------------- feet walk cycle (12 frames, one full gait cycle)
-FEET = dict(S0=(-0.6, 6.0), phi=-40.0, dist=1.25, cam_z=0.28, look_z=0.17, nflower=260, seed=7)
+FEET = dict(S0=(-0.6, 6.0), phi=-40.0, dist=1.3, cam_z=0.28, look_z=0.27, nflower=260, seed=7)
 FEET_STATE = {}
 
 
@@ -477,15 +478,24 @@ def feet_setup():
     C.GAIT_L = 0.9
     sx, sy = F["S0"]
     x0, x1, y0, y1 = sx - 1.3, sx + 1.7, sy - 2.5, sy + 2.4
-    for nm, keep_every in (("FlowerScatter", 0), ("GrassScatter", 9)):
-        me = O[nm].data
-        bm = bmesh.new(); bm.from_mesh(me)
-        kill = []
-        for i, v in enumerate(bm.verts):
-            if x0 < v.co.x < x1 and y0 < v.co.y < y1 and not (keep_every and i % keep_every == 0 and v.co.y > sy + 0.5):
-                kill.append(v)
-        bmesh.ops.delete(bm, geom=kill, context="VERTS")
-        bm.to_mesh(me); bm.free(); me.update()
+    me = O["FlowerScatter"].data
+    bm = bmesh.new(); bm.from_mesh(me)
+    bmesh.ops.delete(bm, geom=[v for v in bm.verts if x0 < v.co.x < x1 and y0 < v.co.y < y1], context="VERTS")
+    bm.to_mesh(me); bm.free(); me.update()
+    # grass stays but is cut down to short tufts around the lane so the ground is covered and the shoes stay readable
+    me = O["GrassScatter"].data
+    n_ = len(me.vertices)
+    co = np.zeros(n_ * 3, np.float32); me.vertices.foreach_get("co", co); co = co.reshape(-1, 3)
+    sc_ = np.zeros(n_ * 3, np.float32); me.attributes["scl"].data.foreach_get("vector", sc_); sc_ = sc_.reshape(-1, 3)
+    m_ = (co[:, 0] > x0) & (co[:, 0] < x1) & (co[:, 1] > y0) & (co[:, 1] < y1)
+    sc_[m_] *= 0.30
+    # almost bare right under the walking lane (blades would pierce the shoes)
+    ph_ = math.radians(FEET["phi"]); Dx, Dy = math.cos(ph_), math.sin(ph_)
+    rx, ry = co[:, 0] - sx, co[:, 1] - sy
+    along, lat = rx * Dx + ry * Dy, -rx * Dy + ry * Dx
+    m2 = (along > -0.55) & (along < 0.9 + 0.55) & (np.abs(lat) < 0.30)
+    sc_[m2 & m_] *= 0.35
+    me.attributes["scl"].data.foreach_set("vector", sc_.ravel()); me.update()
     rng = np.random.default_rng(F["seed"])
     flowers = []
     n = F["nflower"]
@@ -546,11 +556,16 @@ def prep_feet(name):
     bpy.context.view_layer.update()
     feet = [o for o in objs if o.type == "EMPTY"]
     # camera travels with the body (planted foot stays planted in the world)
-    off = Vector((0.12, -F["dist"], 0))
+    off = Vector((0.16, -F["dist"], 0))
     cp = Vector((B.x + off.x, B.y + off.y, 0)); cp.z = ground(cp.x, cp.y) + F["cam_z"]
     if "CAM_FEET" in O:
         bpy.data.objects.remove(O["CAM_FEET"])
-    cam = make_cam("CAM_FEET", cp, (B.x + 0.02, B.y, B.z + F["look_z"]), 50, 2.8, F["dist"] + 0.02)
+    if os.environ.get("FEET_DBG"):      # close look at the front foot (debug only)
+        a0 = feet[0].matrix_world.translation
+        cp = Vector((a0.x + 0.30, a0.y - 0.45, a0.z + 0.12))
+        cam = make_cam("CAM_FEET", cp, (a0.x, a0.y, a0.z), 50, 8.0, (a0 - cp).length)
+    else:
+        cam = make_cam("CAM_FEET", cp, (B.x + 0.17, B.y, B.z + F["look_z"]), 50, 2.8, F["dist"] + 0.02)
     # flowers: bend away from the feet
     fp = []
     for e in feet:
@@ -587,21 +602,22 @@ def prep_feet(name):
     for ev in (-12, -6, 0, 6):
         side = 1 if (ev // 6) % 2 == 0 else -1
         c0 = feet_world(ev, side, phi, S0)
-        for j in range(6):
+        for j in range(4):
             o = pets[idx]; idx += 1
             r = np.random.default_rng(1000 + ev * 7 + j)
             tau = (fi - ev) / 24.0
-            if tau < 0.0 or tau > 0.95:
+            if tau < 0.04 or tau > 0.95:
                 o.hide_render = True
                 continue
             o.hide_render = False
-            vz, vx, vy = r.uniform(0.7, 1.4), r.normal(0, 0.18), r.normal(0, 0.18)
-            pos = c0 + Vector((r.normal(0, 0.05) + vx * tau + 0.15 * tau * D.x, r.normal(0, 0.05) + vy * tau + 0.15 * tau * D.y, 0))
-            pos.z = ground(pos.x, pos.y) + 0.03 + vz * tau - 0.9 * tau * tau
+            ang = r.uniform(0, 6.28); rad0 = r.uniform(0.11, 0.18)       # start well clear of the shoe
+            vz, sp_ = r.uniform(0.35, 0.8), r.uniform(0.15, 0.35)
+            pos = c0 + Vector((math.cos(ang) * (rad0 + sp_ * tau), math.sin(ang) * (rad0 + sp_ * tau), 0))
+            pos.z = ground(pos.x, pos.y) + 0.05 + vz * tau - 0.8 * tau * tau
             o.location = pos
             sp = r.uniform(3, 7)
             o.rotation_euler = (r.uniform(0, 6.28) + sp * tau, r.uniform(0, 6.28) + sp * 0.6 * tau, r.uniform(0, 6.28))
-            sz = r.uniform(1.8, 2.8)
+            sz = r.uniform(0.28, 0.40)
             o.scale = (sz, sz, sz)
     for o in pets[idx:]:
         o.hide_render = True
@@ -662,7 +678,7 @@ def render(name):
     W, H = (450, 630) if QUICK else (900, 1260)
     sc.render.resolution_x, sc.render.resolution_y = W, H
     sc.render.resolution_percentage = 100
-    cy.samples = 16 if QUICK else (40 if layer in ("sky",) else 56)
+    cy.samples = 16 if QUICK else (36 if kind == "seq" else (40 if layer in ("sky",) else 56))
     cy.adaptive_threshold = 0.03 if QUICK else 0.02
     cy.volume_step_rate = 3.0
     cy.volume_max_steps = 96
