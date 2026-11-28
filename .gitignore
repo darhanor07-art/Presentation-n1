@@ -1,1 +1,11 @@
 __pycache__/
+.reanimate/
+.claude/skills/reanimate/scripts/node_modules/
+manhwa/build/_*.html
+manhwa/build/_*.mp4
+manhwa/stills/_*/
+manhwa/build/_raw/
+**/.hyperframes/
+manhwa/build/_*/
+manhwa/assets/audio/*.wav
+manhwa/build/vendor/node_modules/

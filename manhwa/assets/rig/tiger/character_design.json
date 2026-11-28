@@ -1,0 +1,53 @@
+{
+ "version": "1.0",
+ "style": {
+  "visual_style": "korean woodblock print (minhwa / manhwa), flat 1-colour print shader, hatch tones",
+  "palette": [
+   "red",
+   "ink",
+   "paper",
+   "blue (daenggi only)",
+   "gold (sky tiger eyes only)"
+  ],
+  "line_style": "bold ink outlines 3px, tapered strokes",
+  "texture": "hatch / grain / dots tone layers"
+ },
+ "characters": [
+  {
+   "id": "tiger",
+   "display_name": "Tiger (범)",
+   "role": "minhwa tiger emblem: red print -> alive ink tiger; faint sky tiger in the finale",
+   "body_type": "front face emblem; art unit space = half the emblem size (head spans about -1..1), design px 1000 = 1 unit",
+   "style": "woodblock print, red then ink",
+   "silhouette_notes": "REFINED: eyes/lids/pupils/brows/ears/jaw/whiskers are separate transformable parts of one flat emblem.",
+   "required_emotions": [
+    "asleep",
+    "awake",
+    "wary",
+    "fierce"
+   ],
+   "required_actions": [
+    "wake",
+    "eyes_open",
+    "ear_flick",
+    "brow_furrow",
+    "roar",
+    "blink_slow",
+    "breathe"
+   ],
+   "required_views": [
+    "front"
+   ],
+   "props": [],
+   "constraints": [
+    "face is a flat emblem: all motion is part transforms / channels"
+   ]
+  }
+ ],
+ "metadata": {
+  "source": "character_spec_generator",
+  "brief": "MOKPAN web-manhwa character tiger",
+  "refined": true,
+  "refined_by": "build/rigs/refine_rigs.py"
+ }
+}

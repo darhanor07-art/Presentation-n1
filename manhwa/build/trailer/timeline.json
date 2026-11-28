@@ -1,0 +1,182 @@
+{
+  "fps": 30,
+  "duration": 43.333,
+  "frames": 1300,
+  "leadIn": 0.6,
+  "tail": 1.8,
+  "speeds": {
+    "scene": 0.55,
+    "transition": 0.8
+  },
+  "segments": [
+    {
+      "id": "s01",
+      "kind": "scene",
+      "hold": null,
+      "vhStart": 0,
+      "vhLen": 1.4,
+      "start": 0.6,
+      "end": 3.167
+    },
+    {
+      "id": "t01",
+      "kind": "transition",
+      "hold": null,
+      "vhStart": 1.4,
+      "vhLen": 0.6,
+      "start": 3.167,
+      "end": 3.933
+    },
+    {
+      "id": "s02",
+      "kind": "scene",
+      "hold": null,
+      "vhStart": 2,
+      "vhLen": 1.8,
+      "start": 3.933,
+      "end": 7.233
+    },
+    {
+      "id": "t02",
+      "kind": "transition",
+      "hold": null,
+      "vhStart": 3.8,
+      "vhLen": 0.6,
+      "start": 7.233,
+      "end": 8
+    },
+    {
+      "id": "s03",
+      "kind": "scene",
+      "hold": null,
+      "vhStart": 4.3999999999999995,
+      "vhLen": 1.6,
+      "start": 8,
+      "end": 10.933
+    },
+    {
+      "id": "t03",
+      "kind": "transition",
+      "hold": null,
+      "vhStart": 6,
+      "vhLen": 0.35,
+      "start": 10.933,
+      "end": 11.4
+    },
+    {
+      "id": "s04",
+      "kind": "scene",
+      "hold": null,
+      "vhStart": 6.35,
+      "vhLen": 2.2,
+      "start": 11.4,
+      "end": 15.4
+    },
+    {
+      "id": "s05",
+      "kind": "scene",
+      "hold": "press",
+      "vhStart": 8.55,
+      "vhLen": 2,
+      "start": 15.4,
+      "end": 23.067,
+      "hold_window": {
+        "start": 16.7,
+        "release": 19.3,
+        "end": 19.3
+      }
+    },
+    {
+      "id": "s06",
+      "kind": "scene",
+      "hold": null,
+      "vhStart": 10.55,
+      "vhLen": 1.6,
+      "start": 23.067,
+      "end": 26
+    },
+    {
+      "id": "t06",
+      "kind": "transition",
+      "hold": null,
+      "vhStart": 12.15,
+      "vhLen": 0.8,
+      "start": 26,
+      "end": 27
+    },
+    {
+      "id": "s07",
+      "kind": "scene",
+      "hold": "pull",
+      "vhStart": 12.950000000000001,
+      "vhLen": 2.2,
+      "start": 27,
+      "end": 34.933,
+      "hold_window": {
+        "start": 28.433,
+        "release": 30.033,
+        "end": 30.933
+      }
+    },
+    {
+      "id": "t07",
+      "kind": "transition",
+      "hold": null,
+      "vhStart": 15.150000000000002,
+      "vhLen": 0.35,
+      "start": 34.933,
+      "end": 35.4
+    },
+    {
+      "id": "s08",
+      "kind": "scene",
+      "hold": null,
+      "vhStart": 15.500000000000002,
+      "vhLen": 1.2,
+      "start": 35.4,
+      "end": 37.6
+    },
+    {
+      "id": "t08",
+      "kind": "transition",
+      "hold": null,
+      "vhStart": 16.700000000000003,
+      "vhLen": 0.8,
+      "start": 37.6,
+      "end": 38.6
+    },
+    {
+      "id": "s09",
+      "kind": "scene",
+      "hold": null,
+      "vhStart": 17.500000000000004,
+      "vhLen": 1.6,
+      "start": 38.6,
+      "end": 41.533
+    }
+  ],
+  "events": {
+    "s01_seal": 2.1,
+    "s03_door_start": 8.867,
+    "s03_door_end": 10.3,
+    "s04_brush1": 13.567,
+    "s04_brush2": 14.267,
+    "s05_paper_drop": 16.3,
+    "s05_rub_start": 16.7,
+    "s05_rub_end": 19.3,
+    "s05_peel_start": 18.9,
+    "s06_eyes_open": 24.1,
+    "s06_roar": 25.567,
+    "t06_claw0": 26,
+    "t06_claw1": 26.067,
+    "t06_claw2": 26.133,
+    "t06_claw3": 26.233,
+    "s07_hold_start": 28.433,
+    "s07_release": 30.033,
+    "s07_bell": 30.313,
+    "s08_crack": 35.4,
+    "s08_split": 36.133,
+    "t08_ribbon": 37.767,
+    "s09_end_seal": 40.033
+  }
+}

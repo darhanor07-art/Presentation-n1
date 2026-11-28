@@ -1,0 +1,285 @@
+{
+  "name": "ridges",
+  "title": "Red Moon Ridges (MOKPAN s02 / s09)",
+  "quality_tier": "blockout",
+  "width": 1008,
+  "height": 1008,
+  "notes": "Rendered 1008x1008 = 1400x1400 world units (1 px = 1.389 units). The 720 px centre crop is the 1000-unit safe frame; the extra width is for wide screens.",
+  "explicit_constraints": [
+    "mountains under a red moon at night",
+    "far ridge band, middle peaks, near ridges/foothills",
+    "no landmarks (the 2D hanok eave stays in front)",
+    "no water",
+    "OpenMontage free tools only, no API key"
+  ],
+  "inferred_details": [
+    "7 semantic regions grouped in 3 depth classes (far/mid/near) sharing one ID key colour each",
+    "ridge landform for far and near bands, peak landform for the middle band",
+    "dense fog so far ridges fade toward the sky colour (aerial perspective -> hatch density)",
+    "low grazing key light from the left so relief reads as shading",
+    "camera paths: s02 upward crane + push (36 frames), s09 low horizon tilt down (24 frames)"
+  ],
+  "world_spec": {
+    "version": "1.0",
+    "title": "Red Moon Ridges",
+    "seed": 259,
+    "world": {
+      "size": 160,
+      "resolution": 260,
+      "elevation_scale": 26,
+      "water_level": -80
+    },
+    "atmosphere": {
+      "sky_color": "#cf2a1b",
+      "fog_color": "#b8392c",
+      "fog_density": 0.013,
+      "sun_color": "#ffd9c0",
+      "sun_intensity": 3.2,
+      "sun_position": [
+        -70,
+        26,
+        -30
+      ],
+      "ground_color": "#1a0f0d"
+    },
+    "regions": [
+      {
+        "id": "far_a",
+        "label": "Far ridge W",
+        "center": [
+          -0.55,
+          -0.85
+        ],
+        "radius": 0.6,
+        "base_elevation": 0.8,
+        "amplitude": 1.0,
+        "frequency": 2.4,
+        "landform": "peak",
+        "blend_width": 0.12,
+        "color": "#7d4a42",
+        "accent_color": "#ff0000",
+        "scatter": {
+          "tree": 0,
+          "rock": 0,
+          "crystal": 0
+        }
+      },
+      {
+        "id": "far_b",
+        "label": "Far ridge E",
+        "center": [
+          0.55,
+          -0.9
+        ],
+        "radius": 0.6,
+        "base_elevation": 0.85,
+        "amplitude": 0.9,
+        "frequency": 3.0,
+        "landform": "peak",
+        "blend_width": 0.12,
+        "color": "#7d4a42",
+        "accent_color": "#ff0000",
+        "scatter": {
+          "tree": 0,
+          "rock": 0,
+          "crystal": 0
+        }
+      },
+      {
+        "id": "mid_a",
+        "label": "Middle peak W",
+        "center": [
+          -0.45,
+          -0.38
+        ],
+        "radius": 0.5,
+        "base_elevation": 0.35,
+        "amplitude": 1.1,
+        "frequency": 2.6,
+        "landform": "peak",
+        "blend_width": 0.12,
+        "color": "#5a3a34",
+        "accent_color": "#00ff00",
+        "scatter": {
+          "tree": 0,
+          "rock": 0,
+          "crystal": 0
+        }
+      },
+      {
+        "id": "mid_b",
+        "label": "Middle peak E",
+        "center": [
+          0.5,
+          -0.3
+        ],
+        "radius": 0.5,
+        "base_elevation": 0.3,
+        "amplitude": 1.1,
+        "frequency": 3.2,
+        "landform": "peak",
+        "blend_width": 0.12,
+        "color": "#5a3a34",
+        "accent_color": "#00ff00",
+        "scatter": {
+          "tree": 0,
+          "rock": 0,
+          "crystal": 0
+        }
+      },
+      {
+        "id": "near_a",
+        "label": "Near foothills W",
+        "center": [
+          -0.5,
+          0.15
+        ],
+        "radius": 0.55,
+        "base_elevation": 0.02,
+        "amplitude": 0.55,
+        "frequency": 3.0,
+        "landform": "ridge",
+        "blend_width": 0.12,
+        "color": "#3b2824",
+        "accent_color": "#0000ff",
+        "scatter": {
+          "tree": 0,
+          "rock": 0,
+          "crystal": 0
+        }
+      },
+      {
+        "id": "near_b",
+        "label": "Near foothills E",
+        "center": [
+          0.5,
+          0.2
+        ],
+        "radius": 0.55,
+        "base_elevation": 0,
+        "amplitude": 0.5,
+        "frequency": 3.5,
+        "landform": "ridge",
+        "blend_width": 0.12,
+        "color": "#3b2824",
+        "accent_color": "#0000ff",
+        "scatter": {
+          "tree": 0,
+          "rock": 0,
+          "crystal": 0
+        }
+      },
+      {
+        "id": "near_c",
+        "label": "Near foreground",
+        "center": [
+          0.0,
+          0.75
+        ],
+        "radius": 0.7,
+        "base_elevation": 0,
+        "amplitude": 0.25,
+        "frequency": 3.2,
+        "landform": "ridge",
+        "blend_width": 0.15,
+        "color": "#2a1b18",
+        "accent_color": "#0000ff",
+        "scatter": {
+          "tree": 0,
+          "rock": 0,
+          "crystal": 0
+        }
+      }
+    ],
+    "landmarks": []
+  },
+  "classes": {
+    "sky": [
+      0,
+      0,
+      0
+    ],
+    "far": [
+      255,
+      0,
+      0
+    ],
+    "mid": [
+      0,
+      255,
+      0
+    ],
+    "near": [
+      0,
+      0,
+      255
+    ]
+  },
+  "class_of_region_prefix": {
+    "far": "far",
+    "mid": "mid",
+    "near": "near"
+  },
+  "variants": {
+    "s02": {
+      "frames": 36,
+      "ease": "inOutQuad",
+      "from": {
+        "position": [
+          0,
+          24,
+          100
+        ],
+        "target": [
+          0,
+          40,
+          -20
+        ],
+        "fov": 42
+      },
+      "to": {
+        "position": [
+          0,
+          36,
+          86
+        ],
+        "target": [
+          0,
+          34,
+          -24
+        ],
+        "fov": 40
+      }
+    },
+    "s09": {
+      "frames": 24,
+      "ease": "inOutQuad",
+      "from": {
+        "position": [
+          0,
+          16,
+          96
+        ],
+        "target": [
+          0,
+          48,
+          -60
+        ],
+        "fov": 44
+      },
+      "to": {
+        "position": [
+          0,
+          16,
+          96
+        ],
+        "target": [
+          0,
+          14,
+          -60
+        ],
+        "fov": 44
+      }
+    }
+  }
+}
