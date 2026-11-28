@@ -1,4 +1,7 @@
-/* art/tiger.js — minhwa-style front-face tiger emblem. MK.art.tiger(P, cx, cy, size, s) */
+/* art/tiger.js — minhwa-style front-face tiger emblem. MK.art.tiger(P, cx, cy, size, s)
+   Rig parts (MK.rig 'tiger', assets/rig/tiger): ears (flick), brows (furrow), eyelids (close), pupils (dilate/gaze), jaw (open), whisker bundles,
+   head (breath scale via root/head). Options: s.rig = state from MK.rig.eval('tiger',{variant:'face',scene,clock,t}) or s.action = {scene,clock,t}.
+   Rig channels add to the v1 params (eyeOpen*(1-close), mouthOpen+jaw.open, pupil+dilate); without a rig the rest state = v1 look. */
 (function () {
   'use strict';
   var MK = window.MK, art = MK.art = MK.art || {}, clamp = MK.clamp;
@@ -57,23 +60,40 @@
   }
   var STRIPES = null;
 
+  /* apply a rig part's local transform (about its pivot, in emblem units) around fn */
+  function loc(r, id, fn) {
+    var pv = r.c.byId[id].pv, S = r.c.scale, px = pv[0] / S, py = pv[1] / S;
+    P_.push(); P_.translate(px + r.u(id, 'x'), py + r.u(id, 'y')); P_.rotate(r.get(id, 'rotation') * Math.PI / 180); P_.scale(r.get(id, 'scaleX'), r.get(id, 'scaleY')); P_.translate(-px, -py);
+    fn(); P_.pop();
+  }
+  function mat(r, id) { var M = r.M(id); P_.transform(M[0], M[1], M[2], M[3], M[4], M[5]); }
+  var P_ = null;
+
   /* one full stack of the front face in a given line colour */
   function face(P, s, o) {
-    var g = geom(), ow = o.ow, ln = o.line, th = o.thick, e = s.eyeOpen, sx;
+    var g = geom(), ow = o.ow, ln = o.line, th = o.thick, e = s.eyeOpen, sx, r = s._r; P_ = P;
     var faceSt = o.alive ? { c: 'paper', t: .08, h: 'grain', a: 0 } : { c: 'paper', t: .1, h: 'dots' };
     var dark = { c: ln, t: 0 };
-    // ears
+    // ears (rig: flick / pin back)
     [-1, 1].forEach(function (sx) {
-      P.circle(sx * .72, -.78, .17, { c: ln, t: 0 });
-      P.ellipse(sx * .75, -.79, .05, .07, { c: 'paper', t: 0 });
+      P.push(); mat(r, sx < 0 ? 'face_root' : 'face_root');
+      loc(r, sx < 0 ? 'face_ear_l' : 'face_ear_r', function () {
+        P.circle(sx * .72, -.78, .17, { c: ln, t: 0 });
+        P.ellipse(sx * .75, -.79, .05, .07, { c: 'paper', t: 0 });
+      });
+      P.pop();
     });
+    P.push(); mat(r, 'face_head');
     // head
     var hs = { stroke: { w: ow, c: ln } }; for (var k in faceSt) hs[k] = faceSt[k];
     P.poly(g.head, hs);
     P.ellipse(0, .41, .40, .36, { c: 'paper', t: 0 });
     // stripes
     [-1, 1].forEach(function (sx) { P.ellipse(sx * .41, -.455, .21, .065, { c: 'paper', t: 0 }, -sx * .3); });
-    STRIPES.forEach(function (st) { var w0 = st.w[0] * th; P.taper(st.pts, function (u) { return w0 * Math.pow(1 - u, .85) + .004; }, dark, 7); });
+    STRIPES.forEach(function (st) {
+      var w0 = st.w[0] * th, f = function () { P.taper(st.pts, function (u) { return w0 * Math.pow(1 - u, .85) + .004; }, dark, 7); };
+      if (st.k === 'brow') loc(r, st.pts[0][0] < 0 ? 'face_brow_l' : 'face_brow_r', f); else f();
+    });
     // 王
     [[-.62, .21], [-.51, .18], [-.40, .21]].forEach(function (r) {
       P.taper([[-r[1], r[0]], [0, r[0] - .004], [r[1], r[0]]], function (u) { return .10 * th * Math.pow(Math.max(0, 1 - Math.pow(Math.abs(2 * u - 1), 2.2)), .7) + .006; }, dark, 6);
@@ -81,16 +101,17 @@
     P.taper([[0, -.66], [0, -.51], [0, -.36]], function (u) { return .085 * th * (1 - Math.pow(Math.abs(2 * u - 1), 3)) + .01; }, dark, 6);
     // eyes
     [-1, 1].forEach(function (sx) {
-      var E = g.eyes[sx], lidY = MK.lerp(-.04, -.40, clamp(e, 0, 1));
+      var E = g.eyes[sx], side = sx < 0 ? 'l' : 'r', e = s.eyeOpen * (1 - clamp(r.get('face_lid_' + side, 'close'), 0, 1)), lidY = MK.lerp(-.04, -.40, clamp(e, 0, 1));
+      var pdil = s.pupil + r.get('face_pupil_' + side, 'dilate'), pgx = r.u('face_pupil_' + side, 'x') + r.get('face_pupil_' + side, 'gx') / 1000, pgy = r.u('face_pupil_' + side, 'y') + r.get('face_pupil_' + side, 'gy') / 1000;
       P.clip(E.path, function () {
         P.circle(E.cx, E.cy, .32, { c: 'paper', t: 0 });
         if (e < 1) { /* closed part = face colour */ }
         P.clip([[-1, lidY], [1, lidY], [1, 1], [-1, 1]], function () {
           if (e > .02) {
             var gold = o.alive;
-            P.circle(E.cx, E.cy, .095, { c: gold ? 'gold' : ln, t: gold ? P.rad(E.cx, E.cy, .03, .095, [[0, 0], [.7, .05], [1, .45]]) : 0, a: 90 });
-            P.ellipse(E.cx, E.cy, .008 + .032 * s.pupil, .09, { c: gold ? 'ink' : 'paper', t: 0 });
-            P.circle(E.cx + .034, E.cy - .03, .018, { c: 'paper', t: 0 });
+            P.circle(E.cx + pgx, E.cy + pgy, .095, { c: gold ? 'gold' : ln, t: gold ? P.rad(E.cx + pgx, E.cy + pgy, .03, .095, [[0, 0], [.7, .05], [1, .45]]) : 0, a: 90 });
+            P.ellipse(E.cx + pgx, E.cy + pgy, Math.max(.004, .008 + .032 * pdil), .09, { c: gold ? 'ink' : 'paper', t: 0 });
+            P.circle(E.cx + pgx + .034, E.cy + pgy - .03, .018, { c: 'paper', t: 0 });
           }
         });
         if (e < 1) P.rect(-1, -.7, 2, lidY + .7, { c: 'paper', t: faceSt.t, h: faceSt.h, a: faceSt.a || 0 });
@@ -112,7 +133,7 @@
     [-1, 1].forEach(function (sx) { [[.09, .30], [.17, .33], [.12, .385]].forEach(function (d) { P.circle(sx * d[0], d[1], .015, dark); }); });
     P.ellipse(0, .33, .02, .06, { c: 'paper', t: 0 });
     // mouth
-    var m = clamp(s.mouthOpen, 0, 1);
+    var m = clamp(s.mouthOpen + r.get('face_jaw', 'open'), 0, 1);
     if (m > .01) {
       var lip = [[-.25, .435], [-.12, .405], [0, .375], [.12, .405], [.25, .435]];
       var low = quad([.24, .44], [.2, .44 + .26 * m], [0, .46 + .30 * m], 8).concat(quad([0, .46 + .30 * m], [-.2, .44 + .26 * m], [-.24, .44], 8).slice(1));
@@ -124,19 +145,23 @@
       P.taper([[0, .25], [0, .36], [sx * .10, .42], [sx * .21, .43]], [.03 * th, .01], dark, 6);
     });
     // whiskers
-    [[.29, .22], [.33, .36], [.37, .50]].forEach(function (w, i) {
-      [-1, 1].forEach(function (sx) {
-        P.taper([[sx * .22, w[0]], [sx * .55, (w[0] + w[1]) / 2 - .05 + i * .02], [sx * .86, w[1]]], [.018, .004], dark, 6);
+    [-1, 1].forEach(function (sx) {
+      loc(r, sx < 0 ? 'face_whisker_l' : 'face_whisker_r', function () {
+        [[.29, .22], [.33, .36], [.37, .50]].forEach(function (w, i) {
+          P.taper([[sx * .22, w[0]], [sx * .55, (w[0] + w[1]) / 2 - .05 + i * .02], [sx * .86, w[1]]], [.018, .004], dark, 6);
+        });
       });
     });
+    P.pop();
   }
 
   /* sky: faint, cloud-built tiger over a red sky */
   function sky(P, s, ow) {
-    var g = geom(), e = clamp(s.eyeOpen, 0, 1), al = s.skyAlpha == null ? 1 : s.skyAlpha;
+    var g = geom(), e0 = clamp(s.eyeOpen, 0, 1), al = s.skyAlpha == null ? 1 : s.skyAlpha, r = s._r; P_ = P;
     var F = { c: 'red', t: .26, a: 90 }, D = { c: 'red', t: .8, a: 90 };
     P.alpha(al, function () {
-      [-1, 1].forEach(function (sx) { P.circle(sx * .72, -.78, .17, D); P.ellipse(sx * .75, -.79, .05, .07, F); });
+      [-1, 1].forEach(function (sx) { P.push(); mat(r, 'face_root'); loc(r, sx < 0 ? 'face_ear_l' : 'face_ear_r', function () { P.circle(sx * .72, -.78, .17, D); P.ellipse(sx * .75, -.79, .05, .07, F); }); P.pop(); });
+      P.push(); mat(r, 'face_head');
       P.poly(g.head, F);
       P.stroke(g.head.concat([g.head[0]]), { w: ow * 1.2, c: 'red', t: .7, a: 90 });
       P.ellipse(0, .41, .40, .36, { c: 'red', t: .1, a: 90 });
@@ -145,18 +170,21 @@
       P.taper([[0, -.66], [0, -.36]], [.06, .06], D, 2);
       P.path('M-.12 .08 L.12 .08 Q.14 .17 0 .255 Q-.14 .17 -.12 .08 Z', { c: 'red', t: .9, a: 90 });
       [-1, 1].forEach(function (sx) { P.taper([[0, .25], [0, .36], [sx * .10, .42], [sx * .21, .43]], [.03, .01], D, 6); });
+      P.pop();
     });
+    P.push(); mat(r, 'face_head');
     [-1, 1].forEach(function (sx) {
-      var E = g.eyes[sx];
+      var E = g.eyes[sx], side = sx < 0 ? 'l' : 'r', e = e0 * (1 - clamp(r.get('face_lid_' + side, 'close'), 0, 1)), pdil = s.pupil + r.get('face_pupil_' + side, 'dilate');
       P.circle(E.cx, E.cy, .27, { c: 'paper', t: P.rad(E.cx, E.cy, .05, .27, [[0, 0], [.45, .22], [1, .95]]), a: 90 });
       P.clip(E.path, function () {
         P.circle(E.cx, E.cy, .3, { c: 'gold', t: 0 });
         if (e < 1) P.rect(-1, -.7, 2, MK.lerp(-.04, -.40, e) + .7, { c: 'red', t: .26, a: 90 });
-        P.ellipse(E.cx, E.cy, .009 + .026 * s.pupil, .09, { c: 'ink', t: 0 });
+        P.ellipse(E.cx, E.cy, Math.max(.004, .009 + .026 * pdil), .09, { c: 'ink', t: 0 });
       });
       P.stroke(E.topCurve.concat(E.botCurve), { w: ow * 1.6, c: 'red', t: .85, a: 90, closed: true });
       P.stroke(E.topCurve, { w: ow * 3, c: 'red', t: .9, a: 90, closed: false });
     });
+    P.pop();
   }
 
   /* block: carved wooden block. grooves appear along carve order; returns tip */
@@ -223,6 +251,7 @@
     s = s || {}; for (var k in d) if (s[k] == null) s[k] = d[k];
     if (s.mode === 'alive' && s._inkDefault !== false && s.ink === 0 && arguments.length) { /* alive means fully inked unless told otherwise */ s.ink = s.ink || 1; }
     geom(); if (!STRIPES) STRIPES = stripeList();
+    s._r = MK.rig.resolve('tiger', 'face', s) || MK.rig.rest('tiger');
     var ow = clamp(9 / size, .012, .028);
     s.tip = null;
     function run() {
