@@ -57,7 +57,9 @@
     try {
       await Promise.race([Promise.all(FONTS.map(function (f) { return document.fonts.load(f, '목판MOKPANАБҚ가1'); })).then(function () { return document.fonts.ready; }), new Promise(function (r) { setTimeout(r, 6000); })]);
     } catch (e) { MK.err(e, 'fonts'); }
-    MK.overlay.loaderProgress(.8);
+    MK.overlay.loaderProgress(.6);
+    try { await MK.assets.load(function (f) { MK.overlay.loaderProgress(.6 + .35 * f); }); } catch (e) { MK.err(e, 'assets'); }
+    MK.overlay.loaderProgress(.95);
     if (ART) { document.body.classList.add('art'); }
     S.target = S.s = clamp(window.scrollY / window.innerHeight, 0, TL.total);
     renderFrame(S.s, 0, 0, true);

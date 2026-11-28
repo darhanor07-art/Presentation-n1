@@ -32,7 +32,7 @@
       /* sky tiger: faint and huge; rig: slow lazy blink (periodic overlay) + breathing */
       MK.art.tiger(P, 500, 420 + sSky, 1100, { mode: 'sky', eyeOpen: 1, pupil: .3, skyAlpha: .55, action: { scene: 's09', clock: p * 4, t: t } });
       /* far layer: 3D-rendered mountains behind the roofline (D1: MK.art.ridges), only when available */
-      if (typeof MK.art.ridges === 'function') MK.art.ridges(P, 's09', p * 23, { x: b.x0, y: ry - 420, w: b.x1 - b.x0, h: 440 });
+      if (typeof MK.art.ridges === 'function') MK.art.ridges(P, 's09', p, { x: 0, y: 150 + sRoof * .6, w: 1000, h: 1400 });
       /* roofline: eave (ink) + wall + ground */
       var gy = 1112 + sRoof;
       P.rect(b.x0 - 4, ry + 40, b.x1 - b.x0 + 8, b.y1 + TILT - ry, { c: 'ink', t: 0 });

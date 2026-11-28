@@ -36,36 +36,16 @@
      "hold_frames": 24
     },
     "face_sleep": {
-     "description": "asleep in the red print: lids shut, ears slack, head low",
+     "description": "asleep in the red print: lids shut. Deliberately the REST pose (no offsets, no breath) so s06 p=0 equals s05 p=1",
      "parts": {
       "face_lid_l": {
        "close": 1
       },
       "face_lid_r": {
        "close": 1
-      },
-      "face_ear_l": {
-       "rotation": 5
-      },
-      "face_ear_r": {
-       "rotation": -5
-      },
-      "face_head": {
-       "y": 8
       }
      },
-     "loops": {
-      "face_root": {
-       "scaleX": {
-        "a": 0.006,
-        "hz": 0.33
-       },
-       "scaleY": {
-        "a": 0.009,
-        "hz": 0.33
-       }
-      }
-     },
+     "loops": {},
      "hold_frames": 24
     },
     "face_wake": {

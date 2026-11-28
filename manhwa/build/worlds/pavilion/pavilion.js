@@ -120,8 +120,8 @@ function buildLog(root, theta) {
     const x0 = ax, y0 = 172, x1 = ax + L * sn, y1 = 190 + L * cs - RAD * .2, dx = x1 - x0, dy = y1 - y0, len = Math.hypot(dx, dy);
     const ang = Math.atan2(dx, dy);                                          // rope direction (down)
     const holder = new THREE.Group(); holder.position.set((x0 + x1) / 2, Y((y0 + y1) / 2), 12); holder.rotation.z = ang; root.add(holder);
-    add(holder, new THREE.CylinderGeometry(5.5, 5.5, len, 12), "rope", 0, 0, 0);
-    for (let k = 14; k < len - 10; k += 15) add(holder, new THREE.TorusGeometry(5.8, 1.7, 6, 14), "twist", 0, len / 2 - k, 0, [Math.PI / 2, 0, 0]);
+    add(holder, new THREE.CylinderGeometry(8, 8, len, 12), "rope", 0, 0, 0);
+    for (let k = 14; k < len - 10; k += 15) add(holder, new THREE.TorusGeometry(8.4, 2.2, 6, 14), "twist", 0, len / 2 - k, 0, [Math.PI / 2, 0, 0]);
     // iron bracket around the log + knot at the beam
     const bx = ax + L * sn;
     add(root, new THREE.BoxGeometry(30, RAD * 2 + 10, RAD * 2 + 10), "bracket", bx, Y(yc), 0);

@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   var MK = window.MK, clamp = MK.clamp, E = MK.ease, TAU = Math.PI * 2, D2R = Math.PI / 180;
-  var BX = 460, BY = 300, HANG = [460, 190], BELL_MEDAL = [460, 820], L = 630, A1 = [760, 190], A2 = [1000, 190], TIP = 654, R = 46;
+  var BX = 460, BY = 300, HANG = [460, 190], BELL_MEDAL = MK.art.PAV.medal;   // 3D layers: bell/log/pavilion sprites (art/worlds.js)
   var SWING = .28, THETA = 28 * D2R;
   var STRIPES = null;
 
@@ -13,12 +13,6 @@
       var dx = Math.cos(a), dy = Math.sin(a), nx = -dy, ny = dx;
       STRIPES.push({ x: x, y: y, pts: [[x - dx * len / 2, y - dy * len / 2], [x + nx * bow, y + ny * bow], [x + dx * len / 2, y + dy * len / 2]], w: r.range(34, 64) });
     }
-  }
-
-  function rope(P, ax, ay, bx, by) {
-    P.stroke([[ax, ay], [bx, by]], { w: 11, c: 'ink' });
-    var d = Math.hypot(bx - ax, by - ay), ux = (bx - ax) / d, uy = (by - ay) / d, nx = -uy, ny = ux, k;
-    for (k = 10; k < d - 8; k += 13) { var x = ax + ux * k, y = ay + uy * k; P.stroke([[x - nx * 3.6 - ux * 3, y - ny * 3.6 - uy * 3], [x + nx * 3.6 + ux * 3, y + ny * 3.6 + uy * 3]], { w: 2, c: 'paper' }); }
   }
 
   function circlePath(cx, cy, r) { var p = new Path2D(); p.arc(cx, cy, Math.max(0, r), 0, TAU); return p; }
@@ -61,7 +55,7 @@
     draw: function (ctx) {
       var P = ctx.P, p = ctx.p, t = ctx.t, b = ctx.view.bounds, st = ctx.state, fx = ctx.fx, S = st.pose || { h: 0, th: 0, tauI: -1, tauR: -1 };
       var tI = S.tauI, hit = tI >= 0, i;
-      var imp = hit ? Math.exp(-tI / .25) : 0;
+      var imp = hit ? Math.exp(-tI / .25) : 0, bw = b.x1 - b.x0 + 8;
       /* pavilion wall: red, vertical lines */
       P.cover({ c: 'red', t: P.lin(0, 120, 0, 1200, [[0, .85], [1, .35]]), a: 0 });
       /* ghost tiger stripes: scatter along the ripple direction and fade as the front passes */
@@ -78,34 +72,21 @@
       P.rect(b.x0 - 4, 1190, b.x1 - b.x0 + 8, b.y1 - 1190 + 4, { c: 'ink', t: 0 });
       for (i = 0; i < 4; i++) P.stroke([[b.x0 - 4, 1222 + i * 44 + i * i * 4], [b.x1 + 4, 1222 + i * 44 + i * i * 4]], { w: 3, c: 'paper' });
       P.stroke([[b.x0 - 4, 1190], [b.x1 + 4, 1190]], { w: 6, c: 'paper' });
-      /* roof beam */
-      P.rect(b.x0 - 4, b.y0 - 4, b.x1 - b.x0 + 8, 120 - b.y0 + 4, { c: 'ink', t: 0 });
-      P.rect(b.x0 - 4, 120, b.x1 - b.x0 + 8, 70, { c: 'paper', t: .7, h: 'grain', a: 90, stroke: { w: 4, c: 'ink' } });
-      for (var bx = b.x0 + 30; bx < b.x1; bx += 110) P.circle(bx, 155, 7, { c: 'paper', t: 0, stroke: { w: 2.6, c: 'ink' } });
-      /* pillars */
-      [[b.x0 - 4, 64], [936, b.x1 + 4]].forEach(function (pl) {
-        P.rect(pl[0], 190, pl[1] - pl[0], 1000, { c: 'paper', t: .86, h: 'grain', a: 0, stroke: { w: 4, c: 'ink' } });
-        P.rect(pl[0] - 2, 1150, pl[1] - pl[0] + 4, 40, { c: 'ink', t: 0 });
-      });
-      /* swinging bell */
+      /* pavilion (3D layer: roof void, rafter ends, crossbeam, two pillars) */
+      MK.art.pavilion(P);
+      /* swinging bell (3D sprite; sway about the hang point) */
       var sw = hit ? 2.5 * D2R * Math.exp(-tI / .9) * Math.sin(tI * TAU * .9) : 0;
-      P.push(); P.translate(HANG[0], HANG[1]); P.rotate(sw); P.translate(-HANG[0], -HANG[1]);
-      P.rect(BX - 9, HANG[1] - 4, 18, BY - 62 - HANG[1] + 8, { c: 'ink', t: 0 });
-      P.circle(HANG[0], HANG[1], 14, { c: 'paper', t: 0, stroke: { w: 4, c: 'ink' } });
-      MK.art.bell(P, BX, BY, { glint: hit ? Math.exp(-tI / .32) * E.outBack(Math.min(1, tI / .12)) : 0 });
-      P.pop();
-      /* striker log on two ropes (parallelogram pendulum) */
-      var th = S.th, sn = Math.sin(th), cs = Math.cos(th), ox = L * sn, oy = L * cs - L, yc = 820 + oy, x0 = TIP + ox;
-      [A1, A2].forEach(function (a) { rope(P, a[0], a[1], a[0] + L * sn, a[1] + L * cs); });
-      P.poly([[x0, yc - R], [1700 + ox, yc - R], [1700 + ox, yc + R], [x0, yc + R]], { c: 'paper', t: .55, h: 'grain', a: 90, stroke: { w: 4.5, c: 'ink' } });
-      P.stroke([[x0 + 30, yc - R * .35], [1700 + ox, yc - R * .35]], { w: 2, c: 'ink' });
-      P.ellipse(x0, yc, 17, R, { c: 'paper', t: .08, a: 90, stroke: { w: 4.5, c: 'ink' } });
-      [.72, .46, .2].forEach(function (k) { P.ellipse(x0, yc, 17 * k, R * k, { c: 'paper', t: 0, stroke: { w: 2.4, c: 'ink' } }); });
-      [A1[0], A2[0]].forEach(function (ax) {
-        var x = ax + L * sn;
-        P.rect(x - 15, yc - R - 4, 30, 2 * R + 8, { c: 'ink', t: 0 });
-        for (i = 0; i < 4; i++) P.stroke([[x - 11, yc - R + 6 + i * 22], [x + 11, yc - R + 14 + i * 22]], { w: 2.4, c: 'paper' });
-      });
+      MK.art.bell3d(P, BX, BY, 1, sw);
+      if (hit) {                                   // gold glint (accent) on the shoulder, follows the sway
+        var gl = Math.exp(-tI / .32) * E.outBack(Math.min(1, tI / .12)), ga = 84 * gl, gx = -96, gy = 330;
+        if (gl > .01) {
+          P.push(); P.translate(HANG[0], HANG[1]); P.rotate(sw); P.translate(-HANG[0], -HANG[1]); P.translate(BX, BY);
+          P.poly([[gx, gy - ga], [gx + ga * .18, gy - ga * .18], [gx + ga, gy], [gx + ga * .18, gy + ga * .18], [gx, gy + ga], [gx - ga * .18, gy + ga * .18], [gx - ga, gy], [gx - ga * .18, gy - ga * .18]], { c: 'gold', t: 0 });
+          P.pop();
+        }
+      }
+      /* striker log on two ropes (3D sprite chosen by rope angle) */
+      MK.art.log3d(P, S.th);
       /* impact: shock rings + fx */
       if (hit) {
         var Rg = [rr, rr - 90, rr - 180], W = [6, 4, 2], fade = clamp(1 - rr / 2300, 0, 1);

@@ -91,7 +91,7 @@ def build_ridges(variants):
     from tools.graphics.threejs_world import ThreeJSWorld
     spec = json.load(open(os.path.join(HERE, 'ridges.json'), encoding='utf-8'))
     for name in variants:
-        v = spec['variants'][name]; n = v['frames']
+        v = dict(spec['variants'][name]); v['frames'] = n = int(os.environ.get('MK_FRAMES', v['frames']))   # MK_FRAMES=3: quick test
         ws_spec = dict(spec['world_spec']); ws_spec['explicit_constraints'] = spec['explicit_constraints']; ws_spec['inferred_details'] = spec['inferred_details']
         ws_spec['camera_path'] = camera_keys(v)
         for mode, rm in (('lit', 'cinematic'), ('id', 'semantic')):

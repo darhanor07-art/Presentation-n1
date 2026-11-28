@@ -191,5 +191,27 @@
   P.alpha = function (a, inner) { each(function (c) { c.globalAlpha = a; }); try { inner(); } finally { each(function (c) { c.globalAlpha = 1; }); } };
   /* cover whole visible area */
   P.cover = function (st) { var b = MK.view.bounds; P.rect(b.x0 - 2, b.y0 - 2, b.x1 - b.x0 + 4, b.y1 - b.y0 + 4, st); };
+
+  /* pre-rendered 3D layers (MK.assets): FILL image -> fill canvas, TONE image -> tone canvas, current transform/clip.
+     P.img(name, x, y, w, h, {alpha, flip}) ; P.seq(name, f, x, y, w, h, o) = frame f (float) of a sequence, crossfaded floor/ceil. */
+  P.img = function (name, x, y, w, h, o) {
+    var a = MK.assets && MK.assets.get(name); if (!a) return false;
+    o = o || {};
+    each(function (c, isT) {
+      c.save(); c.imageSmoothingEnabled = true; c.imageSmoothingQuality = 'high';
+      if (o.alpha != null) c.globalAlpha *= o.alpha;
+      if (o.flip) { c.translate(x + w, y); c.scale(-1, 1); c.drawImage(isT ? a.tone : a.fill, 0, 0, w, h); }
+      else c.drawImage(isT ? a.tone : a.fill, x, y, w, h);
+      c.restore();
+    });
+    return true;
+  };
+  P.seq = function (name, f, x, y, w, h, o) {
+    var s = MK.assets && MK.assets.seq(name); if (!s) return false;
+    o = o || {}; var n = s.frames.length, ff = clamp(f, 0, n - 1), f0 = Math.floor(ff), f1 = Math.min(n - 1, f0 + 1), k = ff - f0, a0 = o.alpha == null ? 1 : o.alpha;
+    P.img(s.frames[f0], x, y, w, h, { alpha: a0, flip: o.flip });
+    if (k > .002 && f1 !== f0) P.img(s.frames[f1], x, y, w, h, { alpha: a0 * k, flip: o.flip });
+    return true;
+  };
   MK.TONE_STYLES = STY;
 })();

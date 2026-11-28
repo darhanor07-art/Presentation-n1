@@ -2,13 +2,7 @@
 (function () {
   'use strict';
   var MK = window.MK, clamp = MK.clamp, E = MK.ease, TAU = Math.PI * 2;
-  var TRAVEL = 800;
-  var RIDGES = [
-    { base: 760, amp: 120, sc: .0042, seed: 3.1, f: .1, st: { c: 'red', t: .35, a: 90 }, mist: { y: -40, v: 7, n: 2 } },
-    { base: 840, amp: 130, sc: .0050, seed: 8.7, f: .25, st: { c: 'paper', t: .46, h: 'cross', a: 70 }, mist: { y: -30, v: 9, n: 2 } },
-    { base: 915, amp: 120, sc: .0060, seed: 14.2, f: .4, st: { c: 'paper', t: .62, h: 'cross', a: 70 }, mist: { y: -24, v: 12, n: 2 } },
-    { base: 995, amp: 110, sc: .0072, seed: 21.9, f: .6, st: { c: 'paper', t: .93, h: 'grain', a: 0 }, mist: null }
-  ];
+  var TRAVEL = 800;      // eave rise + moon/star drift (ridges are scrubbed by the pre-rendered 3D crane instead)
   var STARS = MK.fx.particles(11, 26, function (r) { return { x0: r.range(-60, 1060), y0: r.range(-120, 470), g: 0, vx: 0, vy: 0, ph: r() * TAU, rr: r.range(2, 4.2) }; });
 
   /* 7 small irregular crater blobs (offsets from the moon centre) */
@@ -18,20 +12,13 @@
     pts.t = .12 + .08 * r(); return pts;
   });
 
-  function ridge(P, R, p, b) {
-    var shift = TRAVEL * R.f * (1 - p), pts = [], x, bottom = b.y1 + TRAVEL + 120;
-    for (x = b.x0 - 40; x <= b.x1 + 40; x += 14) pts.push([x, R.base + shift - R.amp * (.5 + 1.25 * MK.fbm1(x * R.sc + R.seed))]);
-    var st = { c: R.st.c, t: R.st.t, h: R.st.h, a: R.st.a, stroke: { w: 3.4, c: 'ink' } };
-    P.poly(pts.concat([[b.x1 + 40, bottom], [b.x0 - 40, bottom]]), st);
-    return shift;
-  }
-  function mist(P, R, shift, t, b, ri) {
-    if (!R.mist) return;
+  /* mist bands drifting in front of the 3D far/mid layers; y from the rendered skyline (art.ridges return) */
+  function mist(P, y, v, n, t, b, ri) {
     var span = b.x1 - b.x0 + 900, i;
-    for (i = 0; i < R.mist.n; i++) {
-      var w = 520 + 160 * ((i + ri) % 2), x = b.x0 - 450 + (((i * span / R.mist.n + (ri * 217) + R.mist.v * t) % span) + span) % span;
-      var y = R.base + shift + R.mist.y + i * 46 - 20, h = 30 + 10 * ((i + ri) % 3);
-      P.taper([[x - w / 2, y], [x, y - 3], [x + w / 2, y]], function (u) { return h * Math.pow(Math.sin(Math.PI * u), .75) + .5; }, { c: 'paper', t: .1, a: 90 }, 6);
+    for (i = 0; i < n; i++) {
+      var w = 520 + 160 * ((i + ri) % 2), x = b.x0 - 450 + (((i * span / n + (ri * 217) + v * t) % span) + span) % span;
+      var yy = y + i * 46 - 20, h = 30 + 10 * ((i + ri) % 3);
+      P.taper([[x - w / 2, yy], [x, yy - 3], [x + w / 2, yy]], function (u) { return h * Math.pow(Math.sin(Math.PI * u), .75) + .5; }, { c: 'paper', t: .1, a: 90 }, 6);
     }
   }
   function magpie(P, x, y, pose, sc) {
@@ -71,7 +58,8 @@
         P.push(); P.translate(mx, my); CRATERS.forEach(function (c) { P.poly(c, { c: 'red', t: c.t, h: 'dots' }); }); P.pop();
       });
       /* ridges + mist */
-      for (i = 0; i < RIDGES.length; i++) { var sh = ridge(P, RIDGES[i], p, b); mist(P, RIDGES[i], sh, t, b, i); }
+      var H = MK.art.ridges(P, 's02', p, { x: 0, y: 0, w: 1000, h: 1400 });
+      mist(P, H.far + 40, 7, 2, t, b, 0); mist(P, H.mid + 70, 10, 2, t, b, 1);
       /* magpie */
       var mp = MK.range(p, .3, .6);
       if (mp > 0 && mp < 1) {

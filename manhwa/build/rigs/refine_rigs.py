@@ -105,7 +105,7 @@ def carver_cycles():
             'stand': {'segments': seg('stand', 4), 'lag': .085, 'width': 1.1, 'gain': [2.4, 2.6, 2.8, 3.0, 3.2],
                       'drivers': [{'k': 'stand_head.rotation', 'g': 1}, {'k': 'stand_torso.rotation', 'g': 1.2}, {'k': 'stand_root.x', 'g': -.55}, {'k': 'stand_root.y', 'g': .5}, {'k': 'stand_head.y', 'g': .25}],
                       'wind': {'a': .9, 'hz': .42}},
-            'seat': {'segments': seg('seat', 4), 'lag': .09, 'width': 1.1, 'gain': [2.2, 2.4, 2.6, 2.8, 3.0],
+            'seat': {'segments': seg('seat', 4), 'lag': .09, 'width': 1.1, 'gain': [1.3, 1.4, 1.5, 1.6, 1.7],
                      'drivers': [{'k': 'seat_head.rotation', 'g': 1}, {'k': 'seat_torso.rotation', 'g': 1.6}, {'k': 'seat_root.x', 'g': -.4}],
                      'wind': {'a': .5, 'hz': .35}}},
         'mocap_map': {
@@ -154,8 +154,7 @@ def tiger_poses():
     br = {'face_root': {'scaleX': L(.006, .33), 'scaleY': L(.009, .33)}, 'face_whisker_l': {'rotation': L(.8, .33, 1)}, 'face_whisker_r': {'rotation': L(-.8, .33, 1)}}
     G = {}
     G['face_idle'] = {'description': 'neutral, breathing (head scale)', 'parts': {}, 'loops': br, 'hold_frames': 24}
-    G['face_sleep'] = {'description': 'asleep in the red print: lids shut, ears slack, head low', 'parts': {'face_lid_l': {'close': 1}, 'face_lid_r': {'close': 1},
-                       'face_ear_l': {'rotation': 5}, 'face_ear_r': {'rotation': -5}, 'face_head': {'y': 8}}, 'loops': {'face_root': br['face_root']}, 'hold_frames': 24}
+    G['face_sleep'] = {'description': 'asleep in the red print: lids shut. Deliberately the REST pose (no offsets, no breath) so s06 p=0 equals s05 p=1', 'parts': {'face_lid_l': {'close': 1}, 'face_lid_r': {'close': 1}}, 'loops': {}, 'hold_frames': 24}
     G['face_wake'] = {'description': 'ink spreads: head lifts a hair, ears perk', 'parts': {'face_head': {'y': -10, 'scaleX': 1.01, 'scaleY': 1.01},
                       'face_ear_l': {'rotation': -6}, 'face_ear_r': {'rotation': 6}}, 'loops': br, 'hold_frames': 24, 'transition': 'power2.out'}
     G['face_furrow'] = {'description': 'brows knit and drop, eyes narrow, pupils tighten, whiskers draw back',
