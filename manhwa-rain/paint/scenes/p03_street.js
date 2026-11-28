@@ -19,7 +19,7 @@
     for (let x = 128; x < W - 128; x += 132) { const g = c.createLinearGradient(0, zb0, 0, zb1); g.addColorStop(0, 'rgba(200,212,224,.82)'); g.addColorStop(1, 'rgba(176,192,208,.78)'); c.fillStyle = g; c.fillRect(x, zb0, 70, zb1 - zb0); }
     c.fillStyle = 'rgba(206,218,230,.8)'; c.fillRect(96, zb0 - 52, W - 192, 22); c.fillRect(96, zb1 + 30, W - 192, 22); c.restore();
     // wear: erase paint with noise + tyre scuffs
-    const wear = L.noiseAlpha(W, H, { sx: .12, sy: .5, oct: 4, seed: 9, lo: .45, hi: .72, color: '#0d131a', res: 4 }); L.blit(c, wear, { alpha: .75 });
+    const wear = L.noiseAlpha(W, H, { sx: .07, sy: .3, oct: 5, seed: 9, lo: .5, hi: .7, color: '#0d131a', res: 4 }); L.blit(c, wear, { alpha: .45 });
     // dashed lane lines
     c.save(); c.fillStyle = 'rgba(196,208,220,.62)'; for (let y = -40; y < H; y += 170) { if (y > zb0 - 110 && y < zb1 + 110) continue; c.fillRect(300, y, 14, 90); c.fillRect(766, y, 14, 90); } c.restore();
     // manhole
@@ -35,16 +35,16 @@
     puddles.forEach(([px, py, rx, ry, rot], i) => {
       const pts = L.blobPts(px, py, rx, ry, { n: 22, rough: .22, rot, rnd: r });
       c.save(); c.beginPath(); pts.forEach((p, j) => j ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1])); c.closePath(); c.clip();
-      const g2 = c.createLinearGradient(px - rx, py - ry, px + rx * .6, py + ry); g2.addColorStop(0, '#6c869f'); g2.addColorStop(.5, '#3a4b5e'); g2.addColorStop(1, '#222e3c'); c.globalAlpha = .82; c.fillStyle = g2; c.fillRect(px - rx * 1.3, py - ry * 1.3, rx * 2.6, ry * 2.6); c.globalAlpha = 1;
-      L.glow(c, px - rx * .3, py - ry * .2, rx * .9, '#F2C230', .55, 'screen'); L.glow(c, px - rx * .3, py - ry * .2, rx * .22, '#fff3c8', .85, 'screen'); L.glow(c, px + rx * .45, py + ry * .3, rx * .5, '#9fc0dc', .3, 'screen');
-      for (let j = 0; j < 7; j++) { const rr = 5 + j * 11; c.strokeStyle = `rgba(210,225,238,${.34 - j * .04})`; c.lineWidth = 1.4; c.beginPath(); c.ellipse(px + (r() - .5) * rx * .9, py + (r() - .5) * ry * .9, rr, rr * .9, 0, 0, 6.3); c.stroke(); }
+      const g2 = c.createLinearGradient(px - rx, py - ry, px + rx * .6, py + ry); g2.addColorStop(0, '#4d6379'); g2.addColorStop(.5, '#26333f'); g2.addColorStop(1, '#141c26'); c.globalAlpha = .7; c.fillStyle = g2; c.fillRect(px - rx * 1.3, py - ry * 1.3, rx * 2.6, ry * 2.6); c.globalAlpha = 1;
+      L.glow(c, px - rx * .3, py - ry * .2, rx * .8, '#F2C230', .35, 'screen'); L.glow(c, px - rx * .3, py - ry * .2, rx * .16, '#fff3c8', .8, 'screen'); L.lightStreaks(c, [{ x: px - rx * .3, y: py - ry * .75, r: rx * .13, color: '#ffe9a8', a: .55, len: ry * 1.5 }], { amp: 3, blur: 2 }); L.glow(c, px + rx * .45, py + ry * .3, rx * .5, '#9fc0dc', .16, 'screen');
+      for (let j = 0; j < 4; j++) { const rr = 5 + j * 11; c.strokeStyle = `rgba(210,225,238,${.34 - j * .04})`; c.lineWidth = 1.4; c.beginPath(); c.ellipse(px + (r() - .5) * rx * .9, py + (r() - .5) * ry * .9, rr, rr * .9, 0, 0, 6.3); c.stroke(); }
       c.restore();
       c.save(); c.strokeStyle = 'rgba(196,214,230,.5)'; c.lineWidth = 2; c.beginPath(); pts.forEach((p, j) => j ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1])); c.closePath(); c.stroke(); c.restore();
       lamps.push({ x: px - rx * .3, y: py - ry * .2 });
     });
     // overhead lamp light pools with glossy streaks
     [[-30, 260], [1110, 780], [-30, 1380], [1110, 1900]].forEach(([x, y]) => { L.glow(c, x, y, 520, '#e8b64a', .2, 'screen'); L.glow(c, x, y, 260, '#ffdf9a', .16, 'screen'); });
-    L.lightStreaks(c, [{ x: 70, y: 150, r: 26, color: '#F2C230', a: .5, len: 520 }, { x: 1010, y: 650, r: 26, color: '#F2C230', a: .5, len: 520 }, { x: 70, y: 1250, r: 26, color: '#F2C230', a: .45, len: 520 }, { x: 1010, y: 1780, r: 26, color: '#F2C230', a: .45, len: 360 }], { amp: 10, blur: 6 });
+    
     // tiny raindrop rings everywhere
     c.save(); c.strokeStyle = 'rgba(190,208,224,.2)'; c.lineWidth = 1; for (let i = 0; i < 260; i++) { const x = r() * W, y = r() * H, rr = 3 + r() * 11; c.beginPath(); c.ellipse(x, y, rr, rr * .92, 0, 0, 6.3); c.stroke(); } c.restore();
     L.rough(c, { amp: 2.2, seed: 12 });
@@ -109,37 +109,40 @@
   // ---------- Merey seen from above (walking up the screen) ----------
   P.register('merey_top', { w: 360, h: 360, alpha: true, seed: 303 }, async (k) => {
     const S = 3, c = L.layer(360 * S, 360 * S), r = k.rnd; c.scale(S, S); const u = v => v * S; const Y = '#F2C230', YD = '#C9962A', YDD = '#8a5f14', YL = '#FFE27a';
-    const cx = 180, cy = 205;
-    // soft contact shadow
-    c.save(); c.filter = `blur(${10 * S * c.q}px)`; c.fillStyle = 'rgba(2,4,8,.55)'; c.beginPath(); c.ellipse(cx + 12, cy + 16, 160, 92, 0, 0, 6.3); c.fill(); c.restore();
-    // sleeves (arms swinging): left forward, right back, ending in small hands
-    const sleeve = (x0, y0, x1, y1, w) => { c.save(); c.lineCap = 'round'; c.strokeStyle = YD; c.lineWidth = w; c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke(); c.strokeStyle = Y; c.lineWidth = w * .72; c.beginPath(); c.moveTo(x0 - 2, y0); c.lineTo(x1 - 2, y1); c.stroke(); c.strokeStyle = YL; c.globalAlpha = .55; c.lineWidth = w * .12; c.beginPath(); c.moveTo(x0 - w * .28, y0); c.lineTo(x1 - w * .28, y1); c.stroke(); c.restore(); };
-    sleeve(48, 212, 36, 122, 46); sleeve(312, 214, 322, 292, 44);
-    c.fillStyle = '#b99c8c'; c.beginPath(); c.ellipse(34, 112, 14, 16, 0, 0, 6.3); c.fill(); c.beginPath(); c.ellipse(324, 304, 13, 15, 0, 0, 6.3); c.fill();
-    c.fillStyle = YDD; c.fillRect(14, 126, 46, 10); c.fillRect(300, 284, 46, 9);
-    // shoulders / back of the raincoat
-    c.save(); let g = c.createRadialGradient(cx - 40, cy - 40, 10, cx, cy, 170); g.addColorStop(0, YL); g.addColorStop(.3, Y); g.addColorStop(.75, YD); g.addColorStop(1, YDD); c.fillStyle = g; c.beginPath(); c.ellipse(cx, cy, 150, 82, 0, 0, 6.3); c.fill(); c.restore();
-    // fabric folds (radial from the hood), amber strokes
-    c.save(); c.beginPath(); c.ellipse(cx, cy, 150, 82, 0, 0, 6.3); c.clip(); c.strokeStyle = 'rgba(120,78,10,.45)'; c.lineCap = 'round';
-    for (let i = 0; i < 16; i++) { const a = (i / 16) * 6.28 + .2, r0 = 62 + r() * 12, r1 = 110 + r() * 50; c.lineWidth = 2 + r() * 4; c.beginPath(); c.moveTo(cx + Math.cos(a) * r0, cy + Math.sin(a) * r0 * .62); c.quadraticCurveTo(cx + Math.cos(a + .08) * (r0 + r1) / 2, cy + Math.sin(a + .08) * (r0 + r1) / 2 * .6, cx + Math.cos(a) * r1, cy + Math.sin(a) * r1 * .55); c.stroke(); }
+    const cx = 180, cy = 214;
+    const ell = (x, y, rx, ry, rot = 0) => { c.beginPath(); c.ellipse(x, y, rx, ry, rot, 0, 6.2832); };
+    // contact shadow
+    c.save(); c.filter = `blur(${9 * S * c.q}px)`; c.fillStyle = 'rgba(2,4,8,.6)'; ell(cx + 10, cy + 14, 112, 92); c.fill(); c.restore();
+    // arms: left swings forward (up), right back (down); sleeves hang at the sides of the torso
+    const arm = (x0, y0, x1, y1, w, hand) => { c.save(); c.lineCap = 'round'; c.strokeStyle = YDD; c.lineWidth = w + 4; c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke(); c.strokeStyle = YD; c.lineWidth = w; c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke(); c.strokeStyle = Y; c.lineWidth = w * .66; c.beginPath(); c.moveTo(x0 - w * .12, y0); c.lineTo(x1 - w * .12, y1); c.stroke(); c.strokeStyle = 'rgba(255,238,160,.7)'; c.lineWidth = w * .12; c.beginPath(); c.moveTo(x0 - w * .3, y0 + 4); c.lineTo(x1 - w * .3, y1 + 2); c.stroke(); c.restore(); c.fillStyle = YDD; c.beginPath(); ell(x1, y1, w * .56, w * .34, Math.atan2(y1 - y0, x1 - x0) + 1.57); c.fill(); const hx = x1 + (x1 - x0) * .22, hy = y1 + (y1 - y0) * .22; const hg = c.createRadialGradient(hx - 2, hy - 2, 1, hx, hy, 14); hg.addColorStop(0, '#d8bba8'); hg.addColorStop(1, '#8e7466'); c.fillStyle = hg; c.beginPath(); ell(hx, hy, 11, 14, Math.atan2(y1 - y0, x1 - x0) - 1.57); c.fill(); };
+    arm(76, 206, 62, 118, 40); arm(284, 216, 296, 292, 38);
+    // torso / back of raincoat (rounded shoulders, flared hem at the back)
+    c.save(); let g = c.createRadialGradient(cx - 34, cy - 40, 8, cx, cy, 130); g.addColorStop(0, YL); g.addColorStop(.3, Y); g.addColorStop(.72, YD); g.addColorStop(1, YDD); c.fillStyle = g;
+    c.beginPath(); c.moveTo(cx - 100, cy - 18); c.bezierCurveTo(cx - 106, cy - 64, cx - 40, cy - 78, cx, cy - 76); c.bezierCurveTo(cx + 40, cy - 78, cx + 106, cy - 64, cx + 100, cy - 18); c.bezierCurveTo(cx + 112, cy + 40, cx + 96, cy + 92, cx + 76, cy + 96); c.bezierCurveTo(cx + 30, cy + 104, cx - 30, cy + 104, cx - 76, cy + 96); c.bezierCurveTo(cx - 96, cy + 92, cx - 112, cy + 40, cx - 100, cy - 18); c.closePath(); c.fill();
+    c.clip(); c.strokeStyle = 'rgba(110,70,8,.5)'; c.lineCap = 'round';
+    // fabric folds: from shoulder blades down to the hem, a centre back seam
+    c.lineWidth = 2.4; c.beginPath(); c.moveTo(cx, cy - 20); c.lineTo(cx + 1, cy + 100); c.stroke();
+    [-1, 1].forEach(sg => { for (let i = 0; i < 4; i++) { c.lineWidth = 2 + (i % 2) * 2; c.beginPath(); c.moveTo(cx + sg * (30 + i * 22), cy - 6 + i * 3); c.quadraticCurveTo(cx + sg * (44 + i * 26), cy + 38, cx + sg * (38 + i * 28 + 8), cy + 98); c.stroke(); } });
+    c.strokeStyle = 'rgba(255,238,160,.35)'; c.lineWidth = 4; c.beginPath(); c.moveTo(cx - 60, cy - 20); c.quadraticCurveTo(cx - 84, cy + 20, cx - 80, cy + 80); c.stroke();
+    // hem edge darker
+    const hg2 = c.createLinearGradient(0, cy + 60, 0, cy + 104); hg2.addColorStop(0, 'rgba(70,40,0,0)'); hg2.addColorStop(1, 'rgba(70,40,0,.45)'); c.fillStyle = hg2; c.fillRect(cx - 120, cy + 60, 240, 50); c.restore();
+    // hood on top of the shoulders: dome, brim opening toward the top (she looks up the lane)
+    const hx = cx, hy = cy - 52, hr = 64;
+    c.save(); c.fillStyle = 'rgba(80,50,4,.5)'; ell(hx + 2, hy + 10, hr + 7, hr + 2); c.fill();
+    g = c.createRadialGradient(hx - 22, hy - 20, 5, hx, hy, hr); g.addColorStop(0, '#FFEA94'); g.addColorStop(.35, Y); g.addColorStop(.8, YD); g.addColorStop(1, YDD); c.fillStyle = g; ell(hx, hy, hr, hr * .97); c.fill();
+    c.save(); ell(hx, hy, hr, hr * .97); c.clip(); c.fillStyle = '#080b10'; ell(hx, hy - hr + 2, hr * .66, 21); c.fill(); // opening shadow
+    c.fillStyle = '#12161d'; for (let i = 0; i < 12; i++) { c.beginPath(); c.ellipse(hx - 36 + i * 6.6, hy - hr + 16, 5, 11 + (i % 3) * 2, .1 * (i - 6), 0, 6.3); c.fill(); } // bob hair tips peeking out
     c.restore();
-    // hood: dome from above, opening at the top (front) showing dark hair
-    const hx = cx, hy = 170, hr = 74;
-    c.save(); c.fillStyle = 'rgba(70,45,5,.45)'; c.beginPath(); c.ellipse(hx + 4, hy + 12, hr + 8, hr, 0, 0, 6.3); c.fill();
-    g = c.createRadialGradient(hx - 24, hy - 22, 6, hx, hy, hr); g.addColorStop(0, '#FFE88c'); g.addColorStop(.35, Y); g.addColorStop(.8, YD); g.addColorStop(1, YDD); c.fillStyle = g; c.beginPath(); c.arc(hx, hy, hr, 0, 6.3); c.fill();
-    // opening (front/top): dark crescent with bob hair
-    c.save(); c.beginPath(); c.arc(hx, hy, hr, 0, 6.3); c.clip(); c.fillStyle = '#0b0f14'; c.beginPath(); c.ellipse(hx, hy - hr + 2, hr * .72, 24, 0, 0, 6.3); c.fill();
-    c.fillStyle = '#05080b'; c.beginPath(); c.ellipse(hx, hy - hr + 14, hr * .55, 16, 0, 0, 6.3); c.fill(); c.strokeStyle = 'rgba(60,70,85,.6)'; c.lineWidth = 1.5; for (let i = 0; i < 9; i++) { c.beginPath(); c.moveTo(hx - 36 + i * 9, hy - hr + 8); c.lineTo(hx - 38 + i * 9 + (r() - .5) * 6, hy - hr + 26); c.stroke(); } c.restore();
-    // hood seam, drawstring, stitching
-    c.strokeStyle = 'rgba(120,78,10,.7)'; c.lineWidth = 2.4; c.beginPath(); c.moveTo(hx, hy - hr + 24); c.quadraticCurveTo(hx + 6, hy, hx, hy + hr - 6); c.stroke(); c.setLineDash([4, 5]); c.lineWidth = 1.2; c.strokeStyle = 'rgba(255,230,140,.5)'; c.beginPath(); c.moveTo(hx + 7, hy - hr + 26); c.quadraticCurveTo(hx + 13, hy, hx + 7, hy + hr - 8); c.stroke(); c.setLineDash([]);
-    c.strokeStyle = 'rgba(255,238,160,.8)'; c.lineWidth = 2.6; c.lineCap = 'round'; c.beginPath(); c.arc(hx, hy, hr - 3, 3.6, 5.1); c.stroke(); c.restore();
-    // wet sheen + rain beads
-    c.save(); c.globalCompositeOperation = 'screen'; [[cx - 70, cy - 8, 40, 9, -.5], [cx + 82, cy + 22, 34, 7, .5], [hx - 30, hy - 30, 26, 10, -.7]].forEach(([x, y, rx, ry, rot]) => { c.fillStyle = 'rgba(255,248,205,.5)'; c.filter = `blur(${2 * S * c.q}px)`; c.beginPath(); c.ellipse(x, y, rx, ry, rot, 0, 6.3); c.fill(); }); c.restore();
-    for (let i = 0; i < 46; i++) { const a = r() * 6.28, d = r(); const bx = cx + Math.cos(a) * 140 * d, by = cy + Math.sin(a) * 76 * d; if (((bx - hx) ** 2 + (by - hy) ** 2) < (hr * .9) ** 2 && r() < .4) continue; const br = 1.2 + r() * 2.4; c.fillStyle = 'rgba(90,60,6,.5)'; c.beginPath(); c.ellipse(bx + .8, by + 1, br, br, 0, 0, 6.3); c.fill(); c.fillStyle = 'rgba(255,252,235,.85)'; c.beginPath(); c.ellipse(bx - .3, by - .4, br * .6, br * .55, 0, 0, 6.3); c.fill(); }
-    // brush: yellow glaze texture + broken amber ink outlines (small marks => work in 1080-space)
-    L.glaze(c, [{ color: '#d99c1c', op: 130 }], (b, i, rnd) => { b.polygon(L.blobPts(u(cx), u(cy), u(148), u(80), { n: 20, rough: .06, rnd })); b.polygon(L.blobPts(u(hx), u(hy), u(hr), u(hr), { n: 18, rough: .05, rnd })); }, { seed: 331, bleed: .15, tex: .8, border: .3, alpha: .4, atop: true });
-    L.paint(c, (b, rnd) => { L.ink(b, Array.from({ length: 33 }, (_, i) => [u(cx + Math.cos(i / 32 * 6.28) * 150), u(cy + Math.sin(i / 32 * 6.28) * 82)]), { color: '#5a3a08', w: .8, rnd, gap: .3, wig: 1.5, chunk: [80, 260] }); L.ink(b, Array.from({ length: 29 }, (_, i) => [u(hx + Math.cos(i / 28 * 6.28) * hr), u(hy + Math.sin(i / 28 * 6.28) * hr)]), { color: '#5a3a08', w: .8, rnd, gap: .25, wig: 1.2, chunk: [60, 220] }); }, { seed: 332, mode: 'mask', color: '#5a3a08', alpha: .8, gain: 1.3 });
-    const out = L.layer(360, 360); L.blit(out, c, { w: 360, h: 360 }); out.canvas.__alpha = true;
+    c.strokeStyle = 'rgba(120,78,10,.7)'; c.lineWidth = 2.2; c.beginPath(); c.moveTo(hx, hy - hr + 26); c.quadraticCurveTo(hx + 4, hy, hx, hy + hr - 8); c.stroke();
+    c.setLineDash([4, 5]); c.lineWidth = 1.1; c.strokeStyle = 'rgba(255,230,140,.55)'; c.beginPath(); c.moveTo(hx + 6, hy - hr + 28); c.quadraticCurveTo(hx + 11, hy, hx + 6, hy + hr - 9); c.stroke(); c.setLineDash([]);
+    c.strokeStyle = 'rgba(255,240,170,.85)'; c.lineWidth = 2.4; c.lineCap = 'round'; c.beginPath(); c.arc(hx, hy, hr - 3, 3.55, 4.9); c.stroke(); c.restore();
+    // wet sheen + beads (few, crisp)
+    c.save(); c.globalCompositeOperation = 'screen'; c.filter = `blur(${2 * S * c.q}px)`; [[cx - 70, cy + 6, 34, 8, -.7], [cx + 66, cy + 20, 28, 6, .6], [hx - 24, hy - 26, 20, 8, -.7]].forEach(([x, y, rx, ry, rot]) => { c.fillStyle = 'rgba(255,248,205,.5)'; ell(x, y, rx, ry, rot); c.fill(); }); c.restore();
+    for (let i = 0; i < 26; i++) { const a = r() * 6.28, d = r(); const bx = cx + Math.cos(a) * 96 * d, by = cy + 10 + Math.sin(a) * 78 * d; if (Math.hypot(bx - hx, by - hy) < hr * .95) continue; const br = 1.2 + r() * 2.2; c.fillStyle = 'rgba(90,60,6,.5)'; ell(bx + .8, by + 1, br, br); c.fill(); c.fillStyle = 'rgba(255,252,235,.85)'; ell(bx - .3, by - .4, br * .6, br * .55); c.fill(); }
+    // brush: yellow glaze mottling + broken amber ink (marks are fine because we work in 1080-space)
+    L.glaze(c, [{ color: '#d99c1c', op: 130 }], (b, i, rnd) => { b.polygon(L.blobPts(u(cx), u(cy + 10), u(104), u(88), { n: 20, rough: .05, rnd })); b.polygon(L.blobPts(u(hx), u(hy), u(hr), u(hr), { n: 18, rough: .04, rnd })); }, { seed: 331, bleed: .15, tex: .8, border: .3, alpha: .4, atop: true });
+    L.paint(c, (b, rnd) => { L.ink(b, Array.from({ length: 33 }, (_, i) => [u(cx + Math.cos(i / 32 * 6.28) * 106), u(cy + 12 + Math.sin(i / 32 * 6.28) * 90)]), { color: '#5a3a08', w: .8, rnd, gap: .3, wig: 1.5, chunk: [80, 260] }); L.ink(b, Array.from({ length: 29 }, (_, i) => [u(hx + Math.cos(i / 28 * 6.28) * hr), u(hy + Math.sin(i / 28 * 6.28) * hr)]), { color: '#5a3a08', w: .8, rnd, gap: .25, wig: 1.2, chunk: [60, 220] }); }, { seed: 332, mode: 'mask', color: '#5a3a08', alpha: .75, gain: 1.3 });
+    const out = L.layer(360, 360); L.blit(out, c, { w: 360, h: 360 });
     L.rough(out, { amp: .6, seed: 3, freq: .04 }); L.cleanAlpha(out);
     return out;
   });

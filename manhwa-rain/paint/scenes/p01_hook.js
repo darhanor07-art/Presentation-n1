@@ -18,18 +18,18 @@
     // distant warm haze on the horizon (behind far layer)
     L.glow(c, W * .5, 1010, W * .55, '#a98253', .2, 'screen');
     // far skyline: pale, bluish, tiny windows
-    L.skyline(c, { base: 1070, hmin: 50, hmax: 210, wmin: 26, wmax: 70, far: .8, seed: 311, winDens: .42, winSize: [3, 4.5], warm: .3, inkW: .3, steps: .5, antenna: .25, fillDown: 60, glazes: 1 });
-    L.fog(c, { y0: 880, y1: 1110, color: '#6E89A3', a: .26, seed: 21 });
+    L.skyline(c, { base: 1070, hmin: 50, hmax: 210, wmin: 26, wmax: 70, far: .8, seed: 311, winDens: .5, winSize: [2.2, 3.3], warm: .3, gap: -2, inkW: .3, steps: .5, antenna: .25, fillDown: 60, glazes: 1 });
+    L.fog(c, { y0: 880, y1: 1110, color: '#6E89A3', a: .2, seed: 21 });
     // mid skyline
-    L.skyline(c, { base: 1215, hmin: 90, hmax: 330, wmin: 40, wmax: 100, far: .5, seed: 312, winDens: .36, winSize: [5, 7.5], warm: .42, inkW: .4, steps: .5, antenna: .2, fillDown: 60, glazes: 2 });
-    L.fog(c, { y0: 1010, y1: 1290, color: '#5b738c', a: .24, seed: 22 });
+    L.skyline(c, { base: 1215, hmin: 90, hmax: 330, wmin: 40, wmax: 100, far: .5, seed: 312, winDens: .4, winSize: [3.6, 5.2], warm: .42, gap: -2, inkW: .4, steps: .5, antenna: .2, fillDown: 60, glazes: 2 });
+    L.fog(c, { y0: 1010, y1: 1290, color: '#5b738c', a: .16, seed: 22 });
     // near skyline — the hero: dense, sharp
-    L.skyline(c, { base: 1400, hmin: 140, hmax: 470, wmin: 70, wmax: 170, far: .12, seed: 313, winDens: .3, winSize: [9, 13], warm: .5, inkW: .7, steps: .55, antenna: .22, fillDown: 120, glazes: 3, gap: 10 });
-    L.fog(c, { y0: 1230, y1: 1512, color: '#3D4C5E', a: .2, seed: 23 });
+    L.skyline(c, { base: 1400, hmin: 140, hmax: 470, wmin: 70, wmax: 170, far: .12, seed: 313, winDens: .36, winSize: [6, 9], warm: .5, inkW: .7, steps: .55, antenna: .22, fillDown: 120, glazes: 3, gap: -2, colTop: '#1b2634', colBot: '#080c12' });
+    L.fog(c, { y0: 1230, y1: 1512, color: '#3D4C5E', a: .12, seed: 23 });
     L.rough(c, { amp: 2.6, seed: 4 });
     // light: bloom of the lit windows, bokeh in the foreground haze, vertical rain-blurred streaks
-    L.bokeh(c, { n: 16, area: { x0: 0, y0: 1130, x1: W, y1: 1480 }, rmin: 14, rmax: 46, colors: [[PAL.yellow, 4], ['#FFD98A', 2], [PAL.mist, 3], [PAL.rain, 2], [PAL.signal, 1]], a: .32, seed: 7 });
-    L.glow(c, W * .5, 1230, W * .6, '#d1a25e', .12, 'screen');
+    L.bokeh(c, { n: 16, area: { x0: 0, y0: 1130, x1: W, y1: 1480 }, rmin: 10, rmax: 34, colors: [[PAL.yellow, 6], ['#FFD98A', 3], [PAL.mist, 2], [PAL.rain, 1], [PAL.signal, 1]], a: .4, seed: 7 });
+    L.glow(c, W * .5, 1500, W * .7, '#d1a25e', .22, 'screen'); L.glow(c, W * .5, 1230, W * .5, '#d1a25e', .1, 'screen');
     L.bloom(c, { blur: 14, a: .5, boost: 1.6, contrast: 2.0 });
     L.bloom(c, { blur: 40, a: .3, boost: 1.4, contrast: 1.8 });
     L.rain(c, { n: 340, ang: 11, len: [30, 90], w: .8, alpha: .22, color: '#9fb4c8', seed: 51 });

@@ -1,4 +1,60 @@
 {
+  "boot_00": {
+    "file": "boot_00.webp",
+    "w": 1080,
+    "h": 1080,
+    "alpha": true,
+    "kind": "seq"
+  },
+  "boot_01": {
+    "file": "boot_01.webp",
+    "w": 1080,
+    "h": 1080,
+    "alpha": true,
+    "kind": "seq"
+  },
+  "boot_02": {
+    "file": "boot_02.webp",
+    "w": 1080,
+    "h": 1080,
+    "alpha": true,
+    "kind": "seq"
+  },
+  "boot_03": {
+    "file": "boot_03.webp",
+    "w": 1080,
+    "h": 1080,
+    "alpha": true,
+    "kind": "seq"
+  },
+  "boot_04": {
+    "file": "boot_04.webp",
+    "w": 1080,
+    "h": 1080,
+    "alpha": true,
+    "kind": "seq"
+  },
+  "boot_05": {
+    "file": "boot_05.webp",
+    "w": 1080,
+    "h": 1080,
+    "alpha": true,
+    "kind": "seq"
+  },
+  "boot_06": {
+    "file": "boot_06.webp",
+    "w": 1080,
+    "h": 1080,
+    "alpha": true,
+    "kind": "seq"
+  },
+  "boot_07": {
+    "file": "boot_07.webp",
+    "w": 1080,
+    "h": 1080,
+    "alpha": true,
+    "kind": "seq"
+  },
   "hook_city": {
     "file": "hook_city.webp",
     "w": 1080,
@@ -8,6 +64,104 @@
   },
   "hook_roofs": {
     "file": "hook_roofs.webp",
+    "w": 1080,
+    "h": 1512,
+    "alpha": true,
+    "kind": "layer"
+  },
+  "hook_sky": {
+    "file": "hook_sky.webp",
+    "w": 1080,
+    "h": 1890,
+    "alpha": false,
+    "kind": "plate"
+  },
+  "merey_top": {
+    "file": "merey_top.webp",
+    "w": 360,
+    "h": 360,
+    "alpha": true,
+    "kind": "char"
+  },
+  "poster_00": {
+    "file": "poster_00.webp",
+    "w": 720,
+    "h": 1008,
+    "alpha": false,
+    "kind": "seq"
+  },
+  "poster_01": {
+    "file": "poster_01.webp",
+    "w": 720,
+    "h": 1008,
+    "alpha": false,
+    "kind": "seq"
+  },
+  "poster_02": {
+    "file": "poster_02.webp",
+    "w": 720,
+    "h": 1008,
+    "alpha": false,
+    "kind": "seq"
+  },
+  "poster_03": {
+    "file": "poster_03.webp",
+    "w": 720,
+    "h": 1008,
+    "alpha": false,
+    "kind": "seq"
+  },
+  "poster_04": {
+    "file": "poster_04.webp",
+    "w": 720,
+    "h": 1008,
+    "alpha": false,
+    "kind": "seq"
+  },
+  "poster_05": {
+    "file": "poster_05.webp",
+    "w": 720,
+    "h": 1008,
+    "alpha": false,
+    "kind": "seq"
+  },
+  "poster_stop": {
+    "file": "poster_stop.webp",
+    "w": 1080,
+    "h": 1512,
+    "alpha": false,
+    "kind": "plate"
+  },
+  "puddle_bg": {
+    "file": "puddle_bg.webp",
+    "w": 1080,
+    "h": 1512,
+    "alpha": false,
+    "kind": "plate"
+  },
+  "street_ground": {
+    "file": "street_ground.webp",
+    "w": 1080,
+    "h": 2160,
+    "alpha": false,
+    "kind": "plate"
+  },
+  "street_umbrellas": {
+    "file": "street_umbrellas.webp",
+    "w": 1080,
+    "h": 2160,
+    "alpha": true,
+    "kind": "layer"
+  },
+  "window_city": {
+    "file": "window_city.webp",
+    "w": 1080,
+    "h": 1512,
+    "alpha": false,
+    "kind": "plate"
+  },
+  "window_frame": {
+    "file": "window_frame.webp",
     "w": 1080,
     "h": 1512,
     "alpha": true,

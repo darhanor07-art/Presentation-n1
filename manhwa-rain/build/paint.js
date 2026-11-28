@@ -35,6 +35,7 @@ const wanted = args.filter(a => !a.startsWith('--'));
       let info = '';
       if (!quick) {
         const wb = buf(r.webp); fs.writeFileSync(path.join(ROOT, 'assets', k.key + '.webp'), wb);
+        try { manifest = JSON.parse(fs.readFileSync(mpath, 'utf8')); } catch (e) { manifest = {}; }
         manifest[k.key] = { file: k.key + '.webp', w: r.W, h: r.H, alpha: r.alpha, kind: r.kind };
         fs.writeFileSync(mpath, JSON.stringify(Object.fromEntries(Object.keys(manifest).sort().map(x => [x, manifest[x]])), null, 2) + '\n');
         info = ' ' + (wb.length / 1024).toFixed(0) + ' KB';

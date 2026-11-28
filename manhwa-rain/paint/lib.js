@@ -279,7 +279,7 @@
     const src = L.copyLayer(ctx); const r = L.layer(ctx.fw, ctx.fh); const seed = o.seed || 3;
     r.save(); r.setTransform(1, 0, 0, 1, 0, 0);
     for (let y = y0; y < y1; y += st) {
-      const t = (y - y0) / (y1 - y0), sy = y0 - t * span - st * span / (y1 - y0); if (sy < 0) break;
+      const t = (y - y0) / (y1 - y0), sy = (o.src0 === undefined ? y0 : o.src0) - t * span - st * span / (y1 - y0); if (sy < 0) break;
       const dx = (Math.sin(y * fr + seed) * .6 + Math.sin(y * fr * 2.7 + seed * 3) * .4) * amp * (.35 + t) + (L.noise(y * .05, seed, 2) - .5) * amp;
       r.globalAlpha = (o.alpha === undefined ? .85 : o.alpha) * (1 - t * (o.fade === undefined ? .6 : o.fade));
       r.drawImage(src.canvas, x0 * q, sy * q, (x1 - x0) * q, (st * span / (y1 - y0) + .5) * q, (x0 + dx) * q, y * q, (x1 - x0) * q, (st + .5) * q);
@@ -437,7 +437,7 @@
     const prof = [[B[0].x, B[0].base + fillDown]]; B.forEach(bl => { prof.push([bl.x, bl.y]); bl.steps.forEach(s => { prof.push([s.x, bl.y], [s.x, bl.y - s.h], [s.x + s.w, bl.y - s.h], [s.x + s.w, bl.y]); }); prof.push([bl.x + bl.w, bl.y]); }); const lb = B[B.length - 1]; prof.push([lb.x + lb.w, lb.base + fillDown]);
     const gl = (b) => { b.polygon(prof); };
     L.glaze(ctx, [{ color: L.mix(colBot, '#000', .35), op: 140 }], gl, { seed: seed + 3, bleed: .12, tex: .6, border: .25, alpha: .8, atop: true });
-    L.glaze(ctx, [{ color: L.mix(colTop, atm, .35), op: 110 }, { color: L.mix(colTop, '#4a6078', .4), op: 80, alpha: .5 }].slice(0, o.glazes || 2), gl, { seed: seed + 4, mode: 'mask', bleed: .15, tex: .6, border: .2, alpha: .38 * (1 - far * .3), atop: true });
+    L.glaze(ctx, [{ color: L.mix(colTop, atm, .35), op: 110 }, { color: L.mix(colTop, '#4a6078', .4), op: 80, alpha: .5 }].slice(0, o.glazes || 2), gl, { seed: seed + 4, mode: 'mask', bleed: .15, tex: .6, border: .2, alpha: .24 * (1 - far * .3), atop: true });
     // 3) windows
     const dens = o.winDens === undefined ? .3 : o.winDens, ws = o.winSize || [7, 10];
     B.forEach(bl => { L.windows(ctx, { x: bl.x + 3, y: bl.y + 4, w: bl.w - 6, h: bl.h - 6 + fillDown }, { rnd: r, cw: ws[0], ch: ws[1], gx: ws[0] * .7 + 2, gy: ws[1] * .7 + 1, lit: dens, warm: o.warm === undefined ? .4 : o.warm, far, alpha: o.winAlpha === undefined ? .95 : o.winAlpha }); });
@@ -490,7 +490,7 @@
     let stats = null; if (m.alpha) { const t = document.createElement('canvas'); t.width = c.width; t.height = c.height; const cx = t.getContext('2d'); cx.drawImage(c, 0, 0); L.cleanAlpha({ canvas: t }); const a = L.alphaStats({ canvas: t }); stats = a; var src = t; } else src = c;
     const webp = src.toDataURL('image/webp', .88);
     const sc = Math.min(1, 600 / Math.max(c.width, c.height)); const rv = document.createElement('canvas'); rv.width = Math.round(c.width * sc); rv.height = Math.round(c.height * sc); const rx = rv.getContext('2d');
-    rx.fillStyle = '#7d858f'; rx.fillRect(0, 0, rv.width, rv.height); rx.imageSmoothingQuality = 'high'; rx.drawImage(src, 0, 0, rv.width, rv.height);
+    if (m.alpha) { rx.fillStyle = '#5b6570'; rx.fillRect(0, 0, rv.width, rv.height); rx.fillStyle = '#7e8996'; const cs = 16; for (let yy = 0; yy < rv.height; yy += cs) for (let xx = (yy / cs) % 2 ? 0 : cs; xx < rv.width; xx += cs * 2) rx.fillRect(xx, yy, cs, cs); } else { rx.fillStyle = '#7d858f'; rx.fillRect(0, 0, rv.width, rv.height); } rx.imageSmoothingQuality = 'high'; rx.drawImage(src, 0, 0, rv.width, rv.height);
     return { webp, review: rv.toDataURL('image/jpeg', .85), w: c.width, h: c.height, W: m.w, H: m.h, alpha: m.alpha, kind: m.kind, stats, ms };
   };
 })();

@@ -14,9 +14,9 @@
     L.glow(c, W * .5, 880, W * .8, '#b98c52', .22, 'screen');
     L.glow(c, W * .15, 760, 420, '#7d97b3', .16, 'screen');
     // street lights and low lamps — big defocus discs, clustered around the horizon band
-    L.bokeh(c, { n: 38, area: { x0: -40, y0: 760, x1: W + 40, y1: 1120 }, rmin: 16, rmax: 56, colors: [[PAL.yellow, 5], ['#FFD98A', 3], [PAL.mist, 3], [PAL.rain, 3], [PAL.signal, 1]], a: .55, ring: .5, seed: 21 });
-    L.bokeh(c, { n: 14, area: { x0: -60, y0: 960, x1: W + 60, y1: H }, rmin: 50, rmax: 130, colors: [[PAL.yellow, 5], [PAL.mist, 3], [PAL.rain, 2], [PAL.signal, 1]], a: .38, ring: .5, seed: 22 });
-    L.bokeh(c, { n: 20, area: { x0: 0, y0: 300, x1: W, y1: 800 }, rmin: 8, rmax: 34, colors: [[PAL.yellow, 2], [PAL.mist, 4], [PAL.rain, 4]], a: .3, ring: .4, seed: 23 });
+    L.bokeh(c, { n: 38, area: { x0: -40, y0: 760, x1: W + 40, y1: 1120 }, rmin: 16, rmax: 56, colors: [[PAL.yellow, 7], ['#FFD98A', 3], [PAL.mist, 2], [PAL.rain, 3], [PAL.signal, 1]], a: .95, ring: .6, seed: 21 });
+    L.bokeh(c, { n: 14, area: { x0: -60, y0: 960, x1: W + 60, y1: H }, rmin: 50, rmax: 130, colors: [[PAL.yellow, 5], [PAL.mist, 3], [PAL.rain, 2], [PAL.signal, 1]], a: .6, ring: .6, seed: 22 });
+    L.bokeh(c, { n: 20, area: { x0: 0, y0: 300, x1: W, y1: 800 }, rmin: 8, rmax: 34, colors: [[PAL.yellow, 2], [PAL.mist, 4], [PAL.rain, 4]], a: .5, ring: .5, seed: 23 });
     // reflected smear of lights on the wet street (soft, vertical)
     const r = k.rnd; const lt = []; for (let i = 0; i < 26; i++) lt.push({ x: r() * W, y: 1000 + r() * 200, r: 18 + r() * 34, color: r.pick([PAL.yellow, '#FFD98A', PAL.mist, PAL.rain]), a: .26, len: 160 + r() * 200 });
     L.lightStreaks(c, lt, { amp: 6, blur: 9 });
@@ -25,8 +25,8 @@
     L.glaze(c, [{ color: '#7e98b3', op: 80, alpha: .12 }, { color: '#c5d0da', op: 60, alpha: .07 }], (b, i, rnd) => { for (let j = 0; j < 9; j++) b.polygon(L.blobPts(rnd() * W, 300 + rnd() * 1000, 160 + rnd() * 240, 70 + rnd() * 130, { n: 14, rough: .3, rnd })); }, { seed: 41, mode: 'mask', bleed: .5, tex: .4, border: .05, gain: 1.1 });
     L.glaze(c, ['#2a3b52'], (b, i, rnd) => { for (let j = 0; j < 8; j++) b.polygon(L.blobPts(rnd() * W, rnd() * H, 200 + rnd() * 260, 120 + rnd() * 200, { n: 14, rough: .3, rnd })); }, { seed: 42, opacity: 90, bleed: .45, tex: .6, border: .1, alpha: .5 });
     L.rain(c, { n: 220, ang: 10, len: [100, 300], w: 1.4, alpha: .14, color: '#aac0d6', seed: 43 });
-    L.bloom(c, { blur: 30, a: .3, boost: 1.4, contrast: 1.6 });
-    L.vignette(c, .5);
+    L.bloom(c, { blur: 30, a: .4, boost: 1.4, contrast: 1.6 });
+    L.vignette(c, .55);
     L.grain(c, { a: .07 });
     return c;
   });
@@ -37,10 +37,10 @@
     const mv = { x: 504, w: 54 }, mh = { y: 596, h: 48 };
     // glass condensation first (frame will sit on top of it)
     const panes = [[O.x0, O.y0, mv.x, mh.y], [mv.x + mv.w, O.y0, O.x1, mh.y], [O.x0, mh.y + mh.h, mv.x, O.y1], [mv.x + mv.w, mh.y + mh.h, O.x1, O.y1]];
-    const mist = L.layer(); L.fill(mist, 'rgba(197,208,218,.62)');
-    const hole = L.layer(); hole.fillStyle = '#fff'; panes.forEach(([x0, y0, x1, y1]) => hole.fillRect(x0 + 64, y0 + 64, x1 - x0 - 128, y1 - y0 - 128));
+    const mist = L.layer(); L.fill(mist, 'rgba(205,216,226,.86)');
+    const hole = L.layer(); hole.fillStyle = '#fff'; panes.forEach(([x0, y0, x1, y1]) => hole.fillRect(x0 + 74, y0 + 74, x1 - x0 - 148, y1 - y0 - 148));
     const hb = L.blurred(hole, 34); const nz = L.noiseAlpha(W, H, { sx: 1.4, sy: 1.4, oct: 4, seed: 71, lo: .25, hi: .75, color: '#fff', res: 8 });
-    mist.save(); mist.setTransform(1, 0, 0, 1, 0, 0); mist.globalCompositeOperation = 'destination-out'; mist.drawImage(hb.canvas, 0, 0); mist.globalAlpha = .55; mist.drawImage(nz.canvas, 0, 0); mist.restore();
+    mist.save(); mist.setTransform(1, 0, 0, 1, 0, 0); mist.globalCompositeOperation = 'destination-out'; mist.drawImage(hb.canvas, 0, 0); mist.drawImage(hb.canvas, 0, 0); mist.globalAlpha = .6; mist.drawImage(nz.canvas, 0, 0); mist.globalAlpha = 1; mist.drawImage(hb.canvas, 0, 0); mist.restore();
     // wipe trails/drips in the fog
     mist.save(); mist.globalCompositeOperation = 'destination-out'; mist.lineCap = 'round';
     for (let i = 0; i < 16; i++) { const x = O.x0 + 20 + r() * (O.x1 - O.x0 - 40), y = O.y0 + r() * 80, l = 70 + r() * 220; mist.strokeStyle = `rgba(0,0,0,${.35 + r() * .5})`; mist.lineWidth = 2 + r() * 5; mist.beginPath(); mist.moveTo(x, y); mist.bezierCurveTo(x + r() * 10 - 5, y + l * .4, x + r() * 14 - 7, y + l * .7, x + r() * 8 - 4, y + l); mist.stroke(); }
