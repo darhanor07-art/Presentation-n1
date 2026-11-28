@@ -90,5 +90,7 @@ if "flyby" in what or "all" in what:
         bpy.ops.render.render(write_still=True)
         print(f"FRAME {f}/{total} {time.time() - t:.1f}s", flush=True)
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-framerate", "24", "-i", os.path.join(fd, "f%04d.png"),
-                    "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "18", os.path.join(R, "flyby.mp4")], check=True)
+                    "-vf", "pad=ceil(iw/2)*2:ceil(ih/2)*2",   # yuv420p needs even width/height (675 -> 676)
+                    "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "18", "-movflags", "+faststart",
+                    os.path.join(R, "flyby.mp4")], check=True)
     print("DONE flyby.mp4", flush=True)
