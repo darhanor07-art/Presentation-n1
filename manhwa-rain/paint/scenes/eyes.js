@@ -110,9 +110,10 @@
     c.save(); aperture(c, g); c.clip();
     // --- sclera: grey-pink falloff from the iris to the corners, never pure white
     c.fillStyle = s.sclera[1]; c.fillRect(g.cx - a * 1.3, g.cy - a, a * 2.6, a * 2);
-    let rg = c.createRadialGradient(ic[0], ic[1], R * .9, ic[0], ic[1], a * 1.15); rg.addColorStop(0, s.sclera[0]); rg.addColorStop(.55, s.sclera[1]); rg.addColorStop(1, s.sclera[2]); c.fillStyle = rg; c.fillRect(g.cx - a * 1.3, g.cy - a, a * 2.6, a * 2);
+    let rg = c.createRadialGradient(ic[0], ic[1], R * .9, ic[0], ic[1], a * 1.15); rg.addColorStop(0, s.sclera[0]); rg.addColorStop(.38, s.sclera[1]); rg.addColorStop(.8, s.sclera[2]); rg.addColorStop(1, L.shade(s.sclera[2], -.25)); c.fillStyle = rg; c.fillRect(g.cx - a * 1.3, g.cy - a, a * 2.6, a * 2);
+    c.save(); const tg = c.createLinearGradient(0, g.cy - a * .5, 0, g.cy + a * .35); tg.addColorStop(0, 'rgba(25,12,16,.5)'); tg.addColorStop(.5, 'rgba(25,12,16,.12)'); tg.addColorStop(1, 'rgba(25,12,16,.2)'); c.fillStyle = tg; c.fillRect(g.cx - a * 1.3, g.cy - a, a * 2.6, a * 2); c.restore();
     // inner corner: caruncle pink glow
-    const inn = g.P(-.93, .02); rg = c.createRadialGradient(inn[0], inn[1], 0, inn[0], inn[1], a * .26); rg.addColorStop(0, L.rgba('#c47468', .85)); rg.addColorStop(.6, L.rgba('#b9776f', .4)); rg.addColorStop(1, L.rgba('#b9776f', 0)); c.fillStyle = rg; c.fillRect(inn[0] - a * .3, inn[1] - a * .3, a * .6, a * .6);
+    const inn = g.P(-.93, .02); rg = c.createRadialGradient(inn[0], inn[1], 0, inn[0], inn[1], a * .26); rg.addColorStop(0, L.rgba('#b86a60', .6)); rg.addColorStop(.6, L.rgba('#a8665f', .25)); rg.addColorStop(1, L.rgba('#b9776f', 0)); c.fillStyle = rg; c.fillRect(inn[0] - a * .3, inn[1] - a * .3, a * .6, a * .6);
     // fine capillaries
     c.lineCap = 'round'; for (let i = 0; i < 9; i++) { const side = i < 5 ? -1 : 1; const st = g.P(side * (.88 + r() * .1), (r() - .3) * .2); const en = g.P(side * (.5 + r() * .15), (r() - .5) * .3); c.strokeStyle = L.rgba('#a8423f', .08 + r() * .1 * s.veins); c.lineWidth = .7 + r() * .6; c.beginPath(); c.moveTo(st[0], st[1]); c.quadraticCurveTo((st[0] + en[0]) / 2 + (r() - .5) * 18, (st[1] + en[1]) / 2 + (r() - .5) * 18, en[0], en[1]); c.stroke(); }
     // --- iris
@@ -159,8 +160,8 @@
     // wet tear line along the lower margin (inside the aperture) + inner-corner highlight
     c.save(); aperture(c, g); c.clip();
     c.lineCap = 'round';
-    blurDo(c, 1.2, (t) => { t.strokeStyle = L.rgba(s.wet, .55 + .2 * s.tear); t.lineWidth = a * .02 * (1 + 1.4 * s.tear); path(t, off(g.lo.slice(3, 68), a * .018 * (1 + s.tear))); t.stroke(); }, 'screen', 1);
-    c.strokeStyle = L.rgba('#fff', .5); c.lineWidth = Math.max(1, a * .006); path(c, off(g.lo.slice(10, 62), a * .026 * (1 + s.tear))); c.stroke();
+    blurDo(c, 1.2, (t) => { t.strokeStyle = L.rgba(s.wet, .36 + .3 * s.tear); t.lineWidth = a * .014 * (1 + 1.6 * s.tear); path(t, off(g.lo.slice(3, 68), a * .018 * (1 + s.tear))); t.stroke(); }, 'screen', 1);
+    c.strokeStyle = L.rgba('#fff', .28 + .3 * s.tear); c.lineWidth = Math.max(1, a * .004); path(c, off(g.lo.slice(10, 62), a * .026 * (1 + s.tear))); c.stroke();
     c.restore();
     // --- catchlights (corneal reflection; clipped to the iris disc + a bit)
     c.save(); aperture(c, g); c.clip(); c.beginPath(); c.arc(ic[0], ic[1], R * 1.02, 0, TAU); c.clip();
@@ -201,6 +202,8 @@
     const lin = off(upSeg, (u) => a * lash.liner * .42 * (.2 + .8 * Math.pow(sin(PI * Math.pow(u, .85)), .8)));
     c.fillStyle = L.rgba(lash.color, .9); taper(c, lin, (u) => a * lash.liner * .8 * (.15 + .85 * Math.pow(sin(PI * Math.pow(u, .85)), .8)));
     c.restore();
+    // smoky dark base along the lash line on the lid skin (natural lash density shadow)
+    blurDo(c, a * .018, (t) => { t.strokeStyle = L.rgba('#120708', .6); t.lineCap = 'round'; t.lineWidth = a * .035; path(t, off(upSeg, a * .02)); t.stroke(); }, 'multiply', 1);
     // lashes: clumps
     const nClump = lash.clumps, lashes = [];
     for (let i = 0; i < nClump; i++) {
@@ -299,19 +302,19 @@
 
   /* ---------------- styles ---------------- */
   const MEREY = {
-    skin: { lit: '#c59a85', mid: '#a47b69', shade: '#664844', rose: '#b86f66', cool: '#6d6a8a' }, lx: -1, depth: 1, trough: '#5a4660',
-    sclera: ['#d3c9c6', '#c1b3b1', '#7d6672'], veins: 1, wet: '#ffe6e0', tear: 0, rim: '#b8d4e8',
+    skin: { lit: '#dcad94', mid: '#b98a72', shade: '#6f4a45', rose: '#c6786c', cool: '#76729a' }, lx: -1, depth: 1, trough: '#5a4660',
+    sclera: ['#cfc4c0', '#b4a5a5', '#6d5663'], veins: 1, wet: '#ffe6e0', tear: 0, rim: '#b8d4e8',
     iris: { inner: '#a8662c', mid: '#6b3a1b', outer: '#2c170c', rim: '#0b0605' }, pupil: .38, strokes: 780, caustic: '#ffb468', causticA: 1, catch: 'window', catchSide: -1,
-    lash: { color: '#0e0809', color2: '#1d1210', liner: .034, clumps: 17, len: .2, w: 1.15, lower: 16, lowerLen: .075 },
-    brow: { color: '#1e1412', n: 380, thick: .11, dx: 0, dy: 0, arch: -.02, drop: .05 },
+    lash: { color: '#0e0809', color2: '#1d1210', liner: .05, clumps: 26, len: .24, w: 1.7, lower: 22, lowerLen: .085 },
+    brow: { color: '#1e1412', n: 460, thick: .11, dx: 0, dy: .09, arch: -.02, drop: .05 },
     dropTint: '#c4d8ea', dropGlint: '#ffd9a0'
   };
   const SANZHAR = {
-    skin: { lit: '#8d8186', mid: '#5c5662', shade: '#262a3a', rose: '#6c5560', cool: '#2f4066' }, lx: 1, depth: 1.25, trough: '#242a45',
-    sclera: ['#b4b0b2', '#9a9499', '#565262'], veins: .7, wet: '#d7e6ff', tear: 0, rim: '#cfe2ff',
+    skin: { lit: '#94858a', mid: '#665862', shade: '#262a3a', rose: '#7a5560', cool: '#38476a' }, lx: 1, depth: 1.25, trough: '#242a45',
+    sclera: ['#a9a5aa', '#8d8791', '#4a4658'], veins: .7, wet: '#d7e6ff', tear: 0, rim: '#cfe2ff',
     iris: { inner: '#3b6cb8', mid: '#17407f', outer: '#0a1a3f', rim: '#040813' }, pupil: .36, strokes: 840, caustic: '#6fa0ff', causticA: .9, catch: 'headlight', catchSide: 1,
-    lash: { color: '#0a0a0e', color2: '#16161c', liner: .03, clumps: 15, len: .15, w: 1.15, lower: 12, lowerLen: .06 },
-    brow: { color: '#14141a', n: 420, thick: .115, dx: 0, dy: .02, arch: .005, drop: .05 },
+    lash: { color: '#0a0a0e', color2: '#16161c', liner: .045, clumps: 24, len: .17, w: 1.7, lower: 16, lowerLen: .065 },
+    brow: { color: '#14141a', n: 520, thick: .125, dx: 0, dy: .1, arch: .005, drop: .05 },
     dropTint: '#bcd2e6', dropGlint: '#cfe2ff'
   };
   E.styles = { MEREY, SANZHAR };
@@ -320,7 +323,7 @@
   function mereyEye(k, open) {
     const c = L.layer(), seed = 6100, s = MEREY;
     E.skin(c, s, seed);
-    const g = E.make({ cx: 600, cy: 425, a: 300, tilt: .07, mirror: 1, open, Hu: .43, Hl: .32, R: .40 });
+    const g = E.make({ cx: 600, cy: 440, a: 335, tilt: .07, mirror: 1, open, Hu: .43, Hl: .32, R: .40 });
     E.socket(c, g, s, seed);
     E.pores(c, s, seed);
     E.ball(c, g, s, seed);
@@ -343,7 +346,7 @@
   P.register('eye_sanzhar', { w: 1200, h: 700, alpha: false, seed: 6200 }, async (k) => {
     const c = L.layer(), seed = 6200, s = SANZHAR;
     E.skin(c, s, seed);
-    const g = E.make({ cx: 600, cy: 410, a: 300, tilt: .03, mirror: -1, open: 1, Hu: .36, Hl: .27, R: .36, ci: [0, -.03], cornerIn: .05, cornerOut: -.025, lidClosed: .1 });
+    const g = E.make({ cx: 600, cy: 425, a: 335, tilt: .03, mirror: -1, open: 1, Hu: .36, Hl: .27, R: .36, ci: [0, -.03], cornerIn: .05, cornerOut: -.025, lidClosed: .1 });
     E.socket(c, g, s, seed);
     E.pores(c, s, seed);
     E.ball(c, g, s, seed);

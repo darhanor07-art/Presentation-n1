@@ -80,11 +80,11 @@
     ink.fillStyle = K + '.62)'; ink.beginPath(); ink.ellipse(cx, 652, 76, 26, 0, 0, 6.2832); ink.fill(); ink.globalCompositeOperation = 'destination-out'; ink.fillStyle = 'rgba(0,0,0,.34)'; ink.beginPath(); ink.ellipse(cx - 12, 644, 52, 12, -.05, 0, 6.2832); ink.fill(); ink.globalCompositeOperation = 'source-over';
     ink.restore();
     // --- hair mass, then carve the face ---
-    ink.save(); ink.fillStyle = K + '.93)';
-    const hair = sm([[cx - 112, 400], [cx - 108, 318], [cx - 70, 256], [cx, 234], [cx + 74, 252], [cx + 110, 314], [cx + 118, 400], [cx + 114, 490], [cx + 104, 552], [cx + 80, 584], [cx + 66, 560], [cx + 66, 500], [cx - 64, 500], [cx - 68, 566], [cx - 84, 588], [cx - 106, 564], [cx - 116, 500]], true);
+    ink.save(); { const hg = ink.createLinearGradient(0, 230, 0, 590); hg.addColorStop(0, K + '.8)'); hg.addColorStop(1, K + '.9)'); ink.fillStyle = hg; }
+    const hair = sm([[cx - 130, 400], [cx - 124, 316], [cx - 80, 250], [cx, 228], [cx + 84, 248], [cx + 124, 314], [cx + 134, 400], [cx + 128, 490], [cx + 116, 556], [cx + 90, 590], [cx + 76, 560], [cx + 74, 500], [cx - 72, 500], [cx - 76, 566], [cx - 96, 592], [cx - 120, 566], [cx - 130, 500]], true);
     path(ink, hair); ink.fill();
     ink.globalCompositeOperation = 'destination-out'; ink.fillStyle = '#000';
-    const face = sm([[cx - 78, 392], [cx - 56, 352], [cx - 16, 336], [cx + 36, 352], [cx + 74, 384], [cx + 80, 440], [cx + 76, 506], [cx + 52, 568], [cx + 4, 604], [cx - 46, 574], [cx - 74, 510], [cx - 82, 440]], true); path(ink, face); ink.fill();
+    const face = sm([[cx - 82, 388], [cx - 52, 340], [cx - 14, 326], [cx + 38, 342], [cx + 80, 380], [cx + 92, 440], [cx + 84, 508], [cx + 56, 572], [cx + 4, 608], [cx - 50, 576], [cx - 82, 510], [cx - 94, 440]], true); path(ink, face); ink.fill();
     ink.globalCompositeOperation = 'source-over'; ink.restore();
     // --- skin tone and sculpting ---
     ink.save(); path(ink, face); ink.clip();
@@ -126,10 +126,13 @@
     soft(5, () => blob(cx, 580, 28, 7, .22));
     ink.restore();
     // --- brush: charcoal strand flow in the hair, highlight band (erase), graphite hatching on face/neck/jumper ---
-    L.paint(ink, (b, rnd) => {
-      b.set('charcoal', '#000', 1.0);
-      for (let i = 0; i < 130; i++) { const side = rnd() < .5 ? -1 : 1, x0 = cx + side * (rnd() * 120 + 8), y0 = 236 + Math.abs(x0 - cx) * .28 + rnd() * 30; const ln = Math.abs(x0 - cx) < 88 ? 40 + rnd() * 50 : 60 + rnd() * 200, bend = (x0 - cx) * .14; b.spline([[x0, y0, .4], [x0 + bend, y0 + ln * .5, 1], [x0 + bend * 1.2 + side * rnd() * 6, Math.min(Math.abs(x0 - cx) < 88 ? 350 : 590, y0 + ln), .3]], .6); }
-    }, { seed: 562, mode: 'mask', color: INK, alpha: .5, gain: 1.7 });
+    const PX0 = cx - 34, PY0 = 300; // side part
+    const strand = (b, rnd, side) => { const t = rnd(); const sx = PX0 + (rnd() - .5) * 16 + (side > 0 ? 14 : -14), sy = PY0 + (rnd() - .5) * 10; const tipx = cx + side * (96 + rnd() * 26) * (side < 0 ? 1.0 : 1.0), tipy = 540 + rnd() * 50;
+      const mx = cx + side * (60 + t * 70), my = 350 + rnd() * 60; b.spline([[sx, sy, .3], [(sx + mx) / 2 + side * 14, (sy + my) / 2 - 8, .8], [mx + side * (t * 18), my + 60, 1], [tipx + side * 6, tipy - 40, .7], [tipx - side * (8 + rnd() * 10), tipy, .2]], .7); };
+    L.paint(ink, (b, rnd) => { b.set('charcoal', '#000', 1.0); for (let i = 0; i < 230; i++) strand(b, rnd, rnd() < .46 ? -1 : 1); }, { seed: 562, mode: 'mask', color: INK, alpha: .95, gain: 2.4, atop: true });
+    L.paint(ink, (b, rnd) => { b.set('2B', '#000', .5); for (let i = 0; i < 12; i++) strand(b, rnd, rnd() < .5 ? -1 : 1); }, { seed: 566, mode: 'mask', color: INK, alpha: .35, gain: 1.6 }); // loose strands
+    L.paint(ink, (b, rnd) => { b.set('HB', '#000', .5); for (let i = 0; i < 70; i++) strand(b, rnd, rnd() < .46 ? -1 : 1); }, { seed: 567, mode: 'mask', color: '#000', alpha: .0, gain: 0 });
+    ink.save(); ink.globalCompositeOperation = 'destination-out'; ink.filter = `blur(${5 * q}px)`; ink.fillStyle = 'rgba(0,0,0,.3)'; ink.beginPath(); ink.ellipse(cx - 36, 272, 62, 12, -.28, 0, 6.2832); ink.fill(); ink.beginPath(); ink.ellipse(cx - 100, 400, 9, 56, .12, 0, 6.2832); ink.fill(); ink.restore();
     ink.save(); ink.globalCompositeOperation = 'destination-out'; ink.lineCap = 'round';
     for (let i = 0; i < 26; i++) { const t = i / 25, x0 = cx - 104 + t * 208 + (r() - .5) * 8, y0 = 262 + Math.sin(t * 3.14) * -10 + Math.abs(t - .45) * 56 + (r() - .5) * 10; ink.strokeStyle = `rgba(0,0,0,${.14 + r() * .2})`; ink.lineWidth = 1 + r() * 2; ink.beginPath(); ink.moveTo(x0, y0); ink.quadraticCurveTo(x0 + (t - .5) * 20, y0 + 20, x0 + (t - .5) * 34, y0 + 38 + r() * 12); ink.stroke(); }
     ink.restore();
