@@ -12,3 +12,8 @@ manhwa/build/vendor/node_modules/
 blender/**/*.blend1
 blender/**/*.blend
 blender/**/renders/frames/
+
+# blender/moonlit-castle: ауыр уақытша файлдар
+blender/moonlit-castle/renders/_frames/
+blender/**/*.blend1
+*.blend1

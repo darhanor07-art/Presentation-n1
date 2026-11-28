@@ -443,7 +443,7 @@ def mat_glass():
 def mat_moon():
     m, nt = new_mat("Moon")
     obj = texcoord(nt, "Object")
-    mare = ramp(nt, noise_tex(nt, obj, 1.6, 5, 0.6, 0.6), [(0.40, (1, 1, 1)), (0.60, (0.50, 0.52, 0.64))])
+    mare = ramp(nt, noise_tex(nt, obj, 1.6, 5, 0.6, 0.6), [(0.40, (1, 1, 1)), (0.60, (0.42, 0.45, 0.60))])
     vor = nd(nt, "ShaderNodeTexVoronoi", voronoi_dimensions="3D")
     lk(nt, out_sock(obj), vor.inputs["Vector"]); vor.inputs["Scale"].default_value = 7.0
     vor2 = nd(nt, "ShaderNodeTexVoronoi", voronoi_dimensions="3D")
@@ -459,7 +459,7 @@ def mat_moon():
     face = mt(nt, "ADD", 0.55, mt(nt, "MULTIPLY", mt(nt, "SUBTRACT", 1.0, lw.outputs["Facing"]), -0.5))
     em = nd(nt, "ShaderNodeEmission")
     lk(nt, out_sock(col), em.inputs["Color"])
-    lk(nt, out_sock(mt(nt, "MULTIPLY", mt(nt, "ADD", 0.65, mt(nt, "MULTIPLY", lw.outputs["Facing"], 0.35)), 1.7)), em.inputs["Strength"])
+    lk(nt, out_sock(mt(nt, "MULTIPLY", mt(nt, "ADD", 0.65, mt(nt, "MULTIPLY", lw.outputs["Facing"], 0.35)), 1.0)), em.inputs["Strength"])
     mat_output(nt, em)
     return m
 
@@ -1290,8 +1290,8 @@ def main():
     def dens_tree(X, Y):
         rc = np.hypot((X - CX) * 0.85, Y - CY)
         forest = smooth(0.50, 0.62, NZ[3].fbm(X / 90.0 + 9, Y / 90.0, 3))
-        far = forest * smooth(170, 240, rc) * smooth(110, 200, Y) * (1 - smooth(900, 1500, Y)) * 0.012
-        side = smooth(0.45, 0.6, NZ[2].fbm(X / 40.0, Y / 40.0 + 4, 3)) * smooth(55, 95, np.abs(X)) * smooth(25, 60, Y) * (1 - smooth(110, 200, Y)) * 0.006
+        far = forest * smooth(170, 240, rc) * smooth(110, 200, Y) * (1 - smooth(900, 1500, Y)) * 0.05
+        side = smooth(0.45, 0.6, NZ[2].fbm(X / 40.0, Y / 40.0 + 4, 3)) * smooth(55, 95, np.abs(X)) * smooth(25, 60, Y) * (1 - smooth(110, 200, Y)) * 0.02
         return far + side
     N_TREE = 3500
     tx, ty = sample_cells(dens_tree, (-900, 900), (20, 1300), 6.0, N_TREE, rnd)
@@ -1367,7 +1367,7 @@ def main():
         v = nd(nt, "ShaderNodeVolumePrincipled")
         v.inputs["Color"].default_value = (0.62, 0.66, 1.0, 1)
         v.inputs["Anisotropy"].default_value = 0.35
-        lk(nt, out_sock(mt(nt, "MULTIPLY", mt(nt, "MULTIPLY", tot, brk), 0.0055)), v.inputs["Density"])
+        lk(nt, out_sock(mt(nt, "MULTIPLY", mt(nt, "MULTIPLY", tot, brk), 0.003)), v.inputs["Density"])
         o = nd(nt, "ShaderNodeOutputMaterial")
         lk(nt, v.outputs[0], o.inputs["Volume"])
     vm = vol_box("ValleyMist", (CX * 0.4, 330, Z0 * 0.4 + 0), (1500, 760, 90), valley_mist)
@@ -1475,6 +1475,7 @@ def setup_render(sc):
     sc.render.image_settings.color_depth = "16"
     sc.render.threads_mode = "AUTO"
     sc.render.use_compositing = True
+    sc.render.compositor_device = "CPU"   # no GPU in the container
 
 
 def setup_compositor(sc):
