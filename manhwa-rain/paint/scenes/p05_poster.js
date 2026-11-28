@@ -62,56 +62,86 @@
   }
 
   function drawPortrait(ink, rnd0) {
-    // pencil / charcoal bust of Merey (short dark bob, 18). ink layer = graphite density (black with alpha).
-    const cx = 360, r = L.rng(4242);
+    // graphite / charcoal portrait of Merey (18): frontal, open eyes, side-parted short bob. ink layer = density (black w/ alpha)
+    const cx = 360, r = L.rng(4242), q = ink.q, K = 'rgba(16,20,27,';
     const path = (c, pts) => { c.beginPath(); pts.forEach((p, i) => i ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1])); c.closePath(); };
     const sm = (pts, cl = true) => L.smooth(pts, cl, 8);
-    // --- coat / shoulders (mid grey), neck ---
+    const soft = (px, fn) => { ink.save(); ink.filter = `blur(${px * q}px)`; fn(); ink.restore(); };
+    const blob = (x, y, rx, ry, a, rot = 0) => { ink.fillStyle = K + a + ')'; ink.beginPath(); ink.ellipse(x, y, rx, ry, rot, 0, 6.2832); ink.fill(); };
+    // --- jumper / coat + neck ---
     ink.save();
-    const sh = sm([[cx - 56, 640], [cx - 150, 664], [cx - 232, 712], [cx - 250, 740], [cx + 250, 740], [cx + 232, 712], [cx + 150, 664], [cx + 56, 640]], false);
-    let g = ink.createLinearGradient(0, 640, 0, 740); g.addColorStop(0, 'rgba(18,22,29,.55)'); g.addColorStop(1, 'rgba(18,22,29,.85)'); ink.fillStyle = g; path(ink, sh); ink.fill();
-    // neck (light) with chin shadow
-    const neck = sm([[cx - 40, 570], [cx - 44, 640], [cx - 30, 662], [cx, 672], [cx + 30, 662], [cx + 44, 640], [cx + 40, 570]], false); g = ink.createLinearGradient(cx - 44, 0, cx + 44, 0); g.addColorStop(0, 'rgba(18,22,29,.08)'); g.addColorStop(1, 'rgba(18,22,29,.3)'); ink.fillStyle = g; path(ink, neck); ink.fill();
-    ink.fillStyle = 'rgba(18,22,29,.55)'; ink.beginPath(); ink.moveTo(cx - 52, 640); ink.lineTo(cx, 700); ink.lineTo(cx + 52, 640); ink.lineTo(cx + 66, 660); ink.lineTo(cx, 740); ink.lineTo(cx - 66, 660); ink.closePath(); ink.fill(); // collar V
+    const sh = sm([[cx - 52, 650], [cx - 140, 672], [cx - 226, 716], [cx - 262, 744], [cx + 262, 744], [cx + 226, 716], [cx + 140, 672], [cx + 52, 650]], false);
+    let g = ink.createLinearGradient(0, 650, 0, 744); g.addColorStop(0, K + '.5)'); g.addColorStop(1, K + '.78)'); ink.fillStyle = g; path(ink, sh); ink.fill();
+    // neck
+    const neck = sm([[cx - 42, 560], [cx - 44, 630], [cx - 56, 664], [cx + 56, 664], [cx + 44, 630], [cx + 42, 560]], false);
+    g = ink.createLinearGradient(cx - 44, 0, cx + 44, 0); g.addColorStop(0, K + '.1)'); g.addColorStop(.6, K + '.2)'); g.addColorStop(1, K + '.34)'); ink.fillStyle = g; path(ink, neck); ink.fill();
+    soft(9, () => blob(cx, 598, 54, 28, .42)); // chin cast shadow on the neck
+    // roll-neck collar: thick knit band
+    ink.fillStyle = K + '.62)'; ink.beginPath(); ink.ellipse(cx, 652, 76, 26, 0, 0, 6.2832); ink.fill(); ink.globalCompositeOperation = 'destination-out'; ink.fillStyle = 'rgba(0,0,0,.34)'; ink.beginPath(); ink.ellipse(cx - 12, 644, 52, 12, -.05, 0, 6.2832); ink.fill(); ink.globalCompositeOperation = 'source-over';
     ink.restore();
-    // --- hair mass (bob), then carve out the face ---
-    ink.save(); ink.fillStyle = 'rgba(16,19,26,.94)';
-    const hair = sm([[cx - 124, 372], [cx - 112, 288], [cx - 56, 236], [cx + 20, 228], [cx + 92, 256], [cx + 128, 330], [cx + 132, 420], [cx + 128, 500], [cx + 112, 566], [cx + 76, 586], [cx + 74, 530], [cx + 60, 470], [cx - 60, 470], [cx - 76, 530], [cx - 80, 586], [cx - 116, 566], [cx - 132, 500], [cx - 136, 430]], true);
+    // --- hair mass, then carve the face ---
+    ink.save(); ink.fillStyle = K + '.93)';
+    const hair = sm([[cx - 112, 400], [cx - 108, 318], [cx - 70, 256], [cx, 234], [cx + 74, 252], [cx + 110, 314], [cx + 118, 400], [cx + 114, 490], [cx + 104, 552], [cx + 80, 584], [cx + 66, 560], [cx + 66, 500], [cx - 64, 500], [cx - 68, 566], [cx - 84, 588], [cx - 106, 564], [cx - 116, 500]], true);
     path(ink, hair); ink.fill();
-    // face opening: forehead covered by a swept fringe
     ink.globalCompositeOperation = 'destination-out'; ink.fillStyle = '#000';
-    const face = sm([[cx - 70, 386], [cx - 30, 360], [cx + 24, 376], [cx + 72, 360], [cx + 82, 430], [cx + 78, 508], [cx + 50, 574], [cx, 604], [cx - 50, 574], [cx - 78, 508], [cx - 82, 430]], true); path(ink, face); ink.fill();
+    const face = sm([[cx - 78, 392], [cx - 56, 352], [cx - 16, 336], [cx + 36, 352], [cx + 74, 384], [cx + 80, 440], [cx + 76, 506], [cx + 52, 568], [cx + 4, 604], [cx - 46, 574], [cx - 74, 510], [cx - 82, 440]], true); path(ink, face); ink.fill();
     ink.globalCompositeOperation = 'source-over'; ink.restore();
-    // --- face tone: gentle graphite shading (light from the left) ---
+    // --- skin tone and sculpting ---
     ink.save(); path(ink, face); ink.clip();
-    g = ink.createLinearGradient(cx - 82, 0, cx + 84, 0); g.addColorStop(0, 'rgba(18,22,29,.04)'); g.addColorStop(.5, 'rgba(18,22,29,.05)'); g.addColorStop(1, 'rgba(18,22,29,.3)'); ink.fillStyle = g; ink.fillRect(cx - 90, 340, 180, 280);
-    const eyeSh = (x, y) => { const rg = ink.createRadialGradient(x, y, 2, x, y, 36); rg.addColorStop(0, 'rgba(18,22,29,.2)'); rg.addColorStop(1, 'rgba(18,22,29,0)'); ink.fillStyle = rg; ink.fillRect(x - 40, y - 40, 80, 80); }; eyeSh(cx - 40, 446); eyeSh(cx + 40, 446);
-    g = ink.createLinearGradient(0, 560, 0, 606); g.addColorStop(0, 'rgba(18,22,29,0)'); g.addColorStop(1, 'rgba(18,22,29,.3)'); ink.fillStyle = g; ink.fillRect(cx - 90, 556, 180, 60);
-    ink.fillStyle = 'rgba(18,22,29,.16)'; ink.beginPath(); ink.moveTo(cx + 8, 448); ink.lineTo(cx + 26, 506); ink.lineTo(cx + 4, 516); ink.closePath(); ink.fill(); // nose shadow plane
-    // fringe shadow on the forehead
-    g = ink.createLinearGradient(0, 360, 0, 410); g.addColorStop(0, 'rgba(18,22,29,.35)'); g.addColorStop(1, 'rgba(18,22,29,0)'); ink.fillStyle = g; ink.fillRect(cx - 90, 355, 180, 60);
+    ink.fillStyle = K + '.09)'; ink.fillRect(cx - 100, 320, 200, 300);
+    g = ink.createLinearGradient(cx - 82, 0, cx + 82, 0); g.addColorStop(0, K + '.02)'); g.addColorStop(.55, K + '.04)'); g.addColorStop(1, K + '.3)'); ink.fillStyle = g; ink.fillRect(cx - 100, 320, 200, 300);
+    soft(10, () => { blob(cx - 40, 424, 34, 18, .22); blob(cx + 40, 424, 34, 18, .24); blob(cx + 62, 500, 22, 52, .22); blob(cx - 70, 470, 16, 60, .14); blob(cx, 590, 70, 16, .3); blob(cx + 6, 368, 80, 24, .3, .05); blob(cx + 30, 540, 30, 14, .12); });
+    soft(5, () => { blob(cx + 14, 480, 8, 26, .2, .1); blob(cx, 522, 24, 6, .32); }); // nose side plane, shadow under nose
     ink.restore();
-    // --- features: closed/lowered lids, brows, nose, lips (pencil weight) ---
-    ink.save(); ink.lineCap = 'round'; ink.strokeStyle = 'rgba(14,17,23,.78)';
-    [-1, 1].forEach(s => { const ex = cx + s * 40; ink.lineWidth = 2.6; ink.beginPath(); ink.moveTo(ex - 22, 450); ink.quadraticCurveTo(ex, 460, ex + 22, 449); ink.stroke(); ink.lineWidth = 1.2; for (let j = 0; j < 7; j++) { const x = ex - 20 + j * 6.6; ink.beginPath(); ink.moveTo(x, 452 + Math.sin(j / 6 * 3.14) * 6); ink.lineTo(x + s * -2, 460 + Math.sin(j / 6 * 3.14) * 6); ink.stroke(); } ink.strokeStyle = 'rgba(14,17,23,.35)'; ink.lineWidth = 1.4; ink.beginPath(); ink.moveTo(ex - 20, 438); ink.quadraticCurveTo(ex, 430, ex + 22, 437); ink.stroke(); ink.strokeStyle = 'rgba(14,17,23,.78)'; ink.lineWidth = 4.2; ink.beginPath(); ink.moveTo(ex - 26, 421); ink.quadraticCurveTo(ex, 406 + s * 1, ex + 28, 414 + (s > 0 ? 3 : -2)); ink.stroke(); });
-    ink.strokeStyle = 'rgba(14,17,23,.42)'; ink.lineWidth = 1.8; ink.beginPath(); ink.moveTo(cx + 5, 470); ink.quadraticCurveTo(cx + 12, 500, cx + 2, 512); ink.stroke(); ink.lineWidth = 2.6; ink.strokeStyle = 'rgba(14,17,23,.55)'; ink.beginPath(); ink.moveTo(cx - 15, 517); ink.quadraticCurveTo(cx - 6, 523, cx + 2, 518); ink.moveTo(cx + 8, 518); ink.quadraticCurveTo(cx + 15, 522, cx + 19, 516); ink.stroke();
-    ink.strokeStyle = 'rgba(14,17,23,.7)'; ink.lineWidth = 2.4; ink.beginPath(); ink.moveTo(cx - 26, 553); ink.quadraticCurveTo(cx - 8, 548, cx, 552); ink.quadraticCurveTo(cx + 8, 548, cx + 26, 553); ink.stroke(); ink.strokeStyle = 'rgba(14,17,23,.28)'; ink.lineWidth = 6; ink.beginPath(); ink.moveTo(cx - 17, 562); ink.quadraticCurveTo(cx, 569, cx + 17, 562); ink.stroke();
+    // --- eyes (open, looking at the viewer) ---
+    [-1, 1].forEach(sd => {
+      const ex = cx + sd * 40, ey = 424;
+      // eye socket crease and upper lid
+      ink.save(); ink.lineCap = 'round';
+      soft(1.2, () => { ink.strokeStyle = K + '.28)'; ink.lineWidth = 3; ink.beginPath(); ink.moveTo(ex - 24, ey - 8); ink.quadraticCurveTo(ex, ey - 22, ex + 24, ey - 9); ink.stroke(); });
+      // sclera: a touch lighter than skin
+      ink.globalCompositeOperation = 'destination-out'; ink.fillStyle = 'rgba(0,0,0,.09)'; ink.beginPath(); ink.moveTo(ex - 21, ey + 1); ink.quadraticCurveTo(ex, ey - 15, ex + 21, ey + 1); ink.quadraticCurveTo(ex, ey + 9, ex - 21, ey + 1); ink.fill(); ink.globalCompositeOperation = 'source-over';
+      // iris: soft grey with dark limbal ring, pupil, catchlight
+      ink.save(); ink.beginPath(); ink.moveTo(ex - 21, ey + 1); ink.quadraticCurveTo(ex, ey - 15, ex + 21, ey + 1); ink.quadraticCurveTo(ex, ey + 9, ex - 21, ey + 1); ink.clip();
+      const ix = ex + sd * -1.5, iy = ey - 1; const ig = ink.createRadialGradient(ix, iy + 2, 1, ix, iy, 9.5); ig.addColorStop(0, K + '.5)'); ig.addColorStop(.7, K + '.74)'); ig.addColorStop(1, K + '.92)'); ink.fillStyle = ig; ink.beginPath(); ink.arc(ix, iy, 9.5, 0, 6.2832); ink.fill();
+      ink.strokeStyle = K + '.3)'; ink.lineWidth = .8; for (let i = 0; i < 14; i++) { const a = i / 14 * 6.28; ink.beginPath(); ink.moveTo(ix + Math.cos(a) * 3.5, iy + Math.sin(a) * 3.5); ink.lineTo(ix + Math.cos(a) * 8, iy + Math.sin(a) * 8); ink.stroke(); }
+      ink.fillStyle = K + '.97)'; ink.beginPath(); ink.arc(ix, iy, 4, 0, 6.2832); ink.fill();
+      ink.globalCompositeOperation = 'destination-out'; ink.fillStyle = 'rgba(0,0,0,1)'; ink.beginPath(); ink.arc(ix - 3.2, iy - 3.2, 2.1, 0, 6.2832); ink.fill(); ink.fillStyle = 'rgba(0,0,0,.5)'; ink.beginPath(); ink.arc(ix + 3, iy + 3.2, 1.1, 0, 6.2832); ink.fill();
+      // upper lid shadow over the top of the eyeball
+      ink.globalCompositeOperation = 'source-over'; soft(1.5, () => { ink.fillStyle = K + '.4)'; ink.beginPath(); ink.ellipse(ex, ey - 7, 22, 5, 0, 0, 6.2832); ink.fill(); });
+      ink.restore();
+      // lid lines + lashes
+      ink.strokeStyle = K + '.88)'; ink.lineWidth = 2.4; ink.beginPath(); ink.moveTo(ex - 23, ey + 1); ink.quadraticCurveTo(ex - 2, ey - 16, ex + 23, ey - 1 + sd * 0); ink.stroke();
+      ink.lineWidth = 1.3; for (let j = 0; j < 9; j++) { const t = j / 8, x = ex - 20 + t * 40, y = ey - 12 * Math.sin(Math.PI * Math.min(1, t * .95 + .03)) + 2; ink.beginPath(); ink.moveTo(x, y + 2); ink.quadraticCurveTo(x + sd * -1 + (t - .5) * 5, y - 6, x + (t - .5) * 9 + sd * -1, y - 9 - (t > .7 ? 2 : 0)); ink.stroke(); }
+      ink.strokeStyle = K + '.4)'; ink.lineWidth = 1.2; ink.beginPath(); ink.moveTo(ex - 17, ey + 3); ink.quadraticCurveTo(ex, ey + 11, ex + 17, ey + 3); ink.stroke();
+      // brow: tapered hair strokes
+      ink.strokeStyle = K + '.65)'; for (let j = 0; j < 22; j++) { const t = j / 21, bx = ex - 26 + t * 54, by = 400 - Math.sin(t * 3.1) * 8 - (sd > 0 ? t * 3 : (1 - t) * 3) + 6; ink.lineWidth = 1.6 - t * .5; ink.beginPath(); ink.moveTo(bx - 2, by + 3); ink.lineTo(bx + 5, by - 1 + (r() - .5) * 2); ink.stroke(); }
+      ink.restore();
+    });
+    // --- nose (tone only), lips ---
+    ink.save(); ink.lineCap = 'round';
+    soft(1.5, () => { ink.fillStyle = K + '.5)'; ink.beginPath(); ink.ellipse(cx - 9, 520, 5, 3, .3, 0, 6.2832); ink.fill(); ink.beginPath(); ink.ellipse(cx + 12, 521, 5, 3, -.3, 0, 6.2832); ink.fill(); });
+    soft(1.2, () => { ink.strokeStyle = K + '.34)'; ink.lineWidth = 2; ink.beginPath(); ink.moveTo(cx - 17, 516); ink.quadraticCurveTo(cx - 11, 526, cx - 2, 523); ink.moveTo(cx + 22, 515); ink.quadraticCurveTo(cx + 17, 526, cx + 6, 523); ink.stroke(); });
+    soft(1, () => { ink.fillStyle = K + '.58)'; ink.beginPath(); ink.moveTo(cx - 27, 551); ink.quadraticCurveTo(cx - 12, 541, cx, 545); ink.quadraticCurveTo(cx + 12, 541, cx + 27, 551); ink.quadraticCurveTo(cx, 556, cx - 27, 551); ink.fill(); ink.fillStyle = K + '.3)'; ink.beginPath(); ink.moveTo(cx - 24, 553); ink.quadraticCurveTo(cx, 574, cx + 24, 553); ink.quadraticCurveTo(cx, 558, cx - 24, 553); ink.fill(); ink.strokeStyle = K + '.8)'; ink.lineWidth = 1.8; ink.beginPath(); ink.moveTo(cx - 28, 551); ink.quadraticCurveTo(cx, 556, cx + 28, 551); ink.stroke(); });
+    soft(5, () => blob(cx, 580, 28, 7, .22));
     ink.restore();
-    // --- brush: charcoal hair texture following the bob, pencil hatching on face/neck/coat, hair sheen (erase) ---
+    // --- brush: charcoal strand flow in the hair, highlight band (erase), graphite hatching on face/neck/jumper ---
     L.paint(ink, (b, rnd) => {
       b.set('charcoal', '#000', 1.0);
-      for (let i = 0; i < 90; i++) { const side = rnd() < .5 ? -1 : 1, x0 = cx + side * (84 + rnd() * 46), y0 = 300 + rnd() * 120; b.spline([[x0, y0, .5], [x0 + side * (2 + rnd() * 6), y0 + 70 + rnd() * 40, 1], [x0 + side * (2 + rnd() * 10) * (rnd() < .5 ? -1 : 1), Math.min(584, y0 + 150 + rnd() * 90), .4]], .6); }
-      for (let i = 0; i < 60; i++) { const a0 = 200 + rnd() * 140, x0 = cx - 110 + rnd() * 220, y0 = 238 + Math.abs(x0 - cx) * .2 + rnd() * 20; b.spline([[x0, y0, .4], [x0 + (x0 - cx) * .12, y0 + 34, 1], [x0 + (x0 - cx) * .26, y0 + 64 + rnd() * 16, .3]], .6); }
-      for (let i = 0; i < 30; i++) { const x0 = cx - 100 + i * 7, y0 = 262 + Math.abs(i - 15) * 1.8; b.spline([[x0, y0, .4], [x0 + 14 - (i - 15) * .6, y0 + 52 + rnd() * 10, 1], [x0 + 22 - (i - 15), y0 + 100 + rnd() * 12, .3]], .5); }
-    }, { seed: 562, mode: 'mask', color: INK, alpha: .55, gain: 1.7 });
+      for (let i = 0; i < 130; i++) { const side = rnd() < .5 ? -1 : 1, x0 = cx + side * (rnd() * 120 + 8), y0 = 236 + Math.abs(x0 - cx) * .28 + rnd() * 30; const ln = Math.abs(x0 - cx) < 88 ? 40 + rnd() * 50 : 60 + rnd() * 200, bend = (x0 - cx) * .14; b.spline([[x0, y0, .4], [x0 + bend, y0 + ln * .5, 1], [x0 + bend * 1.2 + side * rnd() * 6, Math.min(Math.abs(x0 - cx) < 88 ? 350 : 590, y0 + ln), .3]], .6); }
+    }, { seed: 562, mode: 'mask', color: INK, alpha: .5, gain: 1.7 });
+    ink.save(); ink.globalCompositeOperation = 'destination-out'; ink.lineCap = 'round';
+    for (let i = 0; i < 26; i++) { const t = i / 25, x0 = cx - 104 + t * 208 + (r() - .5) * 8, y0 = 262 + Math.sin(t * 3.14) * -10 + Math.abs(t - .45) * 56 + (r() - .5) * 10; ink.strokeStyle = `rgba(0,0,0,${.14 + r() * .2})`; ink.lineWidth = 1 + r() * 2; ink.beginPath(); ink.moveTo(x0, y0); ink.quadraticCurveTo(x0 + (t - .5) * 20, y0 + 20, x0 + (t - .5) * 34, y0 + 38 + r() * 12); ink.stroke(); }
+    ink.restore();
     L.paint(ink, (b, rnd) => {
-      b.set('2B', '#000', .8); L.ink(b, L.smooth([[cx - 82, 430], [cx - 78, 508], [cx - 50, 574], [cx, 604]], false, 8), { brush: '2B', color: '#000', w: .7, rnd, gap: .25, wig: .8, chunk: [30, 90] });
-      b.set('HB', '#000', .6); for (let i = 0; i < 44; i++) { const tt = i / 44, y = 420 + tt * 160, x0 = cx + 38 + tt * 16 + rnd() * 10; b.line(x0, y, x0 + 24 + rnd() * 14, y + 13 + rnd() * 5); }
-      for (let i = 0; i < 50; i++) { const x0 = cx - 215 + rnd() * 430, y0 = 676 + rnd() * 50; b.line(x0, y0, x0 + 10 + rnd() * 12, y0 + 26 + rnd() * 10); }
-    }, { seed: 563, mode: 'mask', color: INK, alpha: .5, gain: 2.0 });
-    ink.save(); ink.globalCompositeOperation = 'destination-out'; ink.lineCap = 'round'; ink.strokeStyle = 'rgba(0,0,0,.4)'; [[-74, 286, -86, 400], [-40, 262, -62, 380], [48, 262, 82, 360], [92, 300, 108, 420]].forEach(([x0, y0, x1, y1], i) => { ink.lineWidth = 3 + i % 2 * 2; ink.beginPath(); ink.moveTo(cx + x0, y0); ink.quadraticCurveTo(cx + (x0 + x1) / 2 - 6, (y0 + y1) / 2, cx + x1, y1); ink.stroke(); }); ink.restore();
-    // paper oval vignette around the bust (soft pencil edge) — keeps the portrait anchored
-    L.paint(ink, (b, rnd) => { b.set('HB', '#000', .5); for (let i = 0; i < 40; i++) { const a = r() * 6.28, d = 270 + r() * 30; b.line(cx + Math.cos(a) * d * 1.05, 470 + Math.sin(a) * d * .98, cx + Math.cos(a + .06) * (d + 16) * 1.05, 470 + Math.sin(a + .06) * (d + 16) * .98); } }, { seed: 565, mode: 'mask', color: INK, alpha: .22, gain: 1.3 });
+      b.set('HB', '#000', .6);
+      for (let i = 0; i < 70; i++) { const tt = i / 70, y = 400 + tt * 190, x0 = cx + 36 + tt * 14 + rnd() * 14; b.line(x0, y, x0 + 18 + rnd() * 16, y + 11 + rnd() * 5); }
+      for (let i = 0; i < 32; i++) { const x0 = cx - 38 + rnd() * 76, y0 = 580 + rnd() * 70; b.line(x0, y0, x0 + 8 + rnd() * 12, y0 + 14 + rnd() * 8); }
+      b.set('2B', '#000', .8); for (let i = 0; i < 90; i++) { const x0 = cx - 230 + rnd() * 460, y0 = 684 + rnd() * 54; b.line(x0, y0, x0 + 8 + rnd() * 12, y0 + 22 + rnd() * 10); }
+      b.set('HB', '#000', .5); for (let i = 0; i < 36; i++) { const x0 = cx - 70 + rnd() * 140, y0 = 636 + rnd() * 26; b.line(x0, y0, x0 + 6, y0 + 14 + rnd() * 6); }
+    }, { seed: 563, mode: 'mask', color: INK, alpha: .45, gain: 2.0 });
+    // printed-photo grain: speckle dropout over the whole portrait
+    const gr = L.noiseAlpha(PW, PH, { sx: .02, sy: .02, oct: 2, seed: 91, lo: .5, hi: .66, color: '#000', res: 2 }); ink.save(); ink.setTransform(1, 0, 0, 1, 0, 0); ink.globalCompositeOperation = 'destination-out'; ink.globalAlpha = .1; ink.drawImage(gr.canvas, 0, 0, ink.canvas.width, ink.canvas.height); ink.restore();
   }
 
   function poster(level) {

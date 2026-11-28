@@ -12,6 +12,9 @@
     const gr = L.noiseAlpha(W, H, { sx: .06, sy: .06, oct: 3, seed: 5, lo: .35, hi: .75, color: '#4b5967', res: 3, max: .5 }); L.blit(c, gr, { op: 'screen', alpha: .28 });
     // wheel-polished wet bands (lighter, vertical)
     [[170, 90], [350, 80], [690, 80], [880, 90]].forEach(([x, w], i) => { const g = c.createLinearGradient(x - w, 0, x + w, 0); g.addColorStop(0, 'rgba(110,137,163,0)'); g.addColorStop(.5, 'rgba(110,137,163,.16)'); g.addColorStop(1, 'rgba(110,137,163,0)'); c.fillStyle = g; c.fillRect(x - w, 0, w * 2, H); });
+    const sp = L.noiseAlpha(W, H, { sx: .018, sy: .018, oct: 2, seed: 15, lo: .52, hi: .6, color: '#8797a8', res: 2, max: .8 }); L.blit(c, sp, { op: 'screen', alpha: .32 });
+    const sp2 = L.noiseAlpha(W, H, { sx: .02, sy: .02, oct: 2, seed: 16, lo: .55, hi: .62, color: '#000', res: 2 }); L.blit(c, sp2, { alpha: .5 });
+    [[210, 600, 90, 340], [730, 1500, 90, 380], [390, 1900, 80, 240]].forEach(([x, y, rx, ry], i) => { const oc = ['rgba(95,211,192,.10)', 'rgba(150,120,200,.09)', 'rgba(242,194,48,.06)']; for (let j = 0; j < 3; j++) { const g = c.createRadialGradient(x + j * 20, y + j * 60, 4, x + j * 20, y + j * 60, ry * .6); g.addColorStop(0, oc[(i + j) % 3]); g.addColorStop(1, 'rgba(0,0,0,0)'); c.save(); c.globalCompositeOperation = 'screen'; c.translate(x, y); c.scale(rx / ry, 1); c.translate(-x, -y); c.fillStyle = g; c.fillRect(x - ry, y - ry, ry * 2, ry * 2); c.restore(); } });
     // kerbs/pavement both sides
     [[0, 96], [W - 96, 96]].forEach(([x, w]) => { const g = c.createLinearGradient(0, 0, W, 0); c.fillStyle = '#1e2834'; c.fillRect(x, 0, w, H); c.fillStyle = 'rgba(160,185,210,.18)'; c.fillRect(x < 100 ? x + w - 3 : x, 0, 3, H); c.fillStyle = 'rgba(0,0,0,.35)'; c.fillRect(x < 100 ? x + w : x - 10, 0, 10, H); for (let y = 0; y < H; y += 120 + (r() * 30 | 0)) { c.fillStyle = 'rgba(0,0,0,.4)'; c.fillRect(x, y, w, 2); } });
     // zebra crossing band (vertical bars, worn paint)
@@ -30,7 +33,7 @@
     L.glaze(c, ['#18202b', '#0a0f16'], (b, i, rnd) => { for (let j = 0; j < 9; j++) b.polygon(L.blobPts(rnd() * W, rnd() * H, 150 + rnd() * 240, 160 + rnd() * 350, { n: 14, rough: .3, rnd })); }, { seed: 311, opacity: 90, bleed: .4, tex: .8, border: .05, alpha: .5 });
     L.paint(c, (b, rnd) => { b.set('charcoal', '#000', 1); for (let i = 0; i < 90 * (k.q < 1 ? .5 : 1); i++) { const x = rnd() * W, y = rnd() * H; b.line(x, y, x + (rnd() - .5) * 10, y + 80 + rnd() * 240); } }, { seed: 312, mode: 'mask', color: '#05080c', alpha: .35 });
     // puddles reflecting lamps and the grey sky
-    const puddles = [[250, 330, 170, 120, 20], [770, 520, 140, 200, -10], [420, 1450, 210, 150, 35], [190, 1900, 150, 220, 5], [920, 2010, 120, 110, 0], [610, 700, 110, 80, 60], [560, 1880, 160, 100, 15]];
+    const puddles = [[250, 330, 170, 120, 20], [770, 520, 140, 200, -10], [420, 1450, 210, 150, 35], [190, 1900, 150, 220, 5], [920, 2010, 120, 110, 0], [610, 700, 110, 80, 60], [560, 1880, 160, 100, 15], [370, 400, 120, 90, -30], [330, 1560, 120, 110, 10], [700, 1930, 130, 100, 40], [840, 560, 90, 130, 5]];
     const lamps = [];
     puddles.forEach(([px, py, rx, ry, rot], i) => {
       const pts = L.blobPts(px, py, rx, ry, { n: 22, rough: .22, rot, rnd: r });
@@ -38,8 +41,8 @@
       const g2 = c.createLinearGradient(px - rx, py - ry, px + rx * .6, py + ry); g2.addColorStop(0, '#4d6379'); g2.addColorStop(.5, '#26333f'); g2.addColorStop(1, '#141c26'); c.globalAlpha = .7; c.fillStyle = g2; c.fillRect(px - rx * 1.3, py - ry * 1.3, rx * 2.6, ry * 2.6); c.globalAlpha = 1;
       L.glow(c, px - rx * .3, py - ry * .2, rx * .8, '#F2C230', .35, 'screen'); L.glow(c, px - rx * .3, py - ry * .2, rx * .16, '#fff3c8', .8, 'screen'); L.lightStreaks(c, [{ x: px - rx * .3, y: py - ry * .75, r: rx * .13, color: '#ffe9a8', a: .55, len: ry * 1.5 }], { amp: 3, blur: 2 }); L.glow(c, px + rx * .45, py + ry * .3, rx * .5, '#9fc0dc', .16, 'screen');
       for (let j = 0; j < 4; j++) { const rr = 5 + j * 11; c.strokeStyle = `rgba(210,225,238,${.34 - j * .04})`; c.lineWidth = 1.4; c.beginPath(); c.ellipse(px + (r() - .5) * rx * .9, py + (r() - .5) * ry * .9, rr, rr * .9, 0, 0, 6.3); c.stroke(); }
+      c.strokeStyle = 'rgba(4,7,11,.55)'; c.lineWidth = 16; c.filter = `blur(${5 * c.q}px)`; c.beginPath(); pts.forEach((p, j) => j ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1])); c.closePath(); c.stroke();
       c.restore();
-      c.save(); c.strokeStyle = 'rgba(196,214,230,.5)'; c.lineWidth = 2; c.beginPath(); pts.forEach((p, j) => j ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1])); c.closePath(); c.stroke(); c.restore();
       lamps.push({ x: px - rx * .3, y: py - ry * .2 });
     });
     // overhead lamp light pools with glossy streaks

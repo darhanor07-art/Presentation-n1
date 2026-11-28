@@ -4,12 +4,33 @@
   const SZ_P = { w: 1080, h: 1512 }, SZ_T = { w: 1080, h: 1890 };
 
   P.register('hook_sky', { ...SZ_T, alpha: false, seed: 101 }, async (k) => {
-    const c = L.layer();
-    L.sky(c, { top: '#080d15', mid: '#243040', low: '#46586d', cloudDark: '#0c121b', cloudLight: '#7b8fa6', glow: '#c08a4c', glowY: k.H * 1.0, glowA: .75, seed: 11, scale: 1.0, contrast: 1.9, washes: 16, strokes: 90 });
-    L.glow(c, k.W * .5, k.H * 1.04, k.W * 1.0, '#c4904f', .42, 'screen');
-    L.glow(c, k.W * .2, k.H * .93, k.W * .5, '#8aa0b8', .14, 'screen');
-    L.vignette(c, .5);
-    L.grain(c, { a: .07 });
+    const W = k.W, H = k.H, r = L.rng(1011), c = L.layer();
+    L.vgrad(c, [[0, '#070b12'], [.45, '#121b27'], [.8, '#243142'], [1, '#3a3d44']]);
+    L.glow(c, W * .5, H * 1.02, W * 1.0, '#c4904f', .4, 'screen');
+    // a lighter break in the clouds
+    L.glow(c, W * .66, H * .3, W * .5, '#5f7791', .3, 'screen');
+    const clamp01 = v => Math.max(0, Math.min(1, v));
+    // each depth layer: puff density field -> fbm-eroded -> shaded (lit tops, dark undersides) -> tone-mapped
+    const cloudLayer = (tone, cnt, wmin, wmax, seed, opac) => {
+      const RS = 6, cw = Math.ceil(W / RS), ch = Math.ceil(H / RS); const dc = document.createElement('canvas'); dc.width = cw; dc.height = ch; const dx = dc.getContext('2d', { willReadFrequently: true });
+      for (let i = 0; i < cnt; i++) { const w = wmin + r() * (wmax - wmin), cx = r() * W, base = H * (.18 + r() * .85), h = w * (1.2 + r() * 1.4), n = 12;
+        for (let j = 0; j < n; j++) { const t = Math.pow(r(), .8), y = base - t * h, rad = w * (.34 - .16 * t + r() * .1) / RS, x = (cx + (r() - .5) * w * (.8 - .5 * t)) / RS; const g = dx.createRadialGradient(x, y / RS, 0, x, y / RS, rad); g.addColorStop(0, 'rgba(255,255,255,.55)'); g.addColorStop(.6, 'rgba(255,255,255,.3)'); g.addColorStop(1, 'rgba(255,255,255,0)'); dx.fillStyle = g; dx.beginPath(); dx.arc(x, y / RS, rad, 0, 6.2832); dx.fill(); } }
+      const src = dx.getImageData(0, 0, cw, ch).data; const D = new Float32Array(cw * ch);
+      for (let j = 0; j < ch; j++) for (let i = 0; i < cw; i++) { const nz = L.fbm(i * RS / 150, j * RS / 130, 5, seed) - .5; D[j * cw + i] = src[(j * cw + i) * 4 + 3] / 255 * 1.35 + nz * .75; }
+      const out = document.createElement('canvas'); out.width = cw; out.height = ch; const ox = out.getContext('2d'); const im = ox.createImageData(cw, ch); const o = im.data;
+      const dk = L.hex(L.mix('#04070c', '#1a2330', tone)), lt = L.hex(L.mix('#243245', '#93a8bf', tone)), wm = L.hex('#a87a46');
+      for (let j = 0; j < ch; j++) for (let i = 0; i < cw; i++) { const d = D[j * cw + i], a = clamp01((d - .5) / .42); if (a <= 0) continue;
+        const up = D[Math.max(0, j - 3) * cw + i], dn = D[Math.min(ch - 1, j + 3) * cw + i]; let lit = clamp01(.45 + (dn - up) * 1.6 + (d - .7) * .5); lit = lit * lit * (3 - 2 * lit);
+        const yy = j * RS / H, warm = clamp01((yy - .55) * 2.2) * (1 - lit) * .75; const p = (j * cw + i) * 4;
+        o[p] = dk[0] + (lt[0] - dk[0]) * lit + (wm[0] - dk[0]) * warm * .5; o[p + 1] = dk[1] + (lt[1] - dk[1]) * lit + (wm[1] - dk[1]) * warm * .5; o[p + 2] = dk[2] + (lt[2] - dk[2]) * lit + (wm[2] - dk[2]) * warm * .4; o[p + 3] = 255 * a * opac; }
+      ox.putImageData(im, 0, 0); c.save(); c.imageSmoothingEnabled = true; c.filter = `blur(${4 * c.q}px)`; c.drawImage(out, -6, -6, W + 12, H + 12); c.restore();
+    };
+    cloudLayer(.62, 24, 100, 180, 3, .75); cloudLayer(.5, 14, 180, 320, 7, .9); cloudLayer(.32, 8, 300, 520, 11, .95); cloudLayer(.18, 4, 460, 760, 17, 1);
+    // soft blur to merge puffs into wet-in-wet masses, then re-sharpen a little with ink-wash glazes
+    
+    L.glaze(c, [{ color: '#3a4656', op: 70 }, { color: '#1a2230', op: 60 }], (b, i, rnd) => { for (let j = 0; j < 12; j++) b.polygon(L.blobPts(rnd() * W, rnd() * H, 140 + rnd() * 240, 120 + rnd() * 240, { n: 14, rough: .35, rnd })); }, { seed: 105, bleed: .45, tex: .7, border: .1, alpha: .45 });
+    L.glow(c, W * .5, H * 1.0, W * .9, '#c4904f', .25, 'screen');
+    L.vignette(c, .5); L.grain(c, { a: .07 });
     return c;
   });
 

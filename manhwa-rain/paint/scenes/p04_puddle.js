@@ -68,8 +68,8 @@
     { dy: -190, tilt: -8, crown: 22, ring: 5, dr: 6, fall: 1 },
   ];
   const WL = 842, BX = 540;
-  const BACK = [[-168, -30], [-172, -90], [-150, -160], [-122, -230], [-112, -320], [-116, -450]];
-  const FRONT = [[56, -450], [58, -340], [54, -262], [76, -190], [130, -132], [190, -96], [224, -62], [228, -34]];
+  const BACK = [[-152, -36], [-172, -84], [-158, -150], [-122, -230], [-118, -330], [-138, -450]];
+  const FRONT = [[76, -450], [64, -350], [48, -272], [74, -204], [140, -160], [214, -132], [262, -96], [278, -58], [266, -36]];
   function bootPath(c) { const back = L.smooth(BACK, false, 8), front = L.smooth(FRONT, false, 8); c.beginPath(); back.forEach((p, i) => i ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1])); front.forEach(p => c.lineTo(p[0], p[1])); c.closePath(); return back.concat(front); }
 
   function drawCrown(c, f, r, fi, front) {
@@ -94,42 +94,47 @@
       // --- boot + coat in local space ---
       c.save(); c.translate(BX, by); c.rotate(f.tilt * Math.PI / 180);
       // sole
-      c.fillStyle = '#080c11'; c.beginPath(); c.moveTo(-182, 0); c.lineTo(236, 0); c.lineTo(234, -40); c.quadraticCurveTo(160, -46, 40, -36); c.lineTo(-174, -34); c.closePath(); c.fill();
-      c.fillStyle = 'rgba(120,150,178,.5)'; c.fillRect(-170, -36, 396, 2); c.fillStyle = '#05080b'; for (let x = -160; x < 220; x += 26) c.fillRect(x, -22, 9, 18);
+      c.fillStyle = '#080c11'; c.beginPath(); c.moveTo(-170, 0); c.lineTo(262, 0); c.quadraticCurveTo(292, -4, 286, -30); c.quadraticCurveTo(284, -44, 262, -42); c.lineTo(-160, -40); c.quadraticCurveTo(-176, -36, -170, 0); c.closePath(); c.fill();
+      c.fillStyle = '#161d27'; c.fillRect(-160, -22, 430, 14); c.fillStyle = '#04070a'; for (let x = -150; x < 250; x += 22) c.fillRect(x, -20, 8, 11);
+      c.fillStyle = 'rgba(150,176,202,.6)'; c.fillRect(-158, -42, 420, 2.4);
       // upper
-      const outline = bootPath(c); let g = c.createLinearGradient(-170, 0, 240, 0); g.addColorStop(0, YD); g.addColorStop(.16, YL); g.addColorStop(.34, Y); g.addColorStop(.72, YD); g.addColorStop(1, YDD); c.fillStyle = g; c.fill();
+      const outline = bootPath(c); let g = c.createLinearGradient(-170, 0, 240, 0); g.addColorStop(0, YDD); g.addColorStop(.08, YD); g.addColorStop(.26, YL); g.addColorStop(.4, Y); g.addColorStop(.72, YD); g.addColorStop(1, YDD); c.fillStyle = g; c.fill();
       // top rim opening (hidden by coat later) + inner sheen
       c.save(); bootPath(c); c.clip();
       const sh = c.createLinearGradient(0, -450, 0, 0); sh.addColorStop(0, 'rgba(60,35,0,.35)'); sh.addColorStop(.3, 'rgba(60,35,0,0)'); sh.addColorStop(1, 'rgba(60,35,0,.25)'); c.fillStyle = sh; c.fillRect(-200, -460, 460, 470);
       // ankle creases
       c.strokeStyle = 'rgba(110,70,8,.55)'; c.lineWidth = 3; c.lineCap = 'round'; [[-130, -186, 40, -200, 18], [-126, -216, 36, -230, 12], [-118, -250, 42, -258, 9]].forEach(([x0, y0, x1, y1, bend]) => { c.beginPath(); c.moveTo(x0, y0); c.quadraticCurveTo((x0 + x1) / 2, y0 + bend, x1, y1 + 6); c.stroke(); });
       c.strokeStyle = 'rgba(110,70,8,.45)'; c.lineWidth = 2.4; c.beginPath(); c.moveTo(120, -118); c.quadraticCurveTo(100, -135, 70, -170); c.stroke();
+      c.strokeStyle = 'rgba(110,70,8,.6)'; c.lineWidth = 3; c.beginPath(); c.moveTo(100, -158); c.quadraticCurveTo(150, -90, 112, -40); c.stroke(); c.strokeStyle = 'rgba(255,240,170,.5)'; c.lineWidth = 2; c.beginPath(); c.moveTo(106, -158); c.quadraticCurveTo(158, -90, 120, -42); c.stroke();
+      c.fillStyle = 'rgba(100,62,6,.4)'; c.beginPath(); c.moveTo(-170, -50); c.quadraticCurveTo(-176, -130, -130, -190); c.lineTo(-124, -60); c.closePath(); c.fill();
+      c.globalCompositeOperation = 'multiply'; c.fillStyle = 'rgba(120,80,10,.35)'; c.fillRect(-10, -460, 90, 460); c.globalCompositeOperation = 'source-over';
       // glossy reflections: long strip on the lit side + shop window glints + toe highlight
       c.globalCompositeOperation = 'screen'; c.filter = `blur(${2 * c.q}px)`; c.fillStyle = 'rgba(255,246,200,.75)'; c.beginPath(); c.moveTo(-120, -420); c.quadraticCurveTo(-118, -250, -140, -90); c.lineTo(-124, -90); c.quadraticCurveTo(-106, -250, -104, -420); c.fill();
       c.fillStyle = 'rgba(255,255,255,.7)'; c.fillRect(-92, -380, 14, 70); c.fillStyle = 'rgba(255,240,170,.55)'; c.fillRect(-92, -290, 14, 36); c.fillStyle = 'rgba(190,225,255,.5)'; c.fillRect(8, -400, 10, 120);
-      c.beginPath(); c.ellipse(150, -100, 26, 9, -.5, 0, 6.3); c.fillStyle = 'rgba(255,252,230,.8)'; c.fill();
+      c.beginPath(); c.ellipse(190, -118, 36, 9, -.35, 0, 6.3); c.fillStyle = 'rgba(255,252,230,.85)'; c.fill(); c.fillStyle = 'rgba(255,246,200,.5)'; c.fillRect(50, -420, 8, 150);
       c.restore();
       // rim light on edge
       c.strokeStyle = 'rgba(255,240,170,.8)'; c.lineWidth = 3; c.beginPath(); L.smooth(BACK, false, 8).forEach((p, i) => i ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1])); c.stroke();
       c.restore();
       // coat hem (raincoat) draped over the boot shaft
       c.save(); c.translate(BX, by); c.rotate(f.tilt * .4 * Math.PI / 180);
-      const hemY = -438; c.beginPath(); c.moveTo(-170, hemY + 6); for (let i = 0; i <= 12; i++) { const t = i / 12, x = -170 + t * 320; c.lineTo(x, hemY + Math.sin(t * 7 + 1) * 9 + (i % 2 ? 6 : 0)); } c.lineTo(150, -1300); c.lineTo(-140, -1300); c.closePath();
+      const hemY = -438; c.beginPath(); c.moveTo(-200, hemY + 6); for (let i = 0; i <= 12; i++) { const t = i / 12, x = -200 + t * 340; c.lineTo(x, hemY + Math.sin(t * 7 + 1) * 9 + (i % 2 ? 6 : 0)); } c.lineTo(150, -1300); c.lineTo(-170, -1300); c.closePath();
       g = c.createLinearGradient(-170, 0, 150, 0); g.addColorStop(0, YD); g.addColorStop(.2, Y); g.addColorStop(.5, '#e0aa28'); g.addColorStop(1, YDD); c.fillStyle = g; c.fill();
       c.clip(); // folds + shading going up the frame
       const cg = c.createLinearGradient(0, hemY, 0, -1000); cg.addColorStop(0, 'rgba(80,50,4,.35)'); cg.addColorStop(.12, 'rgba(80,50,4,0)'); cg.addColorStop(1, 'rgba(20,12,0,.55)'); c.fillStyle = cg; c.fillRect(-200, -1300, 400, 900);
       for (let i = 0; i < 7; i++) { const x = -150 + i * 50 + r() * 14; c.strokeStyle = i % 2 ? 'rgba(110,70,8,.4)' : 'rgba(255,236,150,.28)'; c.lineWidth = 8 + r() * 10; c.beginPath(); c.moveTo(x, hemY); c.quadraticCurveTo(x + (r() - .5) * 30, hemY - 200, x + (r() - .5) * 40 + (x < -20 ? -10 : 8), -1100); c.stroke(); }
-      c.strokeStyle = 'rgba(255,248,205,.85)'; c.lineWidth = 3; c.beginPath(); for (let i = 0; i <= 12; i++) { const t = i / 12, x = -170 + t * 320, yy = hemY + Math.sin(t * 7 + 1) * 9 + (i % 2 ? 6 : 0); i ? c.lineTo(x, yy) : c.moveTo(x, yy); } c.stroke();
+      c.strokeStyle = 'rgba(255,248,205,.85)'; c.lineWidth = 3; c.beginPath(); for (let i = 0; i <= 12; i++) { const t = i / 12, x = -200 + t * 340, yy = hemY + Math.sin(t * 7 + 1) * 9 + (i % 2 ? 6 : 0); i ? c.lineTo(x, yy) : c.moveTo(x, yy); } c.stroke();
       c.restore();
       // hem drips
       c.save(); c.translate(BX, by + (f.fall ? 0 : 0)); for (let i = 0; i < 4; i++) { const x = -120 + i * 70 + r() * 20, d = (fi >= 6 ? 40 + fi * 6 + r() * 50 : 12 + r() * 18); c.fillStyle = 'rgba(225,238,250,.8)'; c.beginPath(); c.ellipse(x, -430 + d, 2.8, 5, 0, 0, 6.3); c.fill(); if (fi >= 6) { c.strokeStyle = 'rgba(220,235,250,.35)'; c.lineWidth = 1.2; c.beginPath(); c.moveTo(x, -430 + d - 30); c.lineTo(x, -430 + d - 6); c.stroke(); } } c.restore();
       // --- brush: watercolour glaze + broken ink + warm rim, all under the same transform ---
       const tr = (b) => { b.translate(BX, by); b.rotate(f.tilt); };
-      L.glaze(c, [{ color: '#d6951a', op: 140 }], (b, i, rnd) => { b.push(); tr(b); b.polygon(outline); b.polygon([[-170, hemY], [150, hemY], [150, -1300], [-140, -1300]]); b.pop(); }, { seed: 441 + fi, bleed: .2, tex: .85, border: .3, alpha: .42, atop: true });
-      L.paint(c, (b, rnd) => { b.push(); tr(b); L.ink(b, L.smooth(BACK, false, 6), { color: '#4a2e06', w: .9, rnd, gap: .18, wig: 1.2, chunk: [50, 160] }); L.ink(b, L.smooth(FRONT, false, 6), { color: '#4a2e06', w: .9, rnd, gap: .2, wig: 1.2, chunk: [50, 160] }); L.ink(b, [[-182, 0], [236, 0]], { color: '#000', w: .9, rnd, gap: .1, wig: 1 }); L.ink(b, [[-146, hemY - 4], [-150, -900]], { color: '#4a2e06', w: .8, rnd, gap: .3, wig: 2, chunk: [80, 260] }); L.ink(b, [[140, hemY - 4], [146, -900]], { color: '#4a2e06', w: .8, rnd, gap: .3, wig: 2, chunk: [80, 260] }); b.pop(); }, { seed: 451 + fi, mode: 'mask', color: '#3a2204', alpha: .8, gain: 1.3 });
+      L.glaze(c, [{ color: '#d6951a', op: 140 }], (b, i, rnd) => { b.push(); tr(b); b.polygon(outline); b.polygon([[-200, hemY], [140, hemY], [150, -1300], [-170, -1300]]); b.pop(); }, { seed: 441 + fi, bleed: .2, tex: .85, border: .3, alpha: .42, atop: true });
+      L.paint(c, (b, rnd) => { b.push(); tr(b); L.ink(b, L.smooth(BACK, false, 6), { color: '#4a2e06', w: .9, rnd, gap: .18, wig: 1.2, chunk: [50, 160] }); L.ink(b, L.smooth(FRONT, false, 6), { color: '#4a2e06', w: .9, rnd, gap: .2, wig: 1.2, chunk: [50, 160] }); L.ink(b, [[-170, 0], [270, 0]], { color: '#000', w: .9, rnd, gap: .1, wig: 1 }); L.ink(b, [[-190, hemY - 4], [-170, -900]], { color: '#4a2e06', w: .8, rnd, gap: .3, wig: 2, chunk: [80, 260] }); L.ink(b, [[140, hemY - 4], [146, -900]], { color: '#4a2e06', w: .8, rnd, gap: .3, wig: 2, chunk: [80, 260] }); b.pop(); }, { seed: 451 + fi, mode: 'mask', color: '#3a2204', alpha: .8, gain: 1.3 });
       // --- front crown + droplets + water overlay on the submerged sole ---
       if (f.dy >= 0) { c.save(); c.beginPath(); c.rect(0, WL + 0, W0(), 400); c.restore(); const wg = c.createLinearGradient(0, WL - 10, 0, WL + 60); wg.addColorStop(0, 'rgba(120,148,176,.0)'); wg.addColorStop(.25, 'rgba(90,118,146,.7)'); wg.addColorStop(1, 'rgba(30,46,64,.5)'); c.save(); c.fillStyle = wg; c.beginPath(); c.ellipse(BX + 20, WL + 8, 255, 40, 0, 0, Math.PI); c.lineTo(BX + 275, WL - 6); c.ellipse(BX + 20, WL - 4, 255, 14, 0, 0, Math.PI, true); c.fill(); c.strokeStyle = 'rgba(235,245,255,.7)'; c.lineWidth = 2.2; c.beginPath(); c.ellipse(BX + 20, WL - 4, 252, 15, 0, 0.05, Math.PI - .05); c.stroke(); c.restore(); }
       drawCrown(c, f, r, fi, true);
+      if (f.crown) L.paint(c, (b, rnd) => { b.set('charcoal', '#000', 1.5); const n = Math.round(f.crown / 5) + 6; for (let i = 0; i < n; i++) { const a = Math.PI * (1.05 + rnd() * .9), r0 = 110 + rnd() * 90, rr = r0 + 40 + f.crown * (.5 + rnd()) * (f.fall ? .5 : 1), x0 = BX + Math.cos(a) * r0, y0 = WL + Math.sin(a) * r0 * .3, x1 = BX + Math.cos(a) * rr * 1.1, yp = WL + Math.sin(a) * (f.crown * (.6 + rnd() * .9)) - 20; b.spline([[x0, y0, .6], [(x0 + x1) / 2, yp - 30, 1], [x1, f.fall ? yp + 80 : yp + 20, .2]], .7); } }, { seed: 470 + fi, mode: 'mask', color: '#dff0fb', alpha: .7, gain: 1.6 });
       // flying droplets
       for (let i = 0; i < f.dr * 2; i++) { const a = r() * 6.28, sp = f.crown * (.6 + r() * 1.5), dx = Math.cos(a) * (60 + sp * 1.1), dyy = (f.fall ? 40 + r() * 140 : -(60 + r() * sp * 1.6)), x = BX + dx, y = WL + dyy; const rr = 2 + r() * 5; c.fillStyle = 'rgba(200,222,240,.65)'; c.beginPath(); c.ellipse(x, y, rr * .8, rr * (f.fall ? 1.5 : 1), 0, 0, 6.3); c.fill(); c.fillStyle = 'rgba(255,255,255,.9)'; c.beginPath(); c.arc(x - rr * .25, y - rr * .3, rr * .32, 0, 6.3); c.fill(); }
       // warm bounce & shop-light bloom
