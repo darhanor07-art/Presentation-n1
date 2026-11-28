@@ -694,20 +694,21 @@ def build():
 
 
 def set_mode(sc, vol, mode):
-    sc.render.film_transparent = (mode == "fg")
-    sc.render.use_compositing = mode != "fg"
+    sc.render.film_transparent = mode in ("fg", "fgvol")
+    sc.render.use_compositing = mode not in ("fg", "fgvol")
     vol.hide_render = mode == "fg"
     for o in COLL["fg"].objects:
         o.visible_camera = mode != "back"
         o.is_holdout = False
     for o in COLL["back"].objects:
-        o.is_holdout = mode == "fg"
+        o.is_holdout = mode in ("fg", "fgvol")
 
 
 JOBS = {
     "plate": ("plates", "plate_hall", "plate", "cam"),
     "back": ("layers", "hall_back", "back", "cam"),
     "fg": ("layers", "hall_fg", "fg", "cam"),
+    "fgvol": ("_preview", "hall_fg_vol", "fgvol", "cam"),       # same as fg but with the haze (colour source for hall_fg)
     "door": ("plates", "plate_hall_door", "plate", "cam2"),
 }
 
@@ -721,7 +722,7 @@ def main():
         return
     for name in (ARGS or ["plate", "back", "fg"]):
         sub, fname, mode, camname = JOBS[name]
-        d = os.path.join(RS, "_preview") if QUICK else os.path.join(RS, sub)
+        d = os.path.join(RS, "_preview") if (QUICK or sub == "_preview") else os.path.join(RS, sub)
         os.makedirs(d, exist_ok=True)
         path = os.path.join(d, fname + ".png")
         if os.path.exists(path) and not FORCE:
@@ -734,4 +735,21 @@ def main():
         print("RENDERED %s in %.1fs" % (path, time.time() - t), flush=True)
 
 
-main()
+def combine_fg():
+    """hall_fg.png = haze-lit colour (fgvol: haze in front of the near objects) + the clean alpha of the no-haze fg pass
+    (renders/spring/_preview/hall_fg_alpha.png).  bpy's python has no Pillow, so the merge runs in the system python3."""
+    import subprocess
+    code = (
+        "from PIL import Image\n"
+        "import sys\n"
+        "a,v,o=sys.argv[1:4]\n"
+        "A=Image.open(a).convert('RGBA');V=Image.open(v).convert('RGB');V.putalpha(A.getchannel('A'));V.save(o)\n")
+    P = lambda *x: os.path.join(RS, *x)
+    subprocess.run(["python3", "-c", code, P("_preview", "hall_fg_alpha.png"), P("_preview", "hall_fg_vol.png"), P("layers", "hall_fg.png")], check=True)
+    print("combined -> layers/hall_fg.png", flush=True)
+
+
+if "combine" in ARGS:
+    combine_fg()
+else:
+    main()
