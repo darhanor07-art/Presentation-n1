@@ -1,6 +1,6 @@
 """Render the moonlit castle scene.
 
-  python render.py hero|wide|clay|flyby|all [--quick]
+  python render.py hero|wide|clay|flyby|all [--quick] [--force]
 
 Outputs go to renders/ (hero.png, wide.png, clay.png, flyby.mp4).
 Frames of the fly-through are kept in renders/_frames/ (git-ignored); frames that
@@ -42,6 +42,9 @@ def setup(cam, w, h, spp, thr=0.02, fmt="PNG"):
 
 
 def still(name):
+    if os.path.exists(os.path.join(R, name)) and "--force" not in sys.argv:
+        print(f"SKIP {name} (exists, use --force)", flush=True)
+        return
     sc.render.filepath = os.path.join(R, name)
     t = time.time()
     bpy.ops.render.render(write_still=True)
@@ -49,7 +52,7 @@ def still(name):
 
 
 if "hero" in what or "all" in what:
-    setup("CAM_HERO", 1080, 1350, 24 if QUICK else 160, 0.012)
+    setup("CAM_HERO", 1080, 1350, 24 if QUICK else 128, 0.012)
     still("hero.png")
 
 if "wide" in what or "all" in what:
@@ -62,19 +65,19 @@ if "clay" in what or "all" in what:
     clay.node_tree.nodes["Principled BSDF"].inputs["Base Color"].default_value = (0.78, 0.78, 0.80, 1)
     clay.node_tree.nodes["Principled BSDF"].inputs["Roughness"].default_value = 0.9
     sc.view_layers[0].material_override = clay
-    for n in ("HazeBox", "ValleyMist", "MeadowMist"):
+    for n in ("HazeBox", "ValleyMist", "MeadowMist", "MoonHalo"):
         bpy.data.objects[n].hide_render = True
     setup("CAM_HERO", 1080, 1350, 16 if QUICK else 64, 0.02)
     still("clay.png")
     sc.view_layers[0].material_override = None
-    for n in ("HazeBox", "ValleyMist", "MeadowMist"):
+    for n in ("HazeBox", "ValleyMist", "MeadowMist", "MoonHalo"):
         bpy.data.objects[n].hide_render = False
 
 if "flyby" in what or "all" in what:
     fd = os.path.join(R, "_frames")
     os.makedirs(fd, exist_ok=True)
     bpy.data.objects["MeadowMist"].hide_render = True     # volume cost; haze + valley mist stay
-    setup("CAM_FLY", 400, 500, 8, 0.03)
+    setup("CAM_FLY", 540, 675, 12, 0.03)
     cy.use_denoising = True
     total = sc.frame_end
     for f in range(sc.frame_start, total + 1):

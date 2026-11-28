@@ -18,8 +18,8 @@ if "--out" in sys.argv:
 # global layout constants
 # ----------------------------------------------------------------------------
 CX, CY = 28.0, 330.0                 # castle centre (x right, y away from camera)
-MOON_AZ, MOON_EL = math.radians(-12.0), math.radians(27.0)
-MOON_DIST, MOON_R = 4200.0, 4200.0 * math.tan(math.radians(2.6))
+MOON_AZ, MOON_EL = math.radians(8.5), math.radians(22.5)
+MOON_DIST, MOON_R = 4200.0, 4200.0 * math.tan(math.radians(4.4))
 CAM_Z = 0.95
 
 rng_global = np.random.default_rng(12345)
@@ -317,15 +317,17 @@ def mat_leaf(name="Leaf", base=(0.030, 0.120, 0.130)):
     return m
 
 
-def mat_petal(name="Petal"):
+def mat_petal(name="Petal", deep=False):
     m, nt = new_mat(name)
     uv = nd(nt, "ShaderNodeUVMap", uv_map="UV").outputs["UV"]
     u, v, _ = sepxyz(nt, uv)
     tint = attr_node(nt, "tint", "INSTANCER").outputs["Fac"]
     dv = mt(nt, "ABSOLUTE", mt(nt, "SUBTRACT", v, 0.5))
-    base = ramp(nt, u, [(0.0, (0.80, 0.78, 1.0)), (0.22, (0.80, 0.82, 1.0)), (0.6, (0.60, 0.66, 0.98)), (1.0, (0.42, 0.50, 0.95))])
+    base = ramp(nt, u, [(0.0, (0.86, 0.85, 1.0)), (0.2, (0.80, 0.83, 1.0)), (0.55, (0.52, 0.60, 0.99)), (1.0, (0.32, 0.43, 0.98))])
     tintc = mixc(nt, (0.88, 0.96, 1.0), (1.0, 0.86, 1.0), tint)
     col = mixc(nt, base, tintc, 1.0, blend="MULTIPLY")
+    if deep:
+        col = mixc(nt, col, (0.72, 0.76, 1.0), 1.0, blend="MULTIPLY")
     # darker violet star rays from the throat
     ray = mt(nt, "MULTIPLY", mt(nt, "SUBTRACT", 1.0, mt(nt, "MULTIPLY", dv, 11.0), clamp=True),
                mt(nt, "SUBTRACT", 1.0, mt(nt, "MULTIPLY", u, 2.4), clamp=True))
@@ -440,27 +442,61 @@ def mat_glass():
     return m
 
 
+def mat_rock():
+    m, nt = new_mat("Rock")
+    obj = texcoord(nt, "Object")
+    n1 = noise_tex(nt, obj, 0.25, 6, 0.6, 0.2)
+    n2 = noise_tex(nt, obj, 2.0, 6, 0.65)
+    col = ramp(nt, mt(nt, "ADD", n1, mt(nt, "MULTIPLY", n2, 0.4)), [(0.2, (0.05, 0.05, 0.075)), (0.55, (0.14, 0.14, 0.19)), (0.9, (0.25, 0.25, 0.33))])
+    ox, oy, oz = sepxyz(nt, obj)
+    col = mixc(nt, col, (0.02, 0.05, 0.05), mt(nt, "MULTIPLY", mt(nt, "SUBTRACT", 1.0, smooth_node(nt, oz, -2.0, 6.0), clamp=True), 0.8))
+    bump = nd(nt, "ShaderNodeBump"); bump.inputs["Strength"].default_value = 1.0; bump.inputs["Distance"].default_value = 0.5
+    lk(nt, out_sock(mt(nt, "ADD", n1, n2)), bump.inputs["Height"])
+    b = principled(nt, Base_Color=col, Roughness=0.85)
+    lk(nt, bump.outputs["Normal"], b.inputs["Normal"])
+    mat_output(nt, b)
+    return m
+
+
 def mat_moon():
     m, nt = new_mat("Moon")
     obj = texcoord(nt, "Object")
-    mare = ramp(nt, noise_tex(nt, obj, 1.6, 5, 0.6, 0.6), [(0.40, (1, 1, 1)), (0.60, (0.42, 0.45, 0.60))])
-    vor = nd(nt, "ShaderNodeTexVoronoi", voronoi_dimensions="3D")
-    lk(nt, out_sock(obj), vor.inputs["Vector"]); vor.inputs["Scale"].default_value = 7.0
-    vor2 = nd(nt, "ShaderNodeTexVoronoi", voronoi_dimensions="3D")
-    lk(nt, out_sock(obj), vor2.inputs["Vector"]); vor2.inputs["Scale"].default_value = 21.0
-    crater = mt(nt, "MULTIPLY", mt(nt, "SUBTRACT", 1.0, mt(nt, "MULTIPLY", mt(nt, "ABSOLUTE", mt(nt, "SUBTRACT", vor.outputs["Distance"], 0.32)), 8.0), clamp=True), 0.10)
-    crater2 = mt(nt, "MULTIPLY", mt(nt, "SUBTRACT", 1.0, mt(nt, "MULTIPLY", mt(nt, "ABSOLUTE", mt(nt, "SUBTRACT", vor2.outputs["Distance"], 0.3)), 9.0), clamp=True), 0.07)
-    fine = noise_tex(nt, obj, 30.0, 6)
-    col = mixc(nt, (0.58, 0.60, 0.70), (0.98, 0.98, 1.0), out_sock(mare))
-    col = mixc(nt, col, (1.0, 1.0, 1.0), mt(nt, "ADD", crater, crater2))
-    col = mixc(nt, col, (0.5, 0.52, 0.62), mt(nt, "MULTIPLY", mt(nt, "SUBTRACT", fine, 0.5), 0.8, clamp=True))
+    mare = ramp(nt, noise_tex(nt, obj, 1.5, 5, 0.6, 0.7), [(0.40, (1, 1, 1)), (0.56, (0.0, 0.0, 0.0))])
+    def craters(scale, thr, gain):
+        v = nd(nt, "ShaderNodeTexVoronoi", voronoi_dimensions="3D")
+        lk(nt, out_sock(obj), v.inputs["Vector"]); v.inputs["Scale"].default_value = scale
+        d = v.outputs["Distance"]
+        ring = mt(nt, "MULTIPLY", mt(nt, "SUBTRACT", 1.0, mt(nt, "MULTIPLY", mt(nt, "ABSOLUTE", mt(nt, "SUBTRACT", d, thr)), 14.0), clamp=True), gain)
+        floor = mt(nt, "MULTIPLY", mt(nt, "SUBTRACT", 1.0, mt(nt, "MULTIPLY", d, 1.0 / thr), clamp=True), gain * 1.1)
+        return mt(nt, "SUBTRACT", ring, floor)
+    cr = mt(nt, "ADD", mt(nt, "ADD", craters(6.0, 0.33, 0.30), craters(13.0, 0.30, 0.22)), craters(30.0, 0.30, 0.14))
+    fine = noise_tex(nt, obj, 40.0, 6)
+    hi = (0.90, 0.92, 1.0); lo = (0.28, 0.31, 0.50)
+    col = mixc(nt, hi, lo, mt(nt, "SUBTRACT", 1.0, out_sock(mare)))
+    col = mixc(nt, col, (1.0, 1.0, 1.0), mt(nt, "MULTIPLY", mt(nt, "MAXIMUM", cr, 0.0), 1.0, clamp=True))
+    col = mixc(nt, col, (0.30, 0.33, 0.50), mt(nt, "MULTIPLY", mt(nt, "MAXIMUM", mt(nt, "MULTIPLY", cr, -1.0), 0.0), 1.0, clamp=True))
+    col = mixc(nt, col, (0.45, 0.48, 0.62), mt(nt, "MULTIPLY", mt(nt, "SUBTRACT", fine, 0.5), 0.9, clamp=True))
     lw = nd(nt, "ShaderNodeLayerWeight"); lw.inputs["Blend"].default_value = 0.5
-    limb = mt(nt, "SUBTRACT", 1.0, mt(nt, "MULTIPLY", lw.outputs["Facing"], 0.0))
-    face = mt(nt, "ADD", 0.55, mt(nt, "MULTIPLY", mt(nt, "SUBTRACT", 1.0, lw.outputs["Facing"]), -0.5))
     em = nd(nt, "ShaderNodeEmission")
     lk(nt, out_sock(col), em.inputs["Color"])
-    lk(nt, out_sock(mt(nt, "MULTIPLY", mt(nt, "ADD", 0.65, mt(nt, "MULTIPLY", lw.outputs["Facing"], 0.35)), 1.0)), em.inputs["Strength"])
+    lk(nt, out_sock(mt(nt, "MULTIPLY", mt(nt, "ADD", 0.45, mt(nt, "MULTIPLY", lw.outputs["Facing"], 0.55)), 2.1)), em.inputs["Strength"])
     mat_output(nt, em)
+    return m
+
+
+def mat_moon_halo():
+    m, nt = new_mat("MoonHalo")
+    obj = texcoord(nt, "Object")
+    x, y, z = sepxyz(nt, obj)
+    r = mt(nt, "SQRT", mt(nt, "ADD", mt(nt, "MULTIPLY", x, x), mt(nt, "MULTIPLY", y, y)))
+    f = mt(nt, "POWER", mt(nt, "SUBTRACT", 1.0, r, clamp=True), 2.6)
+    em = nd(nt, "ShaderNodeEmission"); em.inputs["Color"].default_value = (0.45, 0.50, 1.0, 1)
+    em.inputs["Strength"].default_value = 0.7
+    tr = nd(nt, "ShaderNodeBsdfTransparent")
+    mx = nd(nt, "ShaderNodeMixShader")
+    lk(nt, out_sock(mt(nt, "MULTIPLY", f, 0.55)), mx.inputs["Fac"])
+    lk(nt, tr.outputs[0], mx.inputs[1]); lk(nt, em.outputs[0], mx.inputs[2])
+    mat_output(nt, mx)
     return m
 
 
@@ -485,6 +521,23 @@ def build_world():
     haze = mt(nt, "MULTIPLY", mt(nt, "MULTIPLY", band, mt(nt, "SUBTRACT", cloud, 0.35, clamp=True)), mt(nt, "MULTIPLY", z, 3.0, clamp=True))
     skyc = mixc(nt, sky, (0.55, 0.45, 1.0), mt(nt, "MULTIPLY", haze, 0.55))
     # wispy high cloud near the moon side
+    # soft glow around the moon + thin cirrus bands lit by it
+    mv = (math.sin(MOON_AZ) * math.cos(MOON_EL), math.cos(MOON_AZ) * math.cos(MOON_EL), math.sin(MOON_EL))
+    dm = nd(nt, "ShaderNodeVectorMath", operation="DOT_PRODUCT")
+    lk(nt, d.outputs[0], dm.inputs[0]); dm.inputs[1].default_value = mv
+    ang = mt(nt, "ARCCOSINE", mt(nt, "MINIMUM", dm.outputs["Value"], 1.0))
+    def gl(w):
+        q = mt(nt, "DIVIDE", ang, w)
+        return mt(nt, "EXPONENT", mt(nt, "MULTIPLY", mt(nt, "MULTIPLY", q, q), -1.0))
+    glow = mt(nt, "ADD", mt(nt, "MULTIPLY", gl(0.16), 0.55), mt(nt, "MULTIPLY", gl(0.55), 0.30))
+    skyc = mixc(nt, skyc, (0.32, 0.36, 0.95), glow, blend="ADD")
+    cc = nd(nt, "ShaderNodeCombineXYZ")
+    lk(nt, out_sock(mt(nt, "MULTIPLY", dx, 2.2)), cc.inputs["X"]); lk(nt, out_sock(mt(nt, "MULTIPLY", dy, 2.2)), cc.inputs["Y"])
+    lk(nt, out_sock(mt(nt, "MULTIPLY", dz, 11.0)), cc.inputs["Z"])
+    cl = ramp(nt, noise_tex(nt, cc.outputs[0], 2.4, 5, 0.6, 0.3), [(0.50, (0, 0, 0)), (0.72, (1, 1, 1))])
+    elev = mt(nt, "MULTIPLY", smooth_node(nt, dz, 0.06, 0.22), mt(nt, "SUBTRACT", 1.0, smooth_node(nt, dz, 0.5, 0.95)))
+    cmask = mt(nt, "MULTIPLY", out_sock(cl), elev)
+    skyc = mixc(nt, skyc, (0.42, 0.44, 0.95), mt(nt, "MULTIPLY", cmask, mt(nt, "ADD", 0.12, mt(nt, "MULTIPLY", glow, 2.2), clamp=True)), blend="ADD")
     # stars
     def stars(scale, thresh, power, gain):
         v = nd(nt, "ShaderNodeTexVoronoi", voronoi_dimensions="3D")
@@ -495,7 +548,7 @@ def build_world():
         sel = mt(nt, "GREATER_THAN", sx, thresh)
         return mt(nt, "MULTIPLY", mt(nt, "MULTIPLY", pt, sel), mt(nt, "MULTIPLY", sy, gain))
     st = mt(nt, "ADD", stars(110.0, 0.80, 3.0, 60.0), stars(240.0, 0.82, 3.0, 40.0))
-    st = mt(nt, "MULTIPLY", st, mt(nt, "SUBTRACT", smooth_node(nt, dz, 0.03, 0.35), 0.0))
+    st = mt(nt, "MULTIPLY", st, mt(nt, "SUBTRACT", smooth_node(nt, dz, 0.14, 0.55), 0.0))
     starc = mixc(nt, (0.85, 0.9, 1.0), (1.0, 0.92, 0.82), 0.3)
     sc = nd(nt, "ShaderNodeVectorMath", operation="SCALE")
     lk(nt, out_sock(starc), sc.inputs[0]); lk(nt, out_sock(st), sc.inputs["Scale"])
@@ -826,12 +879,38 @@ def build_castle(mats):
         for k in range(int(L // 14)):
             q = p0 + (p1 - p0) * ((k + 0.5) / max(1, int(L // 14)))
             box(mb, q.x, q.y - 1.2, -10, 2.0, 2.6, 10 + h * 0.8, ST, rot=ang, taper=0.6)
-    wall((-86, -20), (-13, -26), 11)
-    wall((13, -26), (86, -20), 12)
-    wall((-13, -22), (13, -22), 16, 4)
+    wall((-86, -20), (-13, -26), 8)
+    wall((13, -26), (86, -20), 9)
+    wall((-13, -22), (13, -22), 14, 4)
     wall((-86, -20), (-76, 4), 14); wall((86, -18), (76, 4), 14)
     # gate arch (dark recess)
     window(mb, (0, -22 - 2.0), (0, -1), -1.0, 4.2, 5.0, 0.0, r, GL, DK, ST)
+    # --- irregular rocky foundation: boulders half-buried along the wall bases ---
+    RK = 5
+    def boulder(cx, cy, cz, rad, seed):
+        rr = np.random.default_rng(seed)
+        res = bmesh.ops.create_icosphere(mb.bm, subdivisions=2, radius=1.0)
+        ph = rr.uniform(0, 6.28, 3)
+        for v in res["verts"]:
+            d = v.co.normalized()
+            f = 1.0 + 0.30 * math.sin(d.x * 3.1 + ph[0]) * math.cos(d.z * 2.7 + ph[1]) + 0.18 * math.sin(d.y * 5.3 + ph[2]) + rr.normal(0, 0.05)
+            v.co = Vector((cx + d.x * rad * f * 1.25, cy + d.y * rad * f, cz + d.z * rad * f * 0.65))
+        for f in set(f for v in res["verts"] for f in v.link_faces):
+            f.material_index = RK; f.smooth = True
+    def yline(x):
+        ax = abs(x)
+        return -22.0 if ax < 13 else -26.0 + 6.0 * min(1.0, (ax - 13) / 73.0)
+    k = 0
+    for x in np.arange(-100, 101, 4.5):
+        if abs(x) < 7:
+            continue
+        k += 1
+        boulder(x + r.uniform(-1.5, 1.5), yline(x) - r.uniform(2.0, 5.0), r.uniform(-1.5, 1.8), r.uniform(3.0, 7.0), 900 + k)
+        if r.random() < 0.7:
+            boulder(x + r.uniform(-2, 2), yline(x) - r.uniform(7.0, 11.0), r.uniform(-2.5, 0.2), r.uniform(2.0, 4.5), 1900 + k)
+    for sgn in (-1, 1):                      # flanks
+        for j in range(8):
+            boulder(sgn * (92 + r.uniform(0, 8)), -14 + j * 5.0 + r.uniform(-1, 1), r.uniform(-2, 1), r.uniform(3, 6), 2900 + j + 10 * sgn)
     # --- final object ---
     obj = mb.finish("Castle", mats, sharp_angle=38.0)
     obj.location = (CX, CY, Z0)
@@ -1193,7 +1272,8 @@ def main():
 
     MATS["ground"] = mat_ground(); MATS["grass"] = mat_grass(); MATS["leaf"] = mat_leaf()
     MATS["petal"] = mat_petal(); MATS["stone"] = mat_stone(); MATS["slate"] = mat_slate()
-    MATS["glass"] = mat_glass(); MATS["moon"] = mat_moon()
+    MATS["glass"] = mat_glass(); MATS["moon"] = mat_moon(); MATS["halo"] = mat_moon_halo()
+    MATS["fpetal"] = mat_petal("FloatPetal", deep=True); MATS["rock"] = mat_rock()
     MATS["dark"] = mat_simple("DarkRecess", (0.012, 0.014, 0.028), 0.6)
     MATS["metal"] = mat_simple("RoofMetal", (0.12, 0.13, 0.2), 0.3)
     MATS["stem"] = mat_leaf("Stem", (0.03, 0.10, 0.10))
@@ -1219,7 +1299,7 @@ def main():
     sc.collection.objects.link(terrain)
 
     # ---------------- castle ----------------
-    castle = build_castle([MATS["stone"], MATS["slate"], MATS["glass"], MATS["dark"], MATS["metal"]])
+    castle = build_castle([MATS["stone"], MATS["slate"], MATS["glass"], MATS["dark"], MATS["metal"], MATS["rock"]])
 
     # ---------------- assets ----------------
     mats_flower = [MATS["petal"], MATS["stem"], MATS["leaf"], MATS["stamen"], MATS["throat"]]
@@ -1227,7 +1307,7 @@ def main():
     for f in flowers:
         solidify(f, 0.00022)
     grasses = [build_grass_asset(f"GrassAsset{k}", 40 + k, MATS["grass"]) for k in range(3)]
-    petal_assets = [build_petal_asset(f"PetalAsset{k}", MATS["petal"], 60 + k) for k in range(2)]
+    petal_assets = [build_petal_asset(f"PetalAsset{k}", MATS["fpetal"], 60 + k) for k in range(2)]
     for p in petal_assets:
         solidify(p, 0.0002)
     c_flow = make_collection("ASSET_Flowers", flowers)
@@ -1264,16 +1344,17 @@ def main():
                             np.stack([tilt[:, 0], tilt[:, 1], rnd.uniform(0, 6.28, N_FLOW)], 1),
                             np.stack([fsc, fsc, fsc * rnd.uniform(0.85, 1.2, N_FLOW)], 1), rnd.random(N_FLOW))
     # ---------------- floating petals + motes ----------------
-    N_PET = 260
-    px = rnd.uniform(-9, 14, N_PET) * (1 + rnd.random(N_PET) * 0.8); py = rnd.uniform(1.2, 55, N_PET)
-    pz = ground_z(px, py) + rnd.uniform(0.25, 6.0, N_PET)
-    ps = rnd.uniform(1.0, 2.2, N_PET)
+    N_PET = 80
+    px = rnd.uniform(-3.2, 4.6, N_PET); py = rnd.uniform(1.4, 15.0, N_PET)
+    pz = ground_z(px, py) + rnd.uniform(0.35, 3.4, N_PET)
+    ps = rnd.uniform(2.0, 4.0, N_PET) * np.where(py < 3.0, 1.5, 1.0)
     pet_obj = make_scatter("FloatingPetals", c_pet, np.stack([px, py, pz], 1), rnd.integers(0, 2, N_PET),
                            rnd.uniform(0, 6.28, (N_PET, 3)), np.stack([ps, ps, ps], 1), rnd.random(N_PET))
     # hand placed hero flowers close to the lens
     hero = []
     HF = [(0.34, 1.05, 0, 1.7, 0.25), (-0.30, 1.35, 2, 1.5, -0.2), (0.08, 0.78, 1, 1.35, 0.9), (-0.55, 0.9, 0, 1.6, 2.3),
-          (0.62, 1.7, 2, 1.8, 1.4), (-0.08, 2.1, 1, 1.5, 4.0), (0.95, 0.85, 1, 1.4, 3.1)]
+          (0.62, 1.7, 2, 1.8, 1.4), (-0.08, 2.1, 1, 1.5, 4.0), (0.95, 0.85, 1, 1.4, 3.1),
+          (-0.30, 0.95, 0, 2.3, 0.7), (0.34, 0.92, 2, 2.2, 2.0), (-0.62, 1.5, 1, 1.9, 5.0)]
     for k, (hx, hy, var, sc_, rz) in enumerate(HF):
         o = bpy.data.objects.new(f"HeroFlower{k}", flowers[var].data)
         sc.collection.objects.link(o)
@@ -1285,12 +1366,12 @@ def main():
 
     # ---------------- trees (dark silhouettes on the hills / valley sides) ----------------
     MATS["foliage"] = mat_foliage()
-    trees = [build_tree_asset(f"TreeAsset{k}", k % 2, 300 + k, [MATS["stem"], MATS["foliage"]]) for k in range(4)]
+    trees = [build_tree_asset(f"TreeAsset{k}", 1, 300 + k, [MATS["stem"], MATS["foliage"]]) for k in range(4)]
     c_tree = make_collection("ASSET_Trees", trees)
     def dens_tree(X, Y):
         rc = np.hypot((X - CX) * 0.85, Y - CY)
         forest = smooth(0.50, 0.62, NZ[3].fbm(X / 90.0 + 9, Y / 90.0, 3))
-        far = forest * smooth(170, 240, rc) * smooth(110, 200, Y) * (1 - smooth(900, 1500, Y)) * 0.05
+        far = forest * smooth(260, 340, rc) * smooth(110, 200, Y) * (1 - smooth(900, 1500, Y)) * 0.05
         side = smooth(0.45, 0.6, NZ[2].fbm(X / 40.0, Y / 40.0 + 4, 3)) * smooth(55, 95, np.abs(X)) * smooth(25, 60, Y) * (1 - smooth(110, 200, Y)) * 0.02
         return far + side
     N_TREE = 3500
@@ -1304,6 +1385,9 @@ def main():
     br1 = build_branch("FG_Branch0", [MATS["stem"], MATS["leaf"]], 5, (-0.8, 0.6, 1.4), (-0.02, 1.5, 1.95), 0.12, 22)
     br2 = build_branch("FG_Branch1", [MATS["stem"], MATS["leaf"]], 6, (-1.3, 1.1, 0.85), (-0.5, 2.4, 1.55), 0.2, 20)
 
+    build_branch("FG_LeavesL", [MATS["stem"], MATS["leaf"]], 7, (-0.40, 0.9, 0.45), (-0.12, 1.25, 0.95), 0.08, 9)
+    build_branch("FG_LeavesR", [MATS["stem"], MATS["leaf"]], 8, (0.42, 0.9, 0.45), (0.2, 1.3, 0.92), 0.08, 9)
+
     # ---------------- moon + lights ----------------
     mdir = Vector((math.sin(MOON_AZ) * math.cos(MOON_EL), math.cos(MOON_AZ) * math.cos(MOON_EL), math.sin(MOON_EL)))
     bpy.ops.mesh.primitive_uv_sphere_add(segments=96, ring_count=48, radius=MOON_R, location=mdir * MOON_DIST)
@@ -1314,6 +1398,12 @@ def main():
     moon.data.materials.append(MATS["moon"])
     moon.visible_shadow = False
     moon.visible_glossy = False
+    bpy.ops.mesh.primitive_plane_add(size=2.0, location=mdir * (MOON_DIST - 60))
+    halo = bpy.context.object; halo.name = "MoonHalo"
+    halo.scale = (MOON_R * 5.0, MOON_R * 5.0, 1)
+    halo.rotation_euler = (-mdir).to_track_quat("Z", "Y").to_euler()
+    halo.data.materials.append(MATS["halo"])
+    halo.visible_shadow = False; halo.visible_glossy = False; halo.visible_diffuse = False
 
     def sun(name, direction_to, strength, color, angle_deg, shadow=True):
         ld = bpy.data.lights.new(name, "SUN")
@@ -1402,10 +1492,10 @@ def main():
     hero_cam = make_cam("CAM_HERO", (0, 0, CAM_Z), (90 + 6.5, 0, 0), 35, 5.6, 9.5)
     wide_cam = make_cam("CAM_WIDE", (-6, -4, 1.8), (90 + 4.5, 0, -5), 24, 8.0, 14.0, "HORIZONTAL")
     wide_cam.data.sensor_width = 36.0
-    fly = make_cam("CAM_FLY", (0.2, -3.0, 0.55), (90 + 3.0, 0, 0), 32, 5.6, 8.0)
+    fly = make_cam("CAM_FLY", (0.2, 1.0, 0.6), (90 + 3.0, 0, 0), 32, 5.6, 8.0)
     sc.camera = hero_cam
     sc.frame_start, sc.frame_end, sc.render.fps = 1, 144, 24
-    for fr, loc, rot, lens, foc in ((1, (0.2, -3.0, 0.55), (93.0, 0, 0.0), 32, 6.5),
+    for fr, loc, rot, lens, foc in ((1, (0.2, 1.0, 0.6), (93.0, 0, 0.0), 32, 6.5),
                                     (144, (-0.4, 20.0, 1.55), (98.0, 0, -2.0), 35, 14.0)):
         fly.location = loc
         fly.rotation_euler = tuple(math.radians(a) for a in rot)
