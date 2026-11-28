@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 """Build manhwa/index.html — one self-contained file (fonts base64, css, one <script> per source file).
-Script order: engine (fixed order) -> art/*.js (sorted) -> scenes/*.js (sorted) -> main.js.
+Script order: vendor/three.min.js -> engine (fixed order) -> art/*.js (sorted) -> scenes/*.js (sorted) -> main.js.
 Also rewrites the SCRIPTS block in src/index.html so the dev page stays in sync.
 Env (for partial/parallel builds): MK_OUT=<path relative to manhwa/> (default index.html; when set, src/index.html is
 left untouched), MK_SCENES=<comma list of scene filename prefixes to include> (default: all)."""
 import os, re, glob, base64, json
 
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(HERE); SRC = os.path.join(ROOT, 'src')
-ENGINE = ['core', 'paint', 'assets', 'gl', 'timeline', 'overlay', 'input']
+ENGINE = ['core', 'paint', 'assets', 'gl', 'three', 'timeline', 'overlay', 'input']   # + vendor/three.min.js first (build/vendor/build_three.sh)
 
 def order():
-    files = ['engine/%s.js' % n for n in ENGINE]
+    files = ['vendor/three.min.js'] if os.path.exists(os.path.join(SRC, 'vendor', 'three.min.js')) else []
+    files += ['engine/%s.js' % n for n in ENGINE]
     files += ['art/' + os.path.basename(f) for f in sorted(glob.glob(os.path.join(SRC, 'art', '*.js')))]
     only = [x for x in os.environ.get('MK_SCENES', '').split(',') if x]   # e.g. MK_SCENES=s03,t03 (filename prefixes)
     files += ['scenes/' + os.path.basename(f) for f in sorted(glob.glob(os.path.join(SRC, 'scenes', '*.js')))

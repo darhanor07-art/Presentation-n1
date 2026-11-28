@@ -51,6 +51,9 @@
         th = tauI < 0 ? th0 * (1 - E.inCubic(clamp(tauR / SWING, 0, 1))) : 8 * D2R * Math.exp(-tauI / .5) * Math.abs(Math.sin(tauI * TAU * 1.2));
       }
       st.pose = { h: h, th: th, tauI: tauI, tauR: tauR };
+      /* live 3D only: pointer parallax = bell/pavilion yaw +-4 deg, smooth-damped with the engine dt (zero in capture mode -> deterministic) */
+      var yt = (!MK.capture && inp && inp.pointerActive) ? clamp((inp.pointer.x - 500) / 500, -1, 1) * 4 * D2R : 0;
+      st.yawV = st.yawV || { v: 0 }; st.yaw = MK.three && MK.three.smoothDamp ? MK.three.smoothDamp(st.yaw || 0, yt, st.yawV, .4, ctx.dt) : 0;
     },
     draw: function (ctx) {
       var P = ctx.P, p = ctx.p, t = ctx.t, b = ctx.view.bounds, st = ctx.state, fx = ctx.fx, S = st.pose || { h: 0, th: 0, tauI: -1, tauR: -1 };
@@ -72,11 +75,16 @@
       P.rect(b.x0 - 4, 1190, b.x1 - b.x0 + 8, b.y1 - 1190 + 4, { c: 'ink', t: 0 });
       for (i = 0; i < 4; i++) P.stroke([[b.x0 - 4, 1222 + i * 44 + i * i * 4], [b.x1 + 4, 1222 + i * 44 + i * i * 4]], { w: 3, c: 'paper' });
       P.stroke([[b.x0 - 4, 1190], [b.x1 + 4, 1190]], { w: 6, c: 'paper' });
-      /* pavilion (3D layer: roof void, rafter ends, crossbeam, two pillars) */
-      MK.art.pavilion(P);
-      /* swinging bell (3D sprite; sway about the hang point) */
-      var sw = hit ? 2.5 * D2R * Math.exp(-tI / .9) * Math.sin(tI * TAU * .9) : 0;
-      MK.art.bell3d(P, BX, BY, 1, sw);
+      /* pavilion + bell + striker log: LIVE three.js (MK.three) when available, else the pre-rendered D1 sprites */
+      var live = MK.art.bellLive && MK.art.bellLive(), sw = hit ? 2.5 * D2R * Math.exp(-tI / .9) * Math.sin(tI * TAU * .9) : 0;
+      if (live) {
+        sw = live.update({ th: S.th, tauI: tI, p: p, t: t, yaw: st.yaw || 0 });     // sway = AnimationClip scrubbed at tau since impact, camera dolly clip at p*4
+        if (!live.render(P)) live = null;
+      }
+      if (!live) {
+        MK.art.pavilion(P);                          // 3D layer: roof void, rafter ends, crossbeam, two pillars
+        MK.art.bell3d(P, BX, BY, 1, sw);             // 3D sprite; sway about the hang point
+      }
       if (hit) {                                   // gold glint (accent) on the shoulder, follows the sway
         var gl = Math.exp(-tI / .32) * E.outBack(Math.min(1, tI / .12)), ga = 84 * gl, gx = -96, gy = 330;
         if (gl > .01) {
@@ -85,8 +93,7 @@
           P.pop();
         }
       }
-      /* striker log on two ropes (3D sprite chosen by rope angle) */
-      MK.art.log3d(P, S.th);
+      if (!live) MK.art.log3d(P, S.th);              // striker log on two ropes (3D sprite chosen by rope angle)
       /* impact: shock rings + fx */
       if (hit) {
         var Rg = [rr, rr - 90, rr - 180], W = [6, 4, 2], fade = clamp(1 - rr / 2300, 0, 1);
