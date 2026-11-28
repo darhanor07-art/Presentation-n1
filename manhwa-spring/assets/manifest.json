@@ -1,0 +1,219 @@
+{
+  "aiaru_closed": {
+    "file": "aiaru_closed.webp",
+    "w": 1200,
+    "h": 420,
+    "alpha": false,
+    "kind": "eye"
+  },
+  "aiaru_glance_up": {
+    "file": "aiaru_glance_up.webp",
+    "w": 1200,
+    "h": 420,
+    "alpha": false,
+    "kind": "eye"
+  },
+  "aiaru_half": {
+    "file": "aiaru_half.webp",
+    "w": 1200,
+    "h": 420,
+    "alpha": false,
+    "kind": "eye"
+  },
+  "aiaru_open": {
+    "file": "aiaru_open.webp",
+    "w": 1200,
+    "h": 420,
+    "alpha": false,
+    "kind": "eye"
+  },
+  "aiaru_pupil_0": {
+    "file": "aiaru_pupil_0.webp",
+    "w": 1200,
+    "h": 420,
+    "alpha": false,
+    "kind": "eye"
+  },
+  "aiaru_pupil_1": {
+    "file": "aiaru_pupil_1.webp",
+    "w": 1200,
+    "h": 420,
+    "alpha": false,
+    "kind": "eye"
+  },
+  "aiaru_pupil_2": {
+    "file": "aiaru_pupil_2.webp",
+    "w": 1200,
+    "h": 420,
+    "alpha": false,
+    "kind": "eye"
+  },
+  "aiaru_pupil_3": {
+    "file": "aiaru_pupil_3.webp",
+    "w": 1200,
+    "h": 420,
+    "alpha": false,
+    "kind": "eye"
+  },
+  "aiaru_pupil_4": {
+    "file": "aiaru_pupil_4.webp",
+    "w": 1200,
+    "h": 420,
+    "alpha": false,
+    "kind": "eye"
+  },
+  "aiaru_pupil_5": {
+    "file": "aiaru_pupil_5.webp",
+    "w": 1200,
+    "h": 420,
+    "alpha": false,
+    "kind": "eye"
+  },
+  "aiaru_wide": {
+    "file": "aiaru_wide.webp",
+    "w": 1200,
+    "h": 420,
+    "alpha": false,
+    "kind": "eye"
+  },
+  "tair_glance": {
+    "file": "tair_glance.webp",
+    "w": 1200,
+    "h": 420,
+    "alpha": false,
+    "kind": "eye"
+  },
+  "tair_narrow": {
+    "file": "tair_narrow.webp",
+    "w": 1200,
+    "h": 420,
+    "alpha": false,
+    "kind": "eye"
+  },
+  "tair_open": {
+    "file": "tair_open.webp",
+    "w": 1200,
+    "h": 420,
+    "alpha": false,
+    "kind": "eye"
+  },
+  "aiaru_back_0": {
+    "file": "aiaru_back_0.webp",
+    "w": 900,
+    "h": 1260,
+    "alpha": true,
+    "kind": "char"
+  },
+  "aiaru_back_1": {
+    "file": "aiaru_back_1.webp",
+    "w": 900,
+    "h": 1260,
+    "alpha": true,
+    "kind": "char"
+  },
+  "aiaru_back_2": {
+    "file": "aiaru_back_2.webp",
+    "w": 900,
+    "h": 1260,
+    "alpha": true,
+    "kind": "char"
+  },
+  "aiaru_walk_0": {
+    "file": "aiaru_walk_0.webp",
+    "w": 900,
+    "h": 1260,
+    "alpha": true,
+    "kind": "char"
+  },
+  "aiaru_walk_1": {
+    "file": "aiaru_walk_1.webp",
+    "w": 900,
+    "h": 1260,
+    "alpha": true,
+    "kind": "char"
+  },
+  "tair_34_0": {
+    "file": "tair_34_0.webp",
+    "w": 900,
+    "h": 1260,
+    "alpha": true,
+    "kind": "char"
+  },
+  "tair_34_1": {
+    "file": "tair_34_1.webp",
+    "w": 900,
+    "h": 1260,
+    "alpha": true,
+    "kind": "char"
+  },
+  "plate_garden": {
+    "file": "plate_garden.webp",
+    "w": 900,
+    "h": 1260,
+    "alpha": false,
+    "kind": "plate"
+  },
+  "plate_gate": {
+    "file": "plate_gate.webp",
+    "w": 900,
+    "h": 1260,
+    "alpha": false,
+    "kind": "plate"
+  },
+  "plate_macro": {
+    "file": "plate_macro.webp",
+    "w": 900,
+    "h": 1260,
+    "alpha": false,
+    "kind": "plate"
+  },
+  "plate_moon": {
+    "file": "plate_moon.webp",
+    "w": 900,
+    "h": 1260,
+    "alpha": false,
+    "kind": "plate"
+  },
+  "plate_tower": {
+    "file": "plate_tower.webp",
+    "w": 900,
+    "h": 1260,
+    "alpha": false,
+    "kind": "plate"
+  },
+  "hero_castle": {
+    "file": "hero_castle.webp",
+    "w": 900,
+    "h": 1260,
+    "alpha": true,
+    "kind": "layer"
+  },
+  "hero_fg": {
+    "file": "hero_fg.webp",
+    "w": 900,
+    "h": 1260,
+    "alpha": true,
+    "kind": "layer"
+  },
+  "hero_sky": {
+    "file": "hero_sky.webp",
+    "w": 900,
+    "h": 1260,
+    "alpha": false,
+    "kind": "layer"
+  },
+  "moon_castle": {
+    "file": "moon_castle.webp",
+    "w": 900,
+    "h": 1260,
+    "alpha": true,
+    "kind": "layer"
+  },
+  "moon_sky": {
+    "file": "moon_sky.webp",
+    "w": 900,
+    "h": 1260,
+    "alpha": false,
+    "kind": "layer"
+  }
+}

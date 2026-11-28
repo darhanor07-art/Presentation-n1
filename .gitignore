@@ -17,3 +17,7 @@ blender/**/renders/frames/
 blender/moonlit-castle/renders/_frames/
 blender/**/*.blend1
 *.blend1
+
+# blender/moonlit-castle: spring manhwa (PNG masters ~30 MB are kept; previews/logs are not)
+blender/moonlit-castle/renders/spring/_preview/
+blender/moonlit-castle/renders/spring/*_log.txt

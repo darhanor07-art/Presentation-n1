@@ -112,7 +112,7 @@
   MS.drawSlots = function (c, sceneId, slots, p, len) {
     let any = false;
     for (const sl of slots) {
-      const imgs = MS.findReal('layer', sceneId, sl.slot); if (!imgs.length) continue; any = true;
+      const one = MS.real(sceneId + '_' + sl.slot), imgs = one ? [one] : []; if (!imgs.length) continue; any = true;
       const zoom = 1 + sl.par * .5, dy = (.5 - p) * sl.par * .5 * H;
       c.save(); c.globalAlpha = sl.alpha == null ? 1 : sl.alpha;
       MS.coverInto(c, imgs[0], 0, 0, W, H, zoom, (sl.dx || 0) * u, dy); c.restore();
@@ -208,7 +208,8 @@
       if (al <= .01) return; const h = o.h, w = h * img.width / img.height;
       c.save(); c.translate(o.x, o.y); c.rotate(o.rot || 0); c.globalAlpha = al * (o.alpha == null ? 1 : o.alpha);
       if (o.glow !== 0 && MS.hasFilter) { filt(c, 'blur(' + (14 * u) + 'px) brightness(1.8) saturate(.6)'); c.globalAlpha *= .22; c.drawImage(img, -w / 2, -h, w, h); filt(c, 'none'); c.globalAlpha = al * (o.alpha == null ? 1 : o.alpha); }
-      c.drawImage(img, -w / 2, -h, w, h); c.restore();
+      if (o.bright && MS.hasFilter) filt(c, 'brightness(' + o.bright + ') contrast(1.1)');   // contre-jour silhouette
+      c.drawImage(img, -w / 2, -h, w, h); filt(c, 'none'); c.restore();
     };
     draw(poses[a], 1 - f); draw(poses[b], f);
   };

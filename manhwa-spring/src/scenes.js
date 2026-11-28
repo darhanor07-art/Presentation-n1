@@ -19,7 +19,7 @@
     id: 'moon', len: 3.6, tr: 'flash', plate: { key: 'moon', ph: 'hero' }, grade: { bloom: .5, leak: 1 },
     draw(c, p, t, s, X) {
       const w = W(), h = H(), u = U(); let map = null;
-      const slots = [{ slot: 'sky', par: .2 }, { slot: 'moon', par: .3 }, { slot: 'towers', par: .6 }, { slot: 'mist', par: .9 }];
+      const slots = [{ slot: 'sky', par: .2 }, { slot: 'castle', par: .6 }];
       if (!MS.drawSlots(c, 'moon', slots, p)) {
         // placeholder: camera glides from the moon down to the castle (sky .2 / moon .3 / towers .6 / mist .9 felt through the zoom + mist drift)
         map = MS.drawPlate(c, X.plate, { zoom: lerp(1.95, 1.4, eo(p)), fx: .66, fy: lerp(.12, .33, eo(p)), dx: (p - .5) * -20 * u });
@@ -62,12 +62,16 @@
     id: 'hero', len: 3.8, tr: 'mist', plate: { key: 'hero', ph: 'hero' },
     draw(c, p, t, s, X) {
       const w = W(), h = H(), u = U();
-      const map = MS.drawPlate(c, X.plate, { zoom: lerp(1.3, 1.08, eo(p)), fx: .56, fy: lerp(.46, .4, p), dx: (p - .5) * -26 * u });
-      moonGlow(c, map.x(.68), map.y(.2), h * .3, .3); sparkle(c, X, map, t, X.spots.length * .8);
+      const layered = MS.drawSlots(c, 'hero', [{ slot: 'sky', par: .12 }, { slot: 'castle', par: .3 }], p);
+      if (!layered) {
+        const map = MS.drawPlate(c, X.plate, { zoom: lerp(1.3, 1.08, eo(p)), fx: .56, fy: lerp(.46, .4, p), dx: (p - .5) * -26 * u });
+        moonGlow(c, map.x(.68), map.y(.2), h * .3, .3); sparkle(c, X, map, t, X.spots.length * .8);
+      }
       MS.mist(c, t, s, { y: .63, h: .3, par: .5, vx: 9, alpha: .4 });
       // Aiaru walks forward (scale 1 -> .85, 60 px up), cycling her 3 wind poses
-      const poses = MS.charPoses('aiaru'), k = lerp(1, .85, sm(p));
+      const poses = MS.charPoses('aiaru_back'), k = lerp(1, .85, sm(p));
       MS.drawChar(c, poses, s * 2.1, { x: w * .46 + Math.sin(t * 1.4) * 3 * u, y: h * 1.03 - 60 * u * sm(p), h: h * .64 * k, rot: Math.sin(t * 1.8) * .012 });
+      MS.drawSlots(c, 'hero', [{ slot: 'fg', par: .7 }], p);
       MS.petals(c, t, s, { id: 'p3', n: 54, size: 28, vx: -.1, vy: -.03, scroll: .8, near: .1 });
       MS.petals(c, t, s, { id: 'f3', n: 5, size: 80, near: 1, alpha: .5, scroll: 1.3, vx: -.03 });
     },
@@ -110,9 +114,10 @@
     draw(c, p, t, s, X) {
       const u = U(), h = H(), w = W(); let map = null;
       if (!MS.drawSlots(c, 'tower', [{ slot: 'sky', par: .2 }, { slot: 'moon', par: .3 }, { slot: 'tower', par: .6 }, { slot: 'mist', par: .9 }], p))
-        map = MS.drawPlate(c, X.plate, { zoom: lerp(2.5, 3.2, p), fx: .56, fy: lerp(.32, .26, p) });
+        map = X.real ? MS.drawPlate(c, X.plate, { zoom: lerp(1.06, 1.22, p), fx: .5, fy: lerp(.46, .4, p) })
+          : MS.drawPlate(c, X.plate, { zoom: lerp(2.5, 3.2, p), fx: .56, fy: lerp(.32, .26, p) });
       if (map) {
-        moonGlow(c, map.x(.63), map.y(.22), h * .4, .35);
+        if (!X.real) moonGlow(c, map.x(.63), map.y(.22), h * .4, .35);
         const top = X.spots.filter(q => q.y < .5).sort((a, b) => b.s - a.s)[0];
         if (top) {   // someone's silhouette in the tower window
           const x = map.x(top.x), y = map.y(top.y), k = map.sc / 1.6;
@@ -148,7 +153,7 @@
       moonGlow(c, w * .5 + lerp(10, -10, p) * u, h * .28, h * .45, .55);   // moon contre-jour
       MS.mist(c, t, s, { y: .78, h: .4, par: .5, vx: 8, alpha: .3 });
       const poses = MS.charPoses('tair'), k = lerp(.9, 1.1, sm(p));
-      MS.drawChar(c, poses, p * 2.2, { x: w * .58 + lerp(-14, 14, p) * u, y: h * 1.08, h: h * .86 * k, rot: Math.sin(t * 1.3) * .006 });
+      MS.drawChar(c, poses, p * 2.2, { x: w * .58 + lerp(-14, 14, p) * u, y: h * 1.04, h: h * .7 * k, rot: Math.sin(t * 1.3) * .006, bright: .5 });
       MS.petals(c, t, s, { id: 'p6', n: 52, size: 26, vx: .08, vy: -.02, scroll: .9, near: .12 });
       MS.petals(c, t, s, { id: 'f6', n: 7, size: 90, near: 1, alpha: .55, scroll: 1.5, vx: .03 });
     },

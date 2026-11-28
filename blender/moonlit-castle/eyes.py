@@ -34,10 +34,10 @@ WHO = {
     "aiaru": dict(  # grey-violet iris, soft female eye
         iris_outer=(0.13, 0.11, 0.26), iris_fibre_lo=(0.035, 0.03, 0.10), iris_fibre_hi=(0.36, 0.32, 0.60),
         iris_inner=(0.34, 0.24, 0.27), limbal=(0.035, 0.03, 0.085),
-        skin=(0.86, 0.54, 0.45), lash_len=0.50, lash_n=110, lash_low=0.26, tilt=0.075, W=1.25, lid_t=0.20),
+        skin=(0.80, 0.53, 0.47), lash_len=0.50, lash_n=110, lash_low=0.26, tilt=0.075, W=1.25, lid_t=0.20),
     "tair": dict(   # deep blue iris, narrower male eye
-        iris_outer=(0.025, 0.10, 0.52), iris_fibre_lo=(0.008, 0.03, 0.20), iris_fibre_hi=(0.12, 0.34, 0.85),
-        iris_inner=(0.20, 0.26, 0.42), limbal=(0.006, 0.014, 0.07),
+        iris_outer=(0.02, 0.07, 0.34), iris_fibre_lo=(0.006, 0.02, 0.12), iris_fibre_hi=(0.09, 0.24, 0.66),
+        iris_inner=(0.16, 0.20, 0.30), limbal=(0.006, 0.014, 0.07),
         skin=(0.74, 0.47, 0.38), lash_len=0.34, lash_n=84, lash_low=0.13, tilt=0.045, W=1.22, lid_t=0.24),
 }
 
@@ -135,6 +135,8 @@ def make_sclera_mat():
     # soft grey-blue shading around the limbus
     limb = sstep(nt, rho, RI * 1.55, RI * 1.0)
     base = mixc(nt, base, (0.45, 0.45, 0.55), mt(nt, "MULTIPLY", limb, 0.55))
+    shade = mt(nt, "ADD", mt(nt, "MULTIPLY", sstep(nt, mt(nt, "ABSOLUTE", x), 0.5, 0.98), 0.55), mt(nt, "MULTIPLY", sstep(nt, z, 0.05, 0.75), 0.45))
+    base = mixc(nt, base, (0.06, 0.05, 0.12), mt(nt, "MULTIPLY", shade, 0.8, clamp=True))
     # veins: thin ridged noise lines, denser near the corners
     def veins(scale, w, dist):
         n = noise_tex(nt, obj, scale, 3, 0.55, dist)
@@ -325,8 +327,9 @@ def build_lids(who, up, low, pitch):
         zu, zl = aperture_z(t, u0, l0, tilt)
         return (t * W, zu if upper else zl)
 
-    def outdir(x, z):
-        v = np.array([x / (W * W), (z - 0.0) / 0.30])
+    def outdir(x, z, upper):
+        zc = tilt * x / W
+        v = np.array([x / (W * W), (1.0 if upper else -1.0) * abs(z - zc) / 0.30])
         return v / (np.linalg.norm(v) + 1e-9)
 
     rr = 0.062
@@ -352,7 +355,7 @@ def build_lids(who, up, low, pitch):
             w = SMOOTH(0.0, 0.8, s)
             px = ax * (1 - w) + rx * w
             pz = az * (1 - w) + rz * w
-            dx, dz = outdir(ax, az if upper else az)
+            dx, dz = outdir(ax, az, upper)
             if not upper:
                 pass
             px += dx * s; pz += dz * s
@@ -369,7 +372,7 @@ def build_lids(who, up, low, pitch):
     def rim_pos(psi):
         def fn(t, upper):
             ax, az = margin(t, upper)
-            dx, dz = outdir(ax, az)
+            dx, dz = outdir(ax, az, upper)
             yo = skin_y(ax, az, lt)
             off = -rr * math.sin(psi)
             return (ax + dx * off, yo + rr - rr * math.cos(psi), az + dz * off)
@@ -378,7 +381,7 @@ def build_lids(who, up, low, pitch):
     def inner_pos(s):
         def fn(t, upper):
             ax, az = margin(t, upper)
-            dx, dz = outdir(ax, az)
+            dx, dz = outdir(ax, az, upper)
             yo = skin_y(ax, az, lt)
             px, pz = ax + dx * s * 0.8, az + dz * s * 0.8
             return (px, max(yo + 2 * rr, skin_y(px, pz, lt) + 2 * rr) + s * 0.25, pz)
@@ -436,8 +439,12 @@ def build_lids(who, up, low, pitch):
 
     def lash(t, upper, length, w0, curl, jitter, lat_j=0.0):
         ax, az = margin(t, upper)
-        dx, dz = outdir(ax, az)
+        dx, dz = outdir(ax, az, upper)
         e1 = np.array([dx, 0, dz])             # outward in the lid plane
+        if upper:
+            cl = SMOOTH(0.12, -0.12, up_e)
+            e1 = e1 * (1 - cl) + np.array([0.15 * t, 0, -0.95]) * cl
+            e1 /= np.linalg.norm(e1)
         e2 = np.array([0, -1.0, 0])             # forward
         e3 = np.array([-dz, 0, dx])             # along the margin
         e3 = e3 * (1 if upper else -1)
@@ -476,7 +483,7 @@ def build_lids(who, up, low, pitch):
     pts = []
     for t in np.linspace(-0.72, 0.72, 40):
         ax, az = margin(t, False)
-        dx, dz = outdir(ax, az)
+        dx, dz = outdir(ax, az, False)
         yo = skin_y(ax, az, lt)
         pts.append((ax - dx * (rr + 0.012), yo + rr + 0.02, az - dz * (rr + 0.012)))
     rings_ = []
@@ -601,7 +608,7 @@ def add_lights(who):
     add_panel("Sparkle", (7.5, -9.0, -3.5), 0.9, (0.85, 0.9, 1.0), 25.0, circle=True)
     for nm, loc, size, col, pw in (("KeyArea", (-8.0, -8.0, 8.0), 7.0, (0.74, 0.82, 1.0), 2200.0),
                                    ("RimR", (9.0, -2.0, 3.0), 4.0, (0.55, 0.62, 1.0), 900.0),
-                                   ("WarmFill", (4.0, -9.0, -5.0), 5.0, (1.0, 0.78, 0.62), 60.0),
+                                   ("WarmFill", (4.0, -9.0, -5.0), 5.0, (1.0, 0.78, 0.62), 25.0),
                                    ("FillLow", (-3.0, -9.0, -6.5), 6.0, (0.78, 0.65, 1.0), 60.0)):
         ld = bpy.data.lights.new(nm, "AREA"); ld.shape = "SQUARE"; ld.size = size; ld.energy = pw; ld.color = col
         ob = bpy.data.objects.new(nm, ld); bpy.context.scene.collection.objects.link(ob); ob.location = loc
@@ -630,7 +637,7 @@ def render_job(name, who, up, low, yaw, pitch, pupil):
     setup_camera(W, H)
     sc.render.resolution_x, sc.render.resolution_y = W, H
     sc.render.resolution_percentage = 100
-    sc.cycles.samples = (64 if MID else 28) if QUICK else 160
+    sc.cycles.samples = (64 if MID else 28) if QUICK else 96
     sc.render.film_transparent = False
     sc.view_settings.exposure = EXPOSURE
     sc.render.image_settings.file_format = "PNG"
