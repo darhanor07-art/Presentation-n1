@@ -1,0 +1,83 @@
+{
+  "version": "1.0",
+  "fps": 30,
+  "scenes": [
+    {
+      "scene_id": "s06",
+      "start_seconds": 0,
+      "end_seconds": 4,
+      "camera": {
+        "framing": "medium"
+      },
+      "background": "red print comes alive: wake, eyes open, ear flick, furrow, roar",
+      "effects": [],
+      "actions": [
+        {
+          "at_seconds": 0.0,
+          "duration_seconds": 0.5,
+          "character_id": "tiger",
+          "action": "anticipate",
+          "pose": "idle",
+          "easing": "power2.out"
+        },
+        {
+          "at_seconds": 1.0,
+          "duration_seconds": 1.4,
+          "character_id": "tiger",
+          "action": "perform",
+          "pose": "surprised",
+          "easing": "back.out",
+          "notes": "red print comes alive: wake, eyes open, ear flick, furrow, roar"
+        },
+        {
+          "at_seconds": 2.8,
+          "duration_seconds": 1.0,
+          "character_id": "tiger",
+          "action": "settle",
+          "pose": "idle",
+          "easing": "power2.inOut"
+        }
+      ]
+    },
+    {
+      "scene_id": "s09",
+      "start_seconds": 0,
+      "end_seconds": 4,
+      "camera": {
+        "framing": "medium"
+      },
+      "background": "sky tiger: slow blink and breathe",
+      "effects": [],
+      "actions": [
+        {
+          "at_seconds": 0.0,
+          "duration_seconds": 0.5,
+          "character_id": "tiger",
+          "action": "anticipate",
+          "pose": "idle",
+          "easing": "power2.out"
+        },
+        {
+          "at_seconds": 1.0,
+          "duration_seconds": 1.4,
+          "character_id": "tiger",
+          "action": "perform",
+          "pose": "look_right",
+          "easing": "back.out",
+          "notes": "sky tiger: slow blink and breathe"
+        },
+        {
+          "at_seconds": 2.8,
+          "duration_seconds": 1.0,
+          "character_id": "tiger",
+          "action": "settle",
+          "pose": "idle",
+          "easing": "power2.inOut"
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "source": "action_timeline_compiler"
+  }
+}

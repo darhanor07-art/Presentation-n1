@@ -1,0 +1,28 @@
+{
+  "name": "pavilion",
+  "kind": "custom HyperFrames + three.js composition (not a terrain world)",
+  "source": "build/worlds/pavilion/pavilion.js",
+  "explicit_constraints": [
+    "Korean bronze bell (beomjong) as LatheGeometry: rounded shoulder, almost straight barrel widening slightly to the lip, no Western flare",
+    "raised bands top/bottom as lathe rings",
+    "two yugwak panels with 3x3 knobs facing camera",
+    "dangjwa lotus medallion (disc + petals)",
+    "dragon loop (tube on an S curve) + sound tube",
+    "pavilion: 2 visible pillars, crossbeam, rafters",
+    "striker log ~1.6x bell height on two ropes, pivot at the beam",
+    "key light upper-left, soft fill, rim from behind",
+    "separate transparent layers: pavilion_bg, bell, log (15 frames, theta -12..+30 deg), each lit + flat ID pass"
+  ],
+  "inferred_details": [
+    "orthographic front camera, 1 px = 1.389 world units, 720x1008 = the 1000x1400 safe frame",
+    "dangjwa placed at screen angle +36 deg so the log hits it from the right (strike point = log tip at theta 0: (562,818))",
+    "log tip at x=570 at theta 0; rope length 630; ropes at x=760 and x=1000",
+    "rafter ends drawn as domed cylinders in two staggered rows",
+    "layers are mirror-tiled sideways for wide screens"
+  ],
+  "layers": {
+    "pavilion_bg": 1,
+    "bell": 1,
+    "log": 15
+  }
+}

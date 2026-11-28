@@ -1,0 +1,90 @@
+{
+ "version": "1.0",
+ "fps": 30,
+ "scenes": [
+  {
+   "scene_id": "s03",
+   "start_seconds": 0,
+   "end_seconds": 4,
+   "background": "seated carving loop behind the paper door; loop continues after the doors open",
+   "camera": {
+    "framing": "portrait 1000x1400"
+   },
+   "effects": [],
+   "actions": [
+    {
+     "at_seconds": 0,
+     "duration_seconds": 0.25,
+     "character_id": "carver",
+     "action": "seat_idle",
+     "pose": "seat_idle",
+     "easing": "power2.out"
+    },
+    {
+     "at_seconds": 0.15,
+     "duration_seconds": 0.6,
+     "character_id": "carver",
+     "action": "seat_carve",
+     "pose": "seat_carve",
+     "easing": "power2.inOut",
+     "notes": "loops run on wall time; this just ramps them in"
+    }
+   ]
+  },
+  {
+   "scene_id": "s09",
+   "start_seconds": 0,
+   "end_seconds": 4,
+   "background": "look up at the sky tiger -> turn head slightly -> walk ~5 steps toward the gate (clock = progress*4s)",
+   "camera": {
+    "framing": "portrait 1000x1400"
+   },
+   "effects": [],
+   "actions": [
+    {
+     "at_seconds": 0,
+     "duration_seconds": 0.3,
+     "character_id": "carver",
+     "action": "stand_idle",
+     "pose": "stand_idle",
+     "easing": "power2.out"
+    },
+    {
+     "at_seconds": 0.5,
+     "duration_seconds": 0.9,
+     "character_id": "carver",
+     "action": "stand_look_up",
+     "pose": "stand_look_up",
+     "easing": "power2.inOut",
+     "notes": "p .12-.35"
+    },
+    {
+     "at_seconds": 1.55,
+     "duration_seconds": 0.6,
+     "character_id": "carver",
+     "action": "stand_turn",
+     "pose": "stand_turn",
+     "easing": "power2.inOut",
+     "notes": "p .39-.54"
+    },
+    {
+     "at_seconds": 1.7,
+     "duration_seconds": 0.55,
+     "character_id": "carver",
+     "action": "stand_walk",
+     "pose": "stand_walk",
+     "easing": "power2.inOut",
+     "notes": "walk starts at p .45; ~2.4 strides (about 5 steps) until p 1"
+    }
+   ]
+  }
+ ],
+ "metadata": {
+  "source": "action_timeline_compiler (refined)",
+  "refined": true,
+  "clock": "scene seconds = scene progress p * 4.0 (len 1.6vh * 2.5 s/vh); s03 loops run on wall time",
+  "design_scale": {
+   "carver": 1000
+  }
+ }
+}

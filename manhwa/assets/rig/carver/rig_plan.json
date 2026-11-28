@@ -1,0 +1,630 @@
+{
+ "version": "1.0",
+ "characters": [
+  {
+   "character_id": "carver",
+   "rig_type": "svg_rig",
+   "parts": [
+    {
+     "id": "stand_root",
+     "kind": "root",
+     "layer": 0
+    },
+    {
+     "id": "stand_chima",
+     "kind": "skirt",
+     "layer": 10,
+     "parent": "stand_root"
+    },
+    {
+     "id": "stand_torso",
+     "kind": "torso",
+     "layer": 30,
+     "parent": "stand_root"
+    },
+    {
+     "id": "stand_sleeve_l_up",
+     "kind": "limb",
+     "layer": 35,
+     "parent": "stand_torso"
+    },
+    {
+     "id": "stand_sleeve_l_lo",
+     "kind": "limb",
+     "layer": 36,
+     "parent": "stand_sleeve_l_up"
+    },
+    {
+     "id": "stand_sleeve_r_up",
+     "kind": "limb",
+     "layer": 35,
+     "parent": "stand_torso"
+    },
+    {
+     "id": "stand_sleeve_r_lo",
+     "kind": "limb",
+     "layer": 36,
+     "parent": "stand_sleeve_r_up"
+    },
+    {
+     "id": "stand_neck",
+     "kind": "neck",
+     "layer": 50,
+     "parent": "stand_torso"
+    },
+    {
+     "id": "stand_head",
+     "kind": "head",
+     "layer": 60,
+     "parent": "stand_neck"
+    },
+    {
+     "id": "stand_braid_0",
+     "kind": "braid",
+     "layer": 40,
+     "parent": "stand_head"
+    },
+    {
+     "id": "stand_braid_1",
+     "kind": "braid",
+     "layer": 41,
+     "parent": "stand_braid_0"
+    },
+    {
+     "id": "stand_braid_2",
+     "kind": "braid",
+     "layer": 42,
+     "parent": "stand_braid_1"
+    },
+    {
+     "id": "stand_braid_3",
+     "kind": "braid",
+     "layer": 43,
+     "parent": "stand_braid_2"
+    },
+    {
+     "id": "stand_daenggi",
+     "kind": "ribbon",
+     "layer": 46,
+     "parent": "stand_braid_3"
+    },
+    {
+     "id": "seat_root",
+     "kind": "root",
+     "layer": 0
+    },
+    {
+     "id": "seat_chima",
+     "kind": "skirt",
+     "layer": 10,
+     "parent": "seat_root"
+    },
+    {
+     "id": "seat_torso",
+     "kind": "torso",
+     "layer": 30,
+     "parent": "seat_root"
+    },
+    {
+     "id": "seat_sleeve_l_up",
+     "kind": "limb",
+     "layer": 35,
+     "parent": "seat_torso"
+    },
+    {
+     "id": "seat_sleeve_l_lo",
+     "kind": "limb",
+     "layer": 36,
+     "parent": "seat_sleeve_l_up"
+    },
+    {
+     "id": "seat_sleeve_r_up",
+     "kind": "limb",
+     "layer": 35,
+     "parent": "seat_torso"
+    },
+    {
+     "id": "seat_sleeve_r_lo",
+     "kind": "limb",
+     "layer": 36,
+     "parent": "seat_sleeve_r_up"
+    },
+    {
+     "id": "seat_neck",
+     "kind": "neck",
+     "layer": 50,
+     "parent": "seat_torso"
+    },
+    {
+     "id": "seat_head",
+     "kind": "head",
+     "layer": 60,
+     "parent": "seat_neck"
+    },
+    {
+     "id": "seat_braid_0",
+     "kind": "braid",
+     "layer": 40,
+     "parent": "seat_head"
+    },
+    {
+     "id": "seat_braid_1",
+     "kind": "braid",
+     "layer": 41,
+     "parent": "seat_braid_0"
+    },
+    {
+     "id": "seat_braid_2",
+     "kind": "braid",
+     "layer": 42,
+     "parent": "seat_braid_1"
+    },
+    {
+     "id": "seat_braid_3",
+     "kind": "braid",
+     "layer": 43,
+     "parent": "seat_braid_2"
+    },
+    {
+     "id": "seat_daenggi",
+     "kind": "ribbon",
+     "layer": 46,
+     "parent": "seat_braid_3"
+    }
+   ],
+   "joints": {
+    "stand_root": {
+     "pivot": [
+      0,
+      0
+     ],
+     "rotation": [
+      -5,
+      5
+     ],
+     "scale": [
+      0.8,
+      1.2
+     ]
+    },
+    "stand_chima": {
+     "pivot": [
+      0,
+      -745
+     ],
+     "rotation": [
+      -12,
+      12
+     ],
+     "scale": [
+      0.8,
+      1.2
+     ]
+    },
+    "stand_torso": {
+     "pivot": [
+      0,
+      -700
+     ],
+     "rotation": [
+      -12,
+      12
+     ],
+     "scale": [
+      0.8,
+      1.2
+     ]
+    },
+    "stand_sleeve_l_up": {
+     "pivot": [
+      -92,
+      -835
+     ],
+     "rotation": [
+      -45,
+      45
+     ],
+     "scale": [
+      0.8,
+      1.2
+     ]
+    },
+    "stand_sleeve_l_lo": {
+     "pivot": [
+      -170,
+      -760
+     ],
+     "rotation": [
+      -45,
+      45
+     ],
+     "scale": [
+      0.8,
+      1.2
+     ]
+    },
+    "stand_sleeve_r_up": {
+     "pivot": [
+      92,
+      -835
+     ],
+     "rotation": [
+      -45,
+      45
+     ],
+     "scale": [
+      0.8,
+      1.2
+     ]
+    },
+    "stand_sleeve_r_lo": {
+     "pivot": [
+      170,
+      -760
+     ],
+     "rotation": [
+      -45,
+      45
+     ],
+     "scale": [
+      0.8,
+      1.2
+     ]
+    },
+    "stand_neck": {
+     "pivot": [
+      0,
+      -860
+     ],
+     "rotation": [
+      -10,
+      10
+     ],
+     "scale": [
+      0.8,
+      1.2
+     ]
+    },
+    "stand_head": {
+     "pivot": [
+      0,
+      -885
+     ],
+     "rotation": [
+      -25,
+      25
+     ],
+     "scale": [
+      0.8,
+      1.2
+     ]
+    },
+    "stand_braid_0": {
+     "pivot": [
+      0,
+      -885
+     ],
+     "rotation": [
+      -40,
+      40
+     ],
+     "scale": [
+      0.8,
+      1.2
+     ]
+    },
+    "stand_braid_1": {
+     "pivot": [
+      7,
+      -800
+     ],
+     "rotation": [
+      -40,
+      40
+     ],
+     "scale": [
+      0.8,
+      1.2
+     ]
+    },
+    "stand_braid_2": {
+     "pivot": [
+      -4,
+      -720
+     ],
+     "rotation": [
+      -40,
+      40
+     ],
+     "scale": [
+      0.8,
+      1.2
+     ]
+    },
+    "stand_braid_3": {
+     "pivot": [
+      4,
+      -660
+     ],
+     "rotation": [
+      -40,
+      40
+     ],
+     "scale": [
+      0.8,
+      1.2
+     ]
+    },
+    "stand_daenggi": {
+     "pivot": [
+      0,
+      -612
+     ],
+     "rotation": [
+      -40,
+      40
+     ],
+     "scale": [
+      0.8,
+      1.2
+     ]
+    },
+    "seat_root": {
+     "pivot": [
+      0,
+      0
+     ],
+     "rotation": [
+      -5,
+      5
+     ],
+     "scale": [
+      0.8,
+      1.2
+     ]
+    },
+    "seat_chima": {
+     "pivot": [
+      0,
+      -360
+     ],
+     "rotation": [
+      -8,
+      8
+     ],
+     "scale": [
+      0.8,
+      1.2
+     ]
+    },
+    "seat_torso": {
+     "pivot": [
+      0,
+      -330
+     ],
+     "rotation": [
+      -14,
+      14
+     ],
+     "scale": [
+      0.8,
+      1.2
+     ]
+    },
+    "seat_sleeve_l_up": {
+     "pivot": [
+      -170,
+      -740
+     ],
+     "rotation": [
+      -35,
+      35
+     ],
+     "scale": [
+      0.8,
+      1.2
+     ]
+    },
+    "seat_sleeve_l_lo": {
+     "pivot": [
+      -310,
+      -500
+     ],
+     "rotation": [
+      -35,
+      35
+     ],
+     "scale": [
+      0.8,
+      1.2
+     ]
+    },
+    "seat_sleeve_r_up": {
+     "pivot": [
+      170,
+      -740
+     ],
+     "rotation": [
+      -35,
+      35
+     ],
+     "scale": [
+      0.8,
+      1.2
+     ]
+    },
+    "seat_sleeve_r_lo": {
+     "pivot": [
+      330,
+      -500
+     ],
+     "rotation": [
+      -35,
+      35
+     ],
+     "scale": [
+      0.8,
+      1.2
+     ]
+    },
+    "seat_neck": {
+     "pivot": [
+      0,
+      -800
+     ],
+     "rotation": [
+      -10,
+      10
+     ],
+     "scale": [
+      0.8,
+      1.2
+     ]
+    },
+    "seat_head": {
+     "pivot": [
+      0,
+      -840
+     ],
+     "rotation": [
+      -25,
+      25
+     ],
+     "scale": [
+      0.8,
+      1.2
+     ]
+    },
+    "seat_braid_0": {
+     "pivot": [
+      0,
+      -815
+     ],
+     "rotation": [
+      -40,
+      40
+     ],
+     "scale": [
+      0.8,
+      1.2
+     ]
+    },
+    "seat_braid_1": {
+     "pivot": [
+      12,
+      -660
+     ],
+     "rotation": [
+      -40,
+      40
+     ],
+     "scale": [
+      0.8,
+      1.2
+     ]
+    },
+    "seat_braid_2": {
+     "pivot": [
+      -8,
+      -520
+     ],
+     "rotation": [
+      -40,
+      40
+     ],
+     "scale": [
+      0.8,
+      1.2
+     ]
+    },
+    "seat_braid_3": {
+     "pivot": [
+      8,
+      -420
+     ],
+     "rotation": [
+      -40,
+      40
+     ],
+     "scale": [
+      0.8,
+      1.2
+     ]
+    },
+    "seat_daenggi": {
+     "pivot": [
+      0,
+      -325
+     ],
+     "rotation": [
+      -40,
+      40
+     ],
+     "scale": [
+      0.8,
+      1.2
+     ]
+    }
+   },
+   "layers": [
+    "stand_root",
+    "seat_root",
+    "stand_chima",
+    "seat_chima",
+    "stand_torso",
+    "seat_torso",
+    "stand_sleeve_l_up",
+    "stand_sleeve_r_up",
+    "seat_sleeve_l_up",
+    "seat_sleeve_r_up",
+    "stand_sleeve_l_lo",
+    "stand_sleeve_r_lo",
+    "seat_sleeve_l_lo",
+    "seat_sleeve_r_lo",
+    "stand_braid_0",
+    "seat_braid_0",
+    "stand_braid_1",
+    "seat_braid_1",
+    "stand_braid_2",
+    "seat_braid_2",
+    "stand_braid_3",
+    "seat_braid_3",
+    "stand_daenggi",
+    "seat_daenggi",
+    "stand_neck",
+    "seat_neck",
+    "stand_head",
+    "seat_head"
+   ],
+   "views": [
+    "back_stand",
+    "back_seat"
+   ],
+   "required_poses": [
+    "seat_carve",
+    "seat_idle",
+    "stand_idle",
+    "stand_look_up",
+    "stand_turn",
+    "stand_walk"
+   ],
+   "required_actions": [
+    "seated_carve_loop",
+    "breathe",
+    "look_up",
+    "turn_head",
+    "walk_away"
+   ],
+   "risks": [
+    "stand/seat are two part-sets of one rig (ids prefixed stand_/seat_)",
+    "braid + daenggi are procedural secondary motion (damped lagged follow-through), not keyed",
+    "mocap is front-view 2D: retargeted as deltas (mirrored for the back view); legs are hidden by the chima so only hem/bob/lean are visible"
+   ]
+  }
+ ],
+ "metadata": {
+  "source": "svg_rig_builder",
+  "refined": true,
+  "coordinate_space": "design px; 1000 = figure height (carver) / 1 emblem unit (tiger); y down"
+ }
+}

@@ -1,0 +1,285 @@
+{
+  "tone_div": 2,
+  "levels": 24,
+  "fill_div": 1,
+  "outline": {
+    "w": 2,
+    "fill": "ink"
+  },
+  "sequences": {
+    "pavilion_bg": {
+      "raw": "pavilion_bg",
+      "classes": {
+        "none": {
+          "key": [
+            0,
+            0,
+            0
+          ],
+          "rank": 0,
+          "alpha": 0
+        },
+        "void": {
+          "key": [
+            255,
+            255,
+            0
+          ],
+          "rank": 1,
+          "fill": "ink",
+          "tone": [
+            0,
+            0
+          ],
+          "outline": false
+        },
+        "pillar": {
+          "key": [
+            255,
+            0,
+            0
+          ],
+          "rank": 2,
+          "fill": "paper",
+          "tone": [
+            0.68,
+            0.97
+          ],
+          "style": "grain",
+          "angle": 0
+        },
+        "beam": {
+          "key": [
+            0,
+            255,
+            0
+          ],
+          "rank": 3,
+          "fill": "paper",
+          "tone": [
+            0.65,
+            0.95
+          ],
+          "style": "grain",
+          "angle": 90
+        },
+        "rafter": {
+          "key": [
+            0,
+            0,
+            255
+          ],
+          "rank": 2,
+          "fill": "paper",
+          "tone": [
+            0.25,
+            0.8
+          ],
+          "style": "cross",
+          "angle": 40
+        }
+      }
+    },
+    "bell": {
+      "raw": "bell",
+      "classes": {
+        "none": {
+          "key": [
+            0,
+            0,
+            0
+          ],
+          "rank": 0,
+          "alpha": 0
+        },
+        "body": {
+          "key": [
+            255,
+            0,
+            0
+          ],
+          "rank": 1,
+          "fill": "paper",
+          "tone": [
+            0.15,
+            0.96
+          ],
+          "gamma": 0.8,
+          "style": "line",
+          "angle": 0
+        },
+        "band": {
+          "key": [
+            0,
+            255,
+            0
+          ],
+          "rank": 2,
+          "fill": "ink",
+          "tone": [
+            0,
+            0
+          ],
+          "angle": 0
+        },
+        "knob": {
+          "key": [
+            0,
+            0,
+            255
+          ],
+          "rank": 4,
+          "fill": "paper",
+          "tone": [
+            0.0,
+            0.3
+          ],
+          "style": "dots",
+          "angle": 0
+        },
+        "panel": {
+          "key": [
+            255,
+            255,
+            0
+          ],
+          "rank": 3,
+          "fill": "paper",
+          "tone": [
+            0.55,
+            0.92
+          ],
+          "style": "line",
+          "angle": 90
+        },
+        "medal": {
+          "key": [
+            255,
+            0,
+            255
+          ],
+          "rank": 3,
+          "fill": "paper",
+          "tone": [
+            0.05,
+            0.75
+          ],
+          "style": "line",
+          "angle": 0
+        },
+        "petal": {
+          "key": [
+            0,
+            255,
+            255
+          ],
+          "rank": 4,
+          "fill": "paper",
+          "tone": [
+            0.0,
+            0.5
+          ],
+          "style": "cross",
+          "angle": 45
+        },
+        "dragon": {
+          "key": [
+            255,
+            255,
+            255
+          ],
+          "rank": 2,
+          "fill": "ink",
+          "tone": [
+            0,
+            0
+          ]
+        },
+        "tube": {
+          "key": [
+            255,
+            128,
+            0
+          ],
+          "rank": 2,
+          "fill": "paper",
+          "tone": [
+            0.4,
+            0.9
+          ],
+          "style": "line",
+          "angle": 0
+        }
+      }
+    },
+    "log": {
+      "raw": "log",
+      "fill_div": 1,
+      "classes": {
+        "none": {
+          "key": [
+            0,
+            0,
+            0
+          ],
+          "rank": 0,
+          "alpha": 0
+        },
+        "log": {
+          "key": [
+            255,
+            0,
+            0
+          ],
+          "rank": 1,
+          "fill": "paper",
+          "tone": [
+            0.35,
+            0.95
+          ],
+          "style": "grain",
+          "angle": 90
+        },
+        "rope": {
+          "key": [
+            0,
+            255,
+            0
+          ],
+          "rank": 2,
+          "fill": "ink",
+          "tone": [
+            0,
+            0
+          ]
+        },
+        "bracket": {
+          "key": [
+            0,
+            0,
+            255
+          ],
+          "rank": 3,
+          "fill": "ink",
+          "tone": [
+            0,
+            0
+          ]
+        },
+        "twist": {
+          "key": [
+            255,
+            255,
+            0
+          ],
+          "rank": 4,
+          "fill": "paper",
+          "tone": [
+            0,
+            0
+          ]
+        }
+      }
+    }
+  }
+}

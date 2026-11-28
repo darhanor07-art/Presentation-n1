@@ -1,0 +1,16 @@
+{
+  "tone_div": 3, "fill_div": 2, "levels": 40,
+  "outline": { "w": 1, "fill": "ink" },
+  "sequences": {
+    "ridges_s02": { "raw": "ridges_s02", "horizon": true, "classes": {
+      "sky":  { "key": [0, 0, 0],   "rank": 0, "alpha": 0 },
+      "far":  { "key": [255, 0, 0], "rank": 1, "fill": "red",   "tone": [0.30, 0.62], "gamma": 1.0, "style": "line",  "angle": 90 },
+      "mid":  { "key": [0, 255, 0], "rank": 2, "fill": "paper", "tone": [0.30, 0.78], "gamma": 1.0, "style": "cross", "angle": 60 },
+      "near": { "key": [0, 0, 255], "rank": 3, "fill": "paper", "tone": [0.55, 0.97], "gamma": 0.9, "style": "grain", "angle": 0 } } },
+    "ridges_s09": { "raw": "ridges_s09", "horizon": true, "classes": {
+      "sky":  { "key": [0, 0, 0],   "rank": 0, "alpha": 0 },
+      "far":  { "key": [255, 0, 0], "rank": 1, "fill": "red",   "tone": [0.30, 0.62], "gamma": 1.0, "style": "line",  "angle": 90 },
+      "mid":  { "key": [0, 255, 0], "rank": 2, "fill": "paper", "tone": [0.30, 0.78], "gamma": 1.0, "style": "cross", "angle": 60 },
+      "near": { "key": [0, 0, 255], "rank": 3, "fill": "paper", "tone": [0.55, 0.97], "gamma": 0.9, "style": "grain", "angle": 0 } } }
+  }
+}

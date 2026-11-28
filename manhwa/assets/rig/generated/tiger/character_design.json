@@ -1,0 +1,51 @@
+{
+  "version": "1.0",
+  "style": {
+    "visual_style": "korean woodblock print (minhwa / manhwa), flat 1-colour print shader, hatch tones",
+    "palette": [
+      "red",
+      "ink",
+      "paper",
+      "blue (daenggi only)",
+      "gold (sky tiger eyes only)"
+    ],
+    "line_style": "bold ink outlines 3px, tapered strokes",
+    "texture": "hatch / grain / dots tone layers"
+  },
+  "characters": [
+    {
+      "id": "tiger",
+      "display_name": "Tiger (\ubc94)",
+      "role": "minhwa tiger emblem / antagonist-guardian",
+      "body_type": "front-facing minhwa tiger face emblem with ears, brows, eyelids, slit pupils, jaw, whisker bundles",
+      "style": "woodblock print, red then ink",
+      "silhouette_notes": "round head, big ears, \u738b mark on the forehead",
+      "required_emotions": [
+        "asleep",
+        "awake",
+        "wary",
+        "fierce"
+      ],
+      "required_actions": [
+        "wake",
+        "eyes_open",
+        "ear_flick",
+        "brow_furrow",
+        "roar",
+        "blink_slow",
+        "breathe"
+      ],
+      "required_views": [
+        "front"
+      ],
+      "props": [],
+      "constraints": [
+        "face is a flat emblem: all motion is part transforms / channels"
+      ]
+    }
+  ],
+  "metadata": {
+    "source": "character_spec_generator",
+    "brief": "MOKPAN web-manhwa character tiger"
+  }
+}
