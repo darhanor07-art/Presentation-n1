@@ -58,6 +58,59 @@
     ],
     init: function () { build(); },
     draw: function (ctx) {
+      var live = MK.art.splitLive && MK.art.splitLive();      // LIVE three.js block (MK.three) when available, else the 2D painted halves below
+      if (live && drawLive(ctx, live)) return;
+      draw2d(ctx);
+    }
+  });
+
+  /* ---- live 3D path: 2D desk / blue backdrop / crack stroke / rays + 3D slab, halves, splinters ---- */
+  function rays(P, t, grow) {
+    var bl = { c: 'blue', t: P.rad(LC[0], LC[1], 0, 700 + 800 * grow, [[0, 0], [1, .7]]), a: 90 };
+    return { bl: bl, rays: function () {
+      P.alpha(.5, function () {
+        RAYS.forEach(function (r) {
+          var L = r.l * (.8 + .2 * Math.sin(t * 1.6 + r.k)), a0 = r.a - r.w, a1 = r.a + r.w;
+          P.poly([[LC[0], LC[1]], [LC[0] + Math.cos(a0) * L, LC[1] + Math.sin(a0) * L], [LC[0] + Math.cos(a1) * L, LC[1] + Math.sin(a1) * L]], { c: 'paper', t: 0 });
+        });
+      });
+    } };
+  }
+  function drawLive(ctx, live) {
+    var P = ctx.P, p = ctx.p, t = ctx.t, st = ctx.state, fx = ctx.fx, i, n;
+    if (!CR) build();
+    n = CR.length;
+    P.cover({ c: 'paper', t: .82, h: 'grain', a: 90 });
+    var sa = 1 - range(p, .35, .6);
+    if (sa > .01) P.alpha(sa, function () { P.toneOnly(function () { P.rect(108, 150, 860, 1160, { c: 'ink', t: .95, h: 'cross', a: 45 }); }); });   // drop shadow of the block
+    var g = live.update({ p: p }), grow = range(p, .8, 1);
+    if (p < .35) {
+      if (!live.renderMain(P)) return false;
+      var f = range(p, 0, .35), part = partial(CR, f);
+      P.stroke(part, { w: 7, c: 'ink', closed: false });
+      P.push(); P.translate(-3.5, 0); P.stroke(part, { w: 2, c: 'paper', closed: false }); P.pop();
+      var sh = 0; for (i = 1; i < n; i++) { var ti = MK.event(st, 'z' + i, p, .35 * (i - 1) / (n - 1) + .002, t, 2.5); if (ti >= 0) sh = Math.max(sh, 3.5 * Math.exp(-ti / .09)); }
+      if (sh > .05) fx.shake = Math.max(fx.shake || 0, sh);
+      return true;
+    }
+    for (i = 1; i < n; i++) MK.event(st, 'z' + i, p, .35 * (i - 1) / (n - 1) + .002, t, 2.5);
+    /* gap between the hinged halves (bottom edges, top-down projection) = where the blue light shows */
+    var CE = [[500, 60]].concat(CR, [[500, 1340]]);
+    var le = CE.map(function (q) { return [90 - g.dx + (q[0] - 90) * g.cs, q[1]]; }), re = CE.map(function (q) { return [910 + g.dx + (q[0] - 910) * g.cs, q[1]]; });
+    var gap = le.concat(re.slice().reverse()), L = rays(P, t, grow);
+    function light() { P.cover(L.bl); L.rays(); }
+    P.clip(gap, light);
+    if (grow > 0) { var gc = new Path2D(); gc.arc(LC[0], LC[1], grow * 1750, 0, Math.PI * 2); P.clip(gc, light); }
+    if (!live.renderMain(P)) return false;
+    P.clip(gap, function () { L.rays(); });                 // rays over the emissive core plane
+    live.renderShards(P);
+    var ts = MK.event(st, 'split', p, .35, t, 2.5);
+    if (ts >= 0) { fx.shake = Math.max(fx.shake || 0, 10 * Math.exp(-ts / .22)); var mk = Math.exp(-ts / .3); fx.misreg = [3 * mk, 1.5 * mk]; }
+    return true;
+  }
+
+  function draw2d(ctx) {
+    {
       var P = ctx.P, p = ctx.p, t = ctx.t, st = ctx.state, fx = ctx.fx, b = ctx.view.bounds, i, n;
       if (!CR) build();
       n = CR.length;
@@ -109,5 +162,5 @@
         if (ts >= 0) { fx.shake = Math.max(fx.shake || 0, 10 * Math.exp(-ts / .22)); var mk = Math.exp(-ts / .3); fx.misreg = [3 * mk, 1.5 * mk]; }
       }
     }
-  });
+  }
 })();

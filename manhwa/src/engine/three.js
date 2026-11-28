@@ -28,14 +28,16 @@
     '  #endif', '}'
   ].join('\n');
   var VS_TONE = VIB + '\n' + VIBFN + '\n' + [
-    'varying vec3 vN; varying float vW; varying vec3 vTilt;',
-    'void main(){ vec3 pos=position; vec3 wn=normalize((normalMatrix*normal)*mat3(viewMatrix));',
-    '  float w; vec3 tilt; vibrate(pos,wn,w,tilt); vN=wn; vW=w; vTilt=tilt;',
+    'varying vec3 vN; varying float vW; varying vec3 vTilt; varying vec3 vP;',
+    'void main(){ vec3 pos=position, nn=normal;',
+    '  #ifdef USE_INSTANCING', '  pos=(instanceMatrix*vec4(pos,1.)).xyz; nn=mat3(instanceMatrix)*nn;', '  #endif',
+    '  vec3 wn=normalize((normalMatrix*nn)*mat3(viewMatrix));',
+    '  float w; vec3 tilt; vibrate(pos,wn,w,tilt); vN=wn; vW=w; vTilt=tilt; vP=(modelMatrix*vec4(pos,1.)).xyz;',
     '  gl_Position=projectionMatrix*viewMatrix*modelMatrix*vec4(pos,1.); }'
   ].join('\n');
   var FS_TONE = [
-    'uniform vec3 uKeyD,uKeyC,uRimD,uRimC,uSky,uGrd; uniform float uFlash,uAlb; uniform vec4 uTn; uniform vec2 uLev,uEnc;',
-    'varying vec3 vN; varying float vW; varying vec3 vTilt;',
+    'uniform vec3 uKeyD,uKeyC,uRimD,uRimC,uSky,uGrd,uPtP; uniform float uFlash,uAlb; uniform vec4 uTn,uPt; uniform vec2 uLev,uEnc;',
+    'varying vec3 vN; varying float vW; varying vec3 vTilt; varying vec3 vP;',
     'void main(){ vec3 n=normalize(vN);',
     '  #ifdef DBL', '  if(!gl_FrontFacing) n=-n;', '  #endif',
     '  #ifdef VIB', '  n=normalize(n-vTilt*1.7);', '  #endif',
@@ -43,16 +45,23 @@
     '  float lum=dot(irr,vec3(.2126,.7152,.0722))*uAlb/3.14159265;',
     '  float lit=clamp((lum-uLev.x)/(uLev.y-uLev.x)+uFlash*.5,0.,1.);',
     '  #ifdef VIB', '  lit=clamp(lit+vW*.3,0.,1.);', '  #endif',
+    '  #ifdef BL', '  vec3 ld=uPtP-vP; float dl=length(ld)+1e-3; lit=max(lit,clamp(dot(n,ld/dl)*uPt.y/(1.+dl*dl/(uPt.x*uPt.x)),0.,1.));', '  #endif',
     '  float tone=uTn.x+(uTn.y-uTn.x)*pow(1.-lit,uTn.z);',
     '  gl_FragColor=vec4(tone,uEnc.x,uEnc.y,1.); }'
   ].join('\n');
   /* inverted-hull outline: back faces pushed along the view-space normal (screen px = world units) and back in depth */
   var VS_OUT = VIB + '\n' + VIBFN + '\n' + [
-    'uniform float uOw;',
+    'uniform float uOw; attribute vec3 hn;',      // hn = position-welded smooth normal (MK.three.bake) so hard-edged solids (boxes, extrusions) get a closed outline
     'void main(){ vec3 pos=position; vec3 wn=normalize((normalMatrix*normal)*mat3(viewMatrix));',
-    '  float w; vec3 tilt; vibrate(pos,wn,w,tilt);',
-    '  vec4 mv=viewMatrix*modelMatrix*vec4(pos,1.); vec2 d2=(normalMatrix*normal).xy; float l=length(d2);',
+    '  float w; vec3 tilt; vibrate(pos,wn,w,tilt); vec3 hv=dot(hn,hn)>.01? hn : normal;',
+    '  vec4 mv=viewMatrix*modelMatrix*vec4(pos,1.); vec2 d2=(normalMatrix*hv).xy; float l=length(d2);',
     '  mv.xy+=(l>1e-3? d2/l : vec2(0.))*uOw; mv.z-=uOw*2.; gl_Position=projectionMatrix*mv; }'
+  ].join('\n');
+  /* FILL of meshes that receive the point light (print.bl): palette colour mixed towards BLUE where the light reaches (blue-only-in-finale rule: use in s08 only) */
+  var FS_FILLBL = [
+    'uniform vec3 uPtP,uBase,uBlue; uniform vec4 uPt; varying vec3 vN; varying vec3 vP;',
+    'void main(){ vec3 n=normalize(vN); vec3 ld=uPtP-vP; float dl=length(ld)+1e-3;',
+    '  float bl=clamp(dot(n,ld/dl)*uPt.y/(1.+dl*dl/(uPt.x*uPt.x)),0.,1.); gl_FragColor=vec4(mix(uBase,uBlue,clamp(bl*1.3,0.,1.)),1.); }'
   ].join('\n');
   var FS_OUT = 'uniform vec3 uCol; void main(){ gl_FragColor=vec4(uCol,1.); }';
   /* injected into MeshBasicMaterial (FILL) of vibrating meshes */
@@ -77,7 +86,7 @@
       var V3 = function (x, y, z) { return { value: new THREE.Vector3(x, y, z) }; };
       U = T.U = {
         uKeyD: V3(0, 0, 0), uKeyC: V3(0, 0, 0), uRimD: V3(0, 0, 0), uRimC: V3(0, 0, 0), uSky: V3(0, 0, 0), uGrd: V3(0, 0, 0),
-        uFlash: { value: 0 }, uRip: { value: new THREE.Vector4(0, 0, 1, 1) }, uRipC: V3(0, 0, 0), uAx: V3(0, 0, 0)
+        uFlash: { value: 0 }, uPt: { value: new THREE.Vector4(1, 0, 0, 0) }, uPtP: V3(0, 0, 0), uRip: { value: new THREE.Vector4(0, 0, 1, 1) }, uRipC: V3(0, 0, 0), uAx: V3(0, 0, 0)
       };
       state = 1;
       T.setLights({ key: { dir: [-700, 1500, 900], color: 0xfff0dc, i: 3.1 }, rim: { dir: [900, 500, -800], color: 0xffc8b0, i: 1.9 }, hemi: { sky: 0xf0d8d0, ground: 0x40201c, i: 1.1 } });
@@ -98,6 +107,8 @@
     if (L.hemi) { a = col(L.hemi.sky, L.hemi.i); U.uSky.value.set(a[0], a[1], a[2]); a = col(L.hemi.ground, L.hemi.i); U.uGrd.value.set(a[0], a[1], a[2]); }
   };
   /* key-light flash (tone brightening) 0..1 ; surface ripple: ripple(tau, amp, medalWorld[x,y,z], axisWorld[x,z]) (tau<0 or amp 0 = off) */
+  /* point light (only meshes with print.bl feel it): pos world [x,y,z] (y up), range (falloff distance), intensity (0 = off) */
+  T.setPoint = function (pos, range, i) { if (!U) return; U.uPtP.value.set(pos[0], pos[1], pos[2]); U.uPt.value.set(range, i, 0, 0); };
   T.flash = function (v) { if (U) U.uFlash.value = v; };
   T.ripple = function (tau, amp, medal, axis, k, omega) {
     if (!U) return;
@@ -110,17 +121,22 @@
   /* print = {fill, a, h, t0, t1, gamma, vib, dbl, o (outline width, world units), alb, lev:[lo,hi]} */
   T.material = function (print) {
     init(); var THREE = window.THREE, pr = print || {}, c = rgb01(pr.fill || 'paper');
-    var side = pr.dbl ? THREE.DoubleSide : THREE.FrontSide, defs = {}; if (pr.vib) defs.VIB = 1; if (pr.dbl) defs.DBL = 1;
+    var side = pr.dbl ? THREE.DoubleSide : THREE.FrontSide, defs = {}; if (pr.vib) defs.VIB = 1; if (pr.dbl) defs.DBL = 1; if (pr.bl) defs.BL = 1;
     var fill = new THREE.MeshBasicMaterial({ side: side });
     fill.color.setRGB(c[0], c[1], c[2]);
     if (pr.vib) { fill.onBeforeCompile = fillVib; fill.customProgramCacheKey = function () { return 'mkvib'; }; }
     var u = {
       uKeyD: U.uKeyD, uKeyC: U.uKeyC, uRimD: U.uRimD, uRimC: U.uRimC, uSky: U.uSky, uGrd: U.uGrd, uFlash: U.uFlash,
-      uRip: U.uRip, uRipC: U.uRipC, uAx: U.uAx,
+      uRip: U.uRip, uRipC: U.uRipC, uAx: U.uAx, uPt: U.uPt, uPtP: U.uPtP,
       uAlb: { value: pr.alb == null ? .85 : pr.alb }, uTn: { value: new THREE.Vector4(pr.t0 || 0, pr.t1 == null ? (pr.t0 || 0) : pr.t1, pr.gamma || 1, 0) }, uLev: { value: new THREE.Vector2(pr.lev ? pr.lev[0] : .12, pr.lev ? pr.lev[1] : .8) },
       uEnc: { value: new THREE.Vector2(((((pr.a || 0) % 180) + 180) % 180) / 180, (STY[pr.h || 'line'] || 0) / 255) }
     };
     var tone = new THREE.ShaderMaterial({ vertexShader: VS_TONE, fragmentShader: FS_TONE, uniforms: u, defines: defs, side: side });
+    if (pr.bl) {
+      fill.dispose();
+      fill = new THREE.ShaderMaterial({ vertexShader: VS_TONE, fragmentShader: FS_FILLBL, defines: pr.vib ? { VIB: 1 } : {}, side: side,
+        uniforms: { uRip: U.uRip, uRipC: U.uRipC, uAx: U.uAx, uPt: U.uPt, uPtP: U.uPtP, uBase: { value: new THREE.Vector3(c[0], c[1], c[2]) }, uBlue: { value: new THREE.Vector3(36 / 255, 86 / 255, 211 / 255) } } });
+    }
     var out = { fill: fill, tone: tone };
     if (pr.o) {
       var mk = function (col) { return new THREE.ShaderMaterial({ vertexShader: VS_OUT, fragmentShader: FS_OUT, defines: pr.vib ? { VIB: 1 } : {}, side: THREE.BackSide, uniforms: { uCol: { value: new THREE.Vector3(col[0], col[1], col[2]) }, uOw: { value: pr.o }, uRip: U.uRip, uRipC: U.uRipC, uAx: U.uAx } }); };
@@ -131,11 +147,16 @@
   /* mesh with FILL+TONE (+outline hull) materials; materials are swapped per pass by MK.three.render */
   T.mesh = function (geo, print) {
     init(); var THREE = window.THREE, m = new THREE.Mesh(geo, null), mats = T.material(print);
-    m.userData.mats = mats; m.material = mats.fill; m.userData.print = print;
+    m.userData.mats = mats; m.material = mats.fill; m.userData.print = print; m.userData.only = (print || {}).only;
     if (mats.ofill) {
       var h = new THREE.Mesh(geo, mats.ofill); h.userData.mats = { fill: mats.ofill, tone: mats.otone }; h.userData.isHull = true; h.renderOrder = 1; m.add(h);   // hull after the solids: depth-rejected early
     }
     return m;
+  };
+  /* InstancedMesh with FILL+TONE materials (no hull outline); caller sets matrices (setMatrixAt + instanceMatrix.needsUpdate) per frame */
+  T.instanced = function (geo, count, print) {
+    init(); var m = new window.THREE.InstancedMesh(geo, null, count), mats = T.material(print);
+    m.userData.mats = mats; m.material = mats.fill; m.userData.print = print; m.userData.only = (print || {}).only; m.frustumCulled = false; return m;
   };
   /* bake several transformed primitive geometries into ONE static mesh: parts = [{g, p:[x,y,z], r:[rx,ry,rz], s:[sx,sy,sz], m?:parentObject3D}] */
   T.bake = function (parts, print) {
@@ -153,6 +174,12 @@
     });
     var geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3)); geo.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(nor), 3));
+    if (print && print.o) {                                      // welded smooth normals for the inverted-hull outline
+      var acc = {}, key = function (i) { return Math.round(pos[i * 3] * 50) + ',' + Math.round(pos[i * 3 + 1] * 50) + ',' + Math.round(pos[i * 3 + 2] * 50); }, hn = new Float32Array(pos.length), vi;
+      for (vi = 0; vi < off; vi++) { var kk = key(vi), a = acc[kk] || (acc[kk] = [0, 0, 0]); a[0] += nor[vi * 3]; a[1] += nor[vi * 3 + 1]; a[2] += nor[vi * 3 + 2]; }
+      for (vi = 0; vi < off; vi++) { var b2 = acc[key(vi)], ln = Math.hypot(b2[0], b2[1], b2[2]) || 1; hn[vi * 3] = b2[0] / ln; hn[vi * 3 + 1] = b2[1] / ln; hn[vi * 3 + 2] = b2[2] / ln; }
+      geo.setAttribute('hn', new THREE.BufferAttribute(hn, 3));
+    }
     geo.setIndex(new THREE.BufferAttribute(off > 65535 ? new Uint32Array(idx) : new Uint16Array(idx), 1));
     return T.mesh(geo, print);
   };
@@ -191,7 +218,7 @@
     if (an) { var z = cam.zoom || 1, cx = (cam.left + cam.right) / 2, cy = (cam.top + cam.bottom) / 2; cam.position.x = (an[0] - cx) * (1 - 1 / z); cam.position.y = (H - an[1] - cy) * (1 - 1 / z); }
   }
   function setPass(root, pass) {
-    root.traverse(function (o) { var m = o.userData && o.userData.mats; if (m) o.material = pass === 'fill' ? m.fill : m.tone; });
+    root.traverse(function (o) { var m = o.userData && o.userData.mats; if (m) { o.material = pass === 'fill' ? m.fill : m.tone; if (o.userData.only) o.visible = o.userData.only === pass; } });
   }
   /* group: Object3D to draw (added to the internal scene), camera: MK.three.camera(). Draws into the fill / tone canvases
      under the current 2D transform + clip (respects P.fillOnly / P.toneOnly). Returns false if three is unavailable. */
@@ -200,6 +227,7 @@
     try {
       if (P.w !== sizeW || P.h !== sizeH) { R.setSize(P.w, P.h, false); sizeW = P.w; sizeH = P.h; }
       if (group.parent !== scene) scene.add(group);
+      scene.children.slice().forEach(function (c) { if (c !== group) scene.remove(c); });   // exactly one layer group per render call
       fit(camera, P);
       var cv = R.domElement;
       [['fill', P._f, P.ctxF], ['tone', P._t, P.ctxT]].forEach(function (pp) {
