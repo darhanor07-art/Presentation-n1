@@ -27,6 +27,13 @@
     "alpha": false,
     "kind": "eye"
   },
+  "aiaru_pair_0": {
+    "file": "aiaru_pair_0.webp",
+    "w": 1600,
+    "h": 560,
+    "alpha": false,
+    "kind": "eye"
+  },
   "aiaru_pupil_0": {
     "file": "aiaru_pupil_0.webp",
     "w": 1200,
@@ -160,6 +167,20 @@
     "alpha": false,
     "kind": "plate"
   },
+  "plate_hall": {
+    "file": "plate_hall.webp",
+    "w": 900,
+    "h": 1260,
+    "alpha": false,
+    "kind": "plate"
+  },
+  "plate_hall_door": {
+    "file": "plate_hall_door.webp",
+    "w": 900,
+    "h": 1260,
+    "alpha": false,
+    "kind": "plate"
+  },
   "plate_macro": {
     "file": "plate_macro.webp",
     "w": 900,
@@ -180,6 +201,20 @@
     "h": 1260,
     "alpha": false,
     "kind": "plate"
+  },
+  "hall_back": {
+    "file": "hall_back.webp",
+    "w": 900,
+    "h": 1260,
+    "alpha": false,
+    "kind": "layer"
+  },
+  "hall_fg": {
+    "file": "hall_fg.webp",
+    "w": 900,
+    "h": 1260,
+    "alpha": true,
+    "kind": "layer"
   },
   "hero_castle": {
     "file": "hero_castle.webp",

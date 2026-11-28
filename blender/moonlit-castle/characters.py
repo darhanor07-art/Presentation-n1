@@ -451,7 +451,6 @@ def build_legs_walk(P, skin, dress_z=0.58):
         pts = [hip, (hip + knee) / 2, knee, knee + v * 0.12 + back * 0.003, knee + v * 0.26 + back * 0.010, knee + v * 0.36 + back * 0.004, ank, ank + v * 0.05]
         rad = [0.064, 0.056, 0.0445, 0.0455, 0.0425, 0.0300, 0.0262, 0.0258]
         tube("Leg", pts, rad, skin, 20)
-        blob("Knee", knee + np.array([0, 0.026, 0.0]), (0.034, 0.026, 0.034), skin, seg=16)
         foot = bpy.data.objects.new("FootEmpty", None)
         bpy.context.scene.collection.objects.link(foot)
         foot.location = tuple(ank)

@@ -1,4 +1,4 @@
-"""Convert the PNG masters in renders/spring/{eyes,chars,plates,layers} to WebP (q82, alpha kept)
+"""Convert the PNG masters in renders/spring/{eyes,chars,plates,layers,seq} to WebP (q82, alpha kept)
 and write manhwa-spring/assets/manifest.json.   Run with the system python3 (needs Pillow):
 
   python3 export_webp.py [--force]
@@ -13,7 +13,7 @@ SRC = os.path.join(HERE, "renders", "spring")
 DST = os.path.normpath(os.path.join(HERE, "..", "..", "manhwa-spring", "assets"))
 os.makedirs(DST, exist_ok=True)
 FORCE = "--force" in sys.argv
-KIND = {"eyes": "eye", "chars": "char", "plates": "plate", "layers": "layer"}
+KIND = {"eyes": "eye", "chars": "char", "plates": "plate", "layers": "layer", "seq": "seq"}
 
 man = {}
 for sub, kind in KIND.items():

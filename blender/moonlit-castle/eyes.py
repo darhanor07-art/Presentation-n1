@@ -436,9 +436,9 @@ def build_lids(who, up, low, pitch):
                 y += 0.07 * math.exp(-((s - 0.5) / 0.09) ** 2) * (1.0 if up_e > -0.1 else 0.5)
                 y -= 0.05 * math.exp(-((s - 0.2) / 0.3) ** 2) * SMOOTH(0.0, 0.3, up_e)
             else:
-                y += 0.03 * math.exp(-((s - 0.55) / 0.12) ** 2)
+                y += (0.017 if PAIR else 0.03) * math.exp(-((s - 0.55) / 0.12) ** 2)
             if PAIR:    # the outer part of the lid patch sinks behind the shared face surface
-                y += 0.012 * SMOOTH(1.0, 1.55, s)       # outer edge of the patch tucks just under the shared face surface
+                y += 0.05 * SMOOTH(1.1, 1.55, s)        # outer edge of the patch tucks well under the shared face surface
             return (px, y, pz)
         return fn
 

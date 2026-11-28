@@ -17,7 +17,7 @@ Scene fixes applied in memory on every run (the .blend itself is not modified):
 import sys, os, math, time
 import numpy as np
 import bpy, bmesh
-from mathutils import Vector
+from mathutils import Vector, Quaternion
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from nodeutil import *
 
@@ -384,13 +384,13 @@ def prep_ots_castle(name):
     cam.data.dof.focus_distance = math.hypot(CX - cp.x, CY - cp.y)
     lights = []
     # cool moon rim from the front-right (edges of hair/shoulder), faint cold fill from the left behind
-    l1, c1 = char_light("OTS_Rim", (0.55, 0.80, 0.50), 9.0, (0.70, 0.80, 1.0), 3.0, objs)
+    l1, c1 = char_light("OTS_Rim", (0.55, 0.80, 0.50), 4.0, (0.70, 0.80, 1.0), 3.0, objs)
     l2, c2 = char_light("OTS_Fill", (-0.5, -0.6, 0.45), 0.9, (0.55, 0.62, 1.0), 20.0, objs)
     return lambda: remove_all(objs + [root, l1, l2], [c1, c2])
 
 
-OTS_C = dict(back=1.0, right=0.18, up=0.0, yaw=0.0, el=7.0)
-TAIR_C = dict(look_az=-17.0, tair_off=3.0, dist=5.2, cam_up=-0.30, el=7.0, moon_az=-14.0, moon_el=9.0)
+OTS_C = dict(back=0.88, right=0.15, up=-0.03, yaw=0.0, el=7.0)
+TAIR_C = dict(look_az=-17.0, tair_off=4.5, dist=4.4, cam_up=-0.30, el=7.0, moon_up=3.5)
 
 
 def set_moon(cp, az, el):
@@ -430,11 +430,25 @@ def prep_ots_tair(name):
     tx, ty = cp.x + T["dist"] * math.sin(ta), cp.y + T["dist"] * math.cos(ta)
     rootT, objsT = place_char("tair", dict(wind=0.35, lift=0.1, ph=0.4, view=0.0), (tx, ty, ground(tx, ty)), yaw_to(tx, ty, cp.x, cp.y))
     cam.data.dof.focus_distance = T["dist"]
+    head_el = math.degrees(math.atan2(ground(tx, ty) + 1.85 - cp.z, T["dist"]))
+    T["moon_az"], T["moon_el"] = look + T["tair_off"] + 0.5, head_el + T["moon_up"]
     undo_moon = set_moon(cp, T["moon_az"], T["moon_el"])
+    dm, dnt = new_mat("TairShadowSkin")
+    mat_output(dnt, principled(dnt, Base_Color=(0.030, 0.022, 0.026), Roughness=0.7))
+    for o in objsT:                                    # face / neck / hands: pure shadow, only hair + shoulders catch the rim
+        if o.type == "MESH" and o.name.split(".")[0] in ("Head", "Neck", "Hand"):
+            o.data.materials.clear(); o.data.materials.append(dm)
+    for m in {m for o in objsT if o.type == "MESH" for m in o.data.materials}:     # keep him a dark silhouette
+        for n in m.node_tree.nodes:
+            if n.type == "BSDF_PRINCIPLED":
+                n.inputs["Sheen Weight"].default_value = 0.0
+                c = n.inputs["Base Color"]
+                if not c.is_linked:
+                    c.default_value = tuple(v * 0.45 for v in c.default_value[:3]) + (1.0,)
     # moon rim light on Tair only (hair + shoulders) from behind; his face gets nothing from the camera-side key
     md = dirpt((0, 0, 0), T["moon_az"] + 6.0, T["moon_el"] + 14.0, 1.0)
     lT, cT = char_light("TairRim", md, 14.0, (0.70, 0.80, 1.0), 2.5, objsT)
-    lA, cA = char_light("OTS_Rim", (0.55, 0.80, 0.50), 9.0, (0.70, 0.80, 1.0), 3.0, objsA)
+    lA, cA = char_light("OTS_Rim", (0.55, 0.80, 0.50), 4.0, (0.70, 0.80, 1.0), 3.0, objsA)
     lF, cF = char_light("OTS_Fill", (-0.5, -0.6, 0.45), 0.9, (0.55, 0.62, 1.0), 20.0, objsA)
     # KeyFront (camera side) must not reach Tair's face
     keep = [o for o in bpy.data.objects if o not in objsT and o.type in ("MESH", "CURVES", "HAIR") or (o.type not in ("LIGHT", "CAMERA", "EMPTY") and o not in objsT)]
@@ -450,7 +464,156 @@ def prep_ots_tair(name):
     return cleanup
 
 
+# ---------------------------------------------------------------- feet walk cycle (12 frames, one full gait cycle)
+FEET = dict(S0=(-0.6, 6.0), phi=-40.0, dist=1.25, cam_z=0.28, look_z=0.17, nflower=260, seed=7)
+FEET_STATE = {}
+
+
+def feet_setup():
+    """once per process: clear the dense scatter around the lane, hand-place hero flowers + petals."""
+    if FEET_STATE:
+        return
+    F = FEET
+    C.GAIT_L = 0.9
+    sx, sy = F["S0"]
+    x0, x1, y0, y1 = sx - 1.3, sx + 1.7, sy - 2.5, sy + 2.4
+    for nm, keep_every in (("FlowerScatter", 0), ("GrassScatter", 9)):
+        me = O[nm].data
+        bm = bmesh.new(); bm.from_mesh(me)
+        kill = []
+        for i, v in enumerate(bm.verts):
+            if x0 < v.co.x < x1 and y0 < v.co.y < y1 and not (keep_every and i % keep_every == 0 and v.co.y > sy + 0.5):
+                kill.append(v)
+        bmesh.ops.delete(bm, geom=kill, context="VERTS")
+        bm.to_mesh(me); bm.free(); me.update()
+    rng = np.random.default_rng(F["seed"])
+    flowers = []
+    n = F["nflower"]
+    # denser close to the lane, thinning out to the sides / far ahead
+    k = 0
+    while len(flowers) < n:
+        x, y = rng.uniform(x0, x1), rng.uniform(y0, y1)
+        lane = (x - (sx + 0.35)) ** 2 / 1.6 ** 2 + (y - (sy - 0.9)) ** 2 / 2.6 ** 2
+        if rng.random() > math.exp(-lane * 0.9):
+            continue
+        var = int(rng.integers(0, 3))
+        o = bpy.data.objects.new(f"HF_{k}", O[f"FlowerAsset{var}"].data)
+        sc.collection.objects.link(o)
+        s_ = rng.uniform(0.85, 1.4)
+        o.rotation_mode = "QUATERNION"
+        o.scale = (s_, s_, s_ * rng.uniform(0.9, 1.2))
+        base = Vector((x, y, ground(x, y) - 0.02))
+        o.location = base
+        tilt = rng.normal(0, 0.15, 2)
+        q0 = Quaternion((0, 0, 1), rng.uniform(0, 6.28)) @ Quaternion((1, 0, 0), tilt[0]) @ Quaternion((0, 1, 0), tilt[1])
+        o["base"] = tuple(base); o["s"] = tuple(o.scale)
+        flowers.append((o, base, q0))
+        k += 1
+    pet = []
+    for i in range(24):
+        o = bpy.data.objects.new(f"HP_{i}", O[f"PetalAsset{i % 2}"].data)
+        sc.collection.objects.link(o)
+        pet.append(o)
+    FEET_STATE.update(flowers=flowers, petals=pet, rng=np.random.default_rng(99))
+
+
+def feet_world(f, side, phi, S0):
+    """world position of a foot's ankle / heel at heel strike for event bookkeeping (character-local -> world)."""
+    th = math.radians(phi - 90.0)
+    L = C.GAIT_L
+    B = Vector((S0[0], S0[1], 0)) + Vector((math.cos(math.radians(phi)), math.sin(math.radians(phi)), 0)) * (L * f / 12.0)
+    lx, ly = side * 0.066, 0.30 * L - 0.04
+    return Vector((B.x + lx * math.cos(th) - ly * math.sin(th), B.y + lx * math.sin(th) + ly * math.cos(th), 0))
+
+
+def prep_feet(name):
+    sc.cycles_curves.shape = "THICK"
+    feet_setup()
+    F = FEET
+    fi = int(name.split("_")[1])
+    phi = F["phi"]
+    th = math.radians(phi - 90.0)
+    L = C.GAIT_L
+    p = fi / 12.0
+    S0 = F["S0"]
+    D = Vector((math.cos(math.radians(phi)), math.sin(math.radians(phi)), 0))
+    B = Vector((S0[0], S0[1], 0)) + D * (L * p)
+    B.z = ground(B.x, B.y)
+    wv = 0.18 * math.sin(2 * math.pi * p + 1.0)
+    P = dict(wind=wv, lift=0.15 + 0.1 * math.sin(2 * math.pi * p), ph=0.9 + math.pi * p, view=0.0, gait_p=p, lower=True,
+             sway=0.35 * math.cos(2 * math.pi * p + 0.6))
+    root, objs = place_char("aiaru", P, (B.x, B.y, B.z), math.degrees(th))
+    bpy.context.view_layer.update()
+    feet = [o for o in objs if o.type == "EMPTY"]
+    # camera travels with the body (planted foot stays planted in the world)
+    off = Vector((0.12, -F["dist"], 0))
+    cp = Vector((B.x + off.x, B.y + off.y, 0)); cp.z = ground(cp.x, cp.y) + F["cam_z"]
+    if "CAM_FEET" in O:
+        bpy.data.objects.remove(O["CAM_FEET"])
+    cam = make_cam("CAM_FEET", cp, (B.x + 0.02, B.y, B.z + F["look_z"]), 50, 2.8, F["dist"] + 0.02)
+    # flowers: bend away from the feet
+    fp = []
+    for e in feet:
+        m = e.matrix_world
+        a = m.translation.copy()
+        d = (m.to_3x3() @ Vector((0, 1, 0))); d.z = 0; d.normalize()
+        fp.append((a, d))
+    for o, base, q0 in FEET_STATE["flowers"]:
+        qq = q0.copy(); sc_ = Vector(o["s"]); hide = False
+        for a, d in fp:
+            heel = Vector((a.x, a.y, 0)) - d * 0.05
+            t = max(0.0, min(1.0, (Vector((base.x, base.y, 0)) - heel).dot(d) / 0.24))
+            c = heel + d * (0.24 * t)
+            v = Vector((base.x - c.x, base.y - c.y, 0)); dd = v.length
+            low = 1.0 - smooth_(0.10, 0.22, a.z - B.z)
+            if dd < 0.028:
+                hide = True
+            infl = (1.0 - smooth_(0.05, 0.26, dd)) * (0.45 + 0.55 * low)
+            if infl > 0 and dd > 1e-4:
+                u = v / dd
+                axis = Vector((-u.y, u.x, 0))
+                qq = Quaternion(axis, 1.25 * infl) @ qq
+        # keep a clear corridor between the lens and the feet (otherwise giant blurred heads hide the shoes)
+        cxy = Vector((cp.x, cp.y, 0)); bxy = Vector((B.x, B.y, 0)); seg = bxy - cxy
+        tt = max(0.0, min(1.0, (Vector((base.x, base.y, 0)) - cxy).dot(seg) / seg.length_squared))
+        if (Vector((base.x, base.y, 0)) - (cxy + seg * tt)).length < 0.34 or (Vector((base.x, base.y, 0)) - cxy).length < 0.7:
+            hide = True
+        o.rotation_quaternion = qq
+        o.scale = (0, 0, 0) if hide else sc_
+    # petals lift on foot contact (events at frames -12,-6,0,6, alternating feet)
+    pets = FEET_STATE["petals"]
+    prng = np.random.default_rng(5)
+    idx = 0
+    for ev in (-12, -6, 0, 6):
+        side = 1 if (ev // 6) % 2 == 0 else -1
+        c0 = feet_world(ev, side, phi, S0)
+        for j in range(6):
+            o = pets[idx]; idx += 1
+            r = np.random.default_rng(1000 + ev * 7 + j)
+            tau = (fi - ev) / 24.0
+            if tau < 0.0 or tau > 0.95:
+                o.hide_render = True
+                continue
+            o.hide_render = False
+            vz, vx, vy = r.uniform(0.7, 1.4), r.normal(0, 0.18), r.normal(0, 0.18)
+            pos = c0 + Vector((r.normal(0, 0.05) + vx * tau + 0.15 * tau * D.x, r.normal(0, 0.05) + vy * tau + 0.15 * tau * D.y, 0))
+            pos.z = ground(pos.x, pos.y) + 0.03 + vz * tau - 0.9 * tau * tau
+            o.location = pos
+            sp = r.uniform(3, 7)
+            o.rotation_euler = (r.uniform(0, 6.28) + sp * tau, r.uniform(0, 6.28) + sp * 0.6 * tau, r.uniform(0, 6.28))
+            sz = r.uniform(1.8, 2.8)
+            o.scale = (sz, sz, sz)
+    for o in pets[idx:]:
+        o.hide_render = True
+    # light: faint cool lift on the shoes from the camera side so the white flats read against the backlight
+    l1, c1 = char_light("FeetFill", (-0.35, -0.8, 0.45), 1.6, (0.62, 0.70, 1.0), 25.0, objs)
+    return lambda: remove_all(objs + [root, l1], [c1])
+
+
+smooth_ = lambda a, b, x: float(sm(a, b, x))
 PREP = {"plate_ots_castle": prep_ots_castle, "plate_ots_tair": prep_ots_tair}
+for _i in range(12):
+    PREP[f"feet_{_i:02d}"] = prep_feet
 
 
 # ----------------------------------------------------------------------------
