@@ -1,0 +1,319 @@
+{
+ "version": "1.0",
+ "characters": [
+  {
+   "character_id": "tiger",
+   "rig_type": "svg_rig",
+   "parts": [
+    {
+     "id": "face_root",
+     "kind": "root",
+     "layer": 0
+    },
+    {
+     "id": "face_ear_l",
+     "kind": "ear",
+     "layer": 10,
+     "parent": "face_root"
+    },
+    {
+     "id": "face_ear_r",
+     "kind": "ear",
+     "layer": 10,
+     "parent": "face_root"
+    },
+    {
+     "id": "face_head",
+     "kind": "head",
+     "layer": 20,
+     "parent": "face_root"
+    },
+    {
+     "id": "face_lid_l",
+     "kind": "eyelid",
+     "layer": 50,
+     "parent": "face_head"
+    },
+    {
+     "id": "face_pupil_l",
+     "kind": "pupil",
+     "layer": 51,
+     "parent": "face_head"
+    },
+    {
+     "id": "face_brow_l",
+     "kind": "brow",
+     "layer": 60,
+     "parent": "face_head"
+    },
+    {
+     "id": "face_whisker_l",
+     "kind": "whisker",
+     "layer": 80,
+     "parent": "face_head"
+    },
+    {
+     "id": "face_lid_r",
+     "kind": "eyelid",
+     "layer": 50,
+     "parent": "face_head"
+    },
+    {
+     "id": "face_pupil_r",
+     "kind": "pupil",
+     "layer": 51,
+     "parent": "face_head"
+    },
+    {
+     "id": "face_brow_r",
+     "kind": "brow",
+     "layer": 60,
+     "parent": "face_head"
+    },
+    {
+     "id": "face_whisker_r",
+     "kind": "whisker",
+     "layer": 80,
+     "parent": "face_head"
+    },
+    {
+     "id": "face_jaw",
+     "kind": "jaw",
+     "layer": 70,
+     "parent": "face_head"
+    }
+   ],
+   "joints": {
+    "face_root": {
+     "pivot": [
+      0,
+      100
+     ],
+     "rotation": [
+      -5,
+      5
+     ],
+     "scale": [
+      0.8,
+      1.2
+     ]
+    },
+    "face_ear_l": {
+     "pivot": [
+      -660,
+      -680
+     ],
+     "rotation": [
+      -25,
+      25
+     ],
+     "scale": [
+      0.8,
+      1.2
+     ]
+    },
+    "face_ear_r": {
+     "pivot": [
+      660,
+      -680
+     ],
+     "rotation": [
+      -25,
+      25
+     ],
+     "scale": [
+      0.8,
+      1.2
+     ]
+    },
+    "face_head": {
+     "pivot": [
+      0,
+      0
+     ],
+     "rotation": [
+      -8,
+      8
+     ],
+     "scale": [
+      0.8,
+      1.2
+     ]
+    },
+    "face_lid_l": {
+     "pivot": [
+      -370,
+      -230
+     ],
+     "rotation": [
+      -5,
+      5
+     ],
+     "scale": [
+      0.8,
+      1.2
+     ]
+    },
+    "face_pupil_l": {
+     "pivot": [
+      -370,
+      -230
+     ],
+     "rotation": [
+      -5,
+      5
+     ],
+     "scale": [
+      0.8,
+      1.2
+     ]
+    },
+    "face_brow_l": {
+     "pivot": [
+      -400,
+      -550
+     ],
+     "rotation": [
+      -25,
+      25
+     ],
+     "scale": [
+      0.8,
+      1.2
+     ]
+    },
+    "face_whisker_l": {
+     "pivot": [
+      -220,
+      300
+     ],
+     "rotation": [
+      -20,
+      20
+     ],
+     "scale": [
+      0.8,
+      1.2
+     ]
+    },
+    "face_lid_r": {
+     "pivot": [
+      370,
+      -230
+     ],
+     "rotation": [
+      -5,
+      5
+     ],
+     "scale": [
+      0.8,
+      1.2
+     ]
+    },
+    "face_pupil_r": {
+     "pivot": [
+      370,
+      -230
+     ],
+     "rotation": [
+      -5,
+      5
+     ],
+     "scale": [
+      0.8,
+      1.2
+     ]
+    },
+    "face_brow_r": {
+     "pivot": [
+      400,
+      -550
+     ],
+     "rotation": [
+      -25,
+      25
+     ],
+     "scale": [
+      0.8,
+      1.2
+     ]
+    },
+    "face_whisker_r": {
+     "pivot": [
+      220,
+      300
+     ],
+     "rotation": [
+      -20,
+      20
+     ],
+     "scale": [
+      0.8,
+      1.2
+     ]
+    },
+    "face_jaw": {
+     "pivot": [
+      0,
+      400
+     ],
+     "rotation": [
+      -5,
+      5
+     ],
+     "scale": [
+      0.8,
+      1.2
+     ]
+    }
+   },
+   "layers": [
+    "face_root",
+    "face_ear_l",
+    "face_ear_r",
+    "face_head",
+    "face_lid_l",
+    "face_lid_r",
+    "face_pupil_l",
+    "face_pupil_r",
+    "face_brow_l",
+    "face_brow_r",
+    "face_jaw",
+    "face_whisker_l",
+    "face_whisker_r"
+   ],
+   "views": [
+    "front"
+   ],
+   "required_poses": [
+    "blink_slow",
+    "ear_flick_l",
+    "ear_flick_r",
+    "face_furrow",
+    "face_idle",
+    "face_roar",
+    "face_sleep",
+    "face_wake",
+    "sky_breathe"
+   ],
+   "required_actions": [
+    "wake",
+    "eyes_open",
+    "ear_flick",
+    "brow_furrow",
+    "roar",
+    "blink_slow",
+    "breathe"
+   ],
+   "risks": [
+    "custom channels (close, dilate, open, tilt) are read by src/art/tiger.js",
+    "sky mode reuses the same parts"
+   ]
+  }
+ ],
+ "metadata": {
+  "source": "svg_rig_builder",
+  "refined": true,
+  "coordinate_space": "design px; 1000 = figure height (carver) / 1 emblem unit (tiger); y down"
+ }
+}

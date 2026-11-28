@@ -1,0 +1,495 @@
+{
+ "version": "1.0",
+ "characters": [
+  {
+   "character_id": "carver",
+   "poses": {
+    "seat_idle": {
+     "description": "seated at the desk, breathing only",
+     "parts": {},
+     "loops": {
+      "seat_torso": {
+       "scaleY": {
+        "a": 0.005,
+        "hz": 0.28
+       }
+      },
+      "seat_sleeve_l_up": {
+       "rotation": {
+        "a": 0.7,
+        "hz": 0.28,
+        "ph": 0.4
+       }
+      },
+      "seat_sleeve_r_up": {
+       "rotation": {
+        "a": -0.7,
+        "hz": 0.28,
+        "ph": 0.4
+       }
+      },
+      "seat_head": {
+       "y": {
+        "a": 0.8,
+        "hz": 0.28,
+        "ph": 0.9
+       }
+      }
+     },
+     "hold_frames": 24,
+     "mocap": {
+      "clip": "sit",
+      "rate": 0.11,
+      "clock": "wall",
+      "w": 0.25
+     }
+    },
+    "seat_carve": {
+     "description": "carving loop: right forearm pushes the chisel, torso leans, head follows, braid trails",
+     "parts": {},
+     "loops": {
+      "seat_torso": {
+       "rotation": {
+        "a": 0.9,
+        "hz": 1.1,
+        "ph": 0.3,
+        "o": 1.4
+       },
+       "scaleY": {
+        "a": 0.005,
+        "hz": 0.28
+       }
+      },
+      "seat_sleeve_l_up": {
+       "rotation": {
+        "a": 0.8,
+        "hz": 0.28,
+        "ph": 0.4,
+        "o": -1.2
+       }
+      },
+      "seat_sleeve_r_up": {
+       "rotation": {
+        "a": -4.5,
+        "hz": 1.1,
+        "ph": 0.55
+       }
+      },
+      "seat_head": {
+       "rotation": {
+        "a": 0.8,
+        "hz": 0.55,
+        "ph": 0.8,
+        "o": 1.6
+       },
+       "y": {
+        "a": 0.8,
+        "hz": 0.28,
+        "ph": 0.9,
+        "o": 4
+       }
+      },
+      "seat_sleeve_r_lo": {
+       "rotation": {
+        "a": 11,
+        "hz": 1.1,
+        "a2": 3.2,
+        "ph2": 1.1
+       }
+      },
+      "seat_sleeve_l_lo": {
+       "rotation": {
+        "a": 0.6,
+        "hz": 1.1,
+        "ph": 2.0
+       }
+      },
+      "seat_chima": {
+       "rotation": {
+        "a": 0.35,
+        "hz": 1.1,
+        "ph": 1.0
+       }
+      }
+     },
+     "hold_frames": 24,
+     "transition": "power2.inOut",
+     "mocap": {
+      "clip": "sit",
+      "rate": 0.11,
+      "clock": "wall",
+      "w": 0.3
+     }
+    },
+    "stand_idle": {
+     "description": "standing from behind, relaxed, light weight shift",
+     "parts": {},
+     "loops": {
+      "stand_torso": {
+       "scaleY": {
+        "a": 0.004,
+        "hz": 0.3
+       }
+      },
+      "stand_sleeve_l_up": {
+       "rotation": {
+        "a": 0.8,
+        "hz": 0.3,
+        "ph": 0.4
+       }
+      },
+      "stand_sleeve_r_up": {
+       "rotation": {
+        "a": -0.8,
+        "hz": 0.3,
+        "ph": 0.4
+       }
+      },
+      "stand_root": {
+       "x": {
+        "a": 1.6,
+        "hz": 0.12
+       }
+      },
+      "stand_head": {
+       "rotation": {
+        "a": 0.5,
+        "hz": 0.17,
+        "ph": 1.0
+       }
+      }
+     },
+     "hold_frames": 24
+    },
+    "stand_look_up": {
+     "description": "looks up at the sky tiger: head tips back, chest opens, shoulders lift, braid swings back",
+     "parts": {
+      "stand_head": {
+       "tilt": 1,
+       "y": -12,
+       "rotation": -1.5
+      },
+      "stand_neck": {
+       "rotation": -2,
+       "scaleY": 1.03
+      },
+      "stand_torso": {
+       "rotation": -2.5,
+       "y": -3
+      },
+      "stand_sleeve_l_up": {
+       "rotation": 3.5
+      },
+      "stand_sleeve_r_up": {
+       "rotation": -3.5
+      },
+      "stand_sleeve_l_lo": {
+       "rotation": 2
+      },
+      "stand_sleeve_r_lo": {
+       "rotation": -2
+      },
+      "stand_chima": {
+       "rotation": 0.6
+      }
+     },
+     "loops": {
+      "stand_torso": {
+       "scaleY": {
+        "a": 0.004,
+        "hz": 0.3
+       }
+      },
+      "stand_sleeve_l_up": {
+       "rotation": {
+        "a": 0.8,
+        "hz": 0.3,
+        "ph": 0.4
+       }
+      },
+      "stand_sleeve_r_up": {
+       "rotation": {
+        "a": -0.8,
+        "hz": 0.3,
+        "ph": 0.4
+       }
+      },
+      "stand_root": {
+       "x": {
+        "a": 1.6,
+        "hz": 0.12
+       }
+      },
+      "stand_head": {
+       "rotation": {
+        "a": 0.5,
+        "hz": 0.17,
+        "ph": 1.0
+       }
+      }
+     },
+     "hold_frames": 30,
+     "transition": "power2.inOut"
+    },
+    "stand_turn": {
+     "description": "turns the head slightly (cheek edge shows), still tipped up, then relaxes",
+     "parts": {
+      "stand_head": {
+       "tilt": 0.55,
+       "yaw": 0.75,
+       "y": -6,
+       "rotation": -4
+      },
+      "stand_neck": {
+       "rotation": -3
+      },
+      "stand_torso": {
+       "rotation": -1.2,
+       "y": -1
+      },
+      "stand_sleeve_l_up": {
+       "rotation": 1.5
+      },
+      "stand_sleeve_r_up": {
+       "rotation": -1.5
+      }
+     },
+     "loops": {
+      "stand_torso": {
+       "scaleY": {
+        "a": 0.004,
+        "hz": 0.3
+       }
+      },
+      "stand_sleeve_l_up": {
+       "rotation": {
+        "a": 0.8,
+        "hz": 0.3,
+        "ph": 0.4
+       }
+      },
+      "stand_sleeve_r_up": {
+       "rotation": {
+        "a": -0.8,
+        "hz": 0.3,
+        "ph": 0.4
+       }
+      },
+      "stand_root": {
+       "x": {
+        "a": 1.6,
+        "hz": 0.12
+       }
+      },
+      "stand_head": {
+       "rotation": {
+        "a": 0.5,
+        "hz": 0.17,
+        "ph": 1.0
+       }
+      }
+     },
+     "hold_frames": 18,
+     "transition": "power2.inOut"
+    },
+    "stand_walk": {
+     "description": "walk toward the gate: CMU walk stride retargeted (spine lean, head, sleeves, hem swing, bob)",
+     "parts": {
+      "stand_head": {
+       "tilt": 0.25,
+       "yaw": 0.35,
+       "y": -3
+      }
+     },
+     "loops": {},
+     "hold_frames": 30,
+     "transition": "power2.inOut",
+     "mocap": {
+      "clip": "walk",
+      "rate": 1.1,
+      "clock": "scene",
+      "w": 1
+     }
+    }
+   },
+   "mouth_shapes": {
+    "closed": {
+     "description": "Neutral closed mouth"
+    },
+    "small_o": {
+     "description": "Small open mouth for surprise or vowel"
+    },
+    "wide": {
+     "description": "Wide open mouth"
+    },
+    "smile": {
+     "description": "Smile shape"
+    }
+   },
+   "action_cycles": {
+    "chains": {
+     "stand": {
+      "segments": [
+       "stand_braid_0",
+       "stand_braid_1",
+       "stand_braid_2",
+       "stand_braid_3",
+       "stand_daenggi"
+      ],
+      "lag": 0.085,
+      "width": 1.1,
+      "gain": [
+       2.4,
+       2.6,
+       2.8,
+       3.0,
+       3.2
+      ],
+      "drivers": [
+       {
+        "k": "stand_head.rotation",
+        "g": 1
+       },
+       {
+        "k": "stand_torso.rotation",
+        "g": 1.2
+       },
+       {
+        "k": "stand_root.x",
+        "g": -0.55
+       },
+       {
+        "k": "stand_root.y",
+        "g": 0.5
+       },
+       {
+        "k": "stand_head.y",
+        "g": 0.25
+       }
+      ],
+      "wind": {
+       "a": 0.9,
+       "hz": 0.42
+      }
+     },
+     "seat": {
+      "segments": [
+       "seat_braid_0",
+       "seat_braid_1",
+       "seat_braid_2",
+       "seat_braid_3",
+       "seat_daenggi"
+      ],
+      "lag": 0.09,
+      "width": 1.1,
+      "gain": [
+       2.2,
+       2.4,
+       2.6,
+       2.8,
+       3.0
+      ],
+      "drivers": [
+       {
+        "k": "seat_head.rotation",
+        "g": 1
+       },
+       {
+        "k": "seat_torso.rotation",
+        "g": 1.6
+       },
+       {
+        "k": "seat_root.x",
+        "g": -0.4
+       }
+      ],
+      "wind": {
+       "a": 0.5,
+       "hz": 0.35
+      }
+     }
+    },
+    "mocap_map": {
+     "walk": {
+      "stand": {
+       "stand_torso.rotation": {
+        "src": "spine",
+        "g": 1.3
+       },
+       "stand_head.rotation": {
+        "src": "head",
+        "g": 0.9
+       },
+       "stand_root.y": {
+        "src": "bob",
+        "g": 900
+       },
+       "stand_root.x": {
+        "src": "sway",
+        "g": 2200
+       },
+       "stand_sleeve_r_up.rotation": {
+        "src": "upP",
+        "g": 2.2
+       },
+       "stand_sleeve_r_lo.rotation": {
+        "src": "loP",
+        "g": 1.6
+       },
+       "stand_sleeve_l_up.rotation": {
+        "src": "upN",
+        "g": 2.2
+       },
+       "stand_sleeve_l_lo.rotation": {
+        "src": "loN",
+        "g": 1.6
+       },
+       "stand_chima.hemP": {
+        "src": "liftP",
+        "g": 260
+       },
+       "stand_chima.hemN": {
+        "src": "liftN",
+        "g": 260
+       },
+       "stand_chima.hem": {
+        "src": "shift",
+        "g": 1500
+       },
+       "stand_chima.rotation": {
+        "src": "legP",
+        "g": 0.08
+       }
+      }
+     },
+     "sit": {
+      "seat": {
+       "seat_torso.rotation": {
+        "src": "spine",
+        "g": 0.5
+       },
+       "seat_head.rotation": {
+        "src": "head",
+        "g": 0.5
+       },
+       "seat_root.x": {
+        "src": "sway",
+        "g": 500
+       },
+       "seat_head.y": {
+        "src": "bob",
+        "g": 120
+       }
+      }
+     }
+    }
+   }
+  }
+ ],
+ "metadata": {
+  "source": "pose_library_builder",
+  "refined": true,
+  "channels": "rotation(deg) x y(px) scaleX scaleY + custom (hem hemP hemN flare, tilt yaw, close dilate gx gy open)",
+  "loops": "{a,hz,ph,o,a2,ph2} sinusoids added to the pose value, evaluated on wall time"
+ }
+}

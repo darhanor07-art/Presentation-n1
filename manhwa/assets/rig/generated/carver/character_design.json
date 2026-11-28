@@ -1,0 +1,52 @@
+{
+  "version": "1.0",
+  "style": {
+    "visual_style": "korean woodblock print (minhwa / manhwa), flat 1-colour print shader, hatch tones",
+    "palette": [
+      "red",
+      "ink",
+      "paper",
+      "blue (daenggi only)",
+      "gold (sky tiger eyes only)"
+    ],
+    "line_style": "bold ink outlines 3px, tapered strokes",
+    "texture": "hatch / grain / dots tone layers"
+  },
+  "characters": [
+    {
+      "id": "carver",
+      "display_name": "Carver (\uac01\uc218)",
+      "role": "protagonist, woodblock carver",
+      "body_type": "young Korean woman in hanbok: short jeogori jacket + full chima skirt, long single braid with a BLUE daenggi ribbon, seen from BEHIND",
+      "style": "woodblock print, back view",
+      "silhouette_notes": "wide sleeves, bell skirt, braid + ribbon tails readable in silhouette",
+      "required_emotions": [
+        "calm",
+        "focused",
+        "awe"
+      ],
+      "required_actions": [
+        "seated_carve_loop",
+        "breathe",
+        "look_up",
+        "turn_head",
+        "walk_away"
+      ],
+      "required_views": [
+        "back"
+      ],
+      "props": [
+        "chisel (drawn in scene)"
+      ],
+      "constraints": [
+        "legs hidden by chima",
+        "face never visible (back view)",
+        "no extra colours besides blue daenggi"
+      ]
+    }
+  ],
+  "metadata": {
+    "source": "character_spec_generator",
+    "brief": "MOKPAN web-manhwa character carver"
+  }
+}

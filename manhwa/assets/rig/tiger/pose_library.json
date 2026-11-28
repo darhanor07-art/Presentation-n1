@@ -1,0 +1,348 @@
+{
+ "version": "1.0",
+ "characters": [
+  {
+   "character_id": "tiger",
+   "poses": {
+    "face_idle": {
+     "description": "neutral, breathing (head scale)",
+     "parts": {},
+     "loops": {
+      "face_root": {
+       "scaleX": {
+        "a": 0.006,
+        "hz": 0.33
+       },
+       "scaleY": {
+        "a": 0.009,
+        "hz": 0.33
+       }
+      },
+      "face_whisker_l": {
+       "rotation": {
+        "a": 0.8,
+        "hz": 0.33,
+        "ph": 1
+       }
+      },
+      "face_whisker_r": {
+       "rotation": {
+        "a": -0.8,
+        "hz": 0.33,
+        "ph": 1
+       }
+      }
+     },
+     "hold_frames": 24
+    },
+    "face_sleep": {
+     "description": "asleep in the red print: lids shut, ears slack, head low",
+     "parts": {
+      "face_lid_l": {
+       "close": 1
+      },
+      "face_lid_r": {
+       "close": 1
+      },
+      "face_ear_l": {
+       "rotation": 5
+      },
+      "face_ear_r": {
+       "rotation": -5
+      },
+      "face_head": {
+       "y": 8
+      }
+     },
+     "loops": {
+      "face_root": {
+       "scaleX": {
+        "a": 0.006,
+        "hz": 0.33
+       },
+       "scaleY": {
+        "a": 0.009,
+        "hz": 0.33
+       }
+      }
+     },
+     "hold_frames": 24
+    },
+    "face_wake": {
+     "description": "ink spreads: head lifts a hair, ears perk",
+     "parts": {
+      "face_head": {
+       "y": -10,
+       "scaleX": 1.01,
+       "scaleY": 1.01
+      },
+      "face_ear_l": {
+       "rotation": -6
+      },
+      "face_ear_r": {
+       "rotation": 6
+      }
+     },
+     "loops": {
+      "face_root": {
+       "scaleX": {
+        "a": 0.006,
+        "hz": 0.33
+       },
+       "scaleY": {
+        "a": 0.009,
+        "hz": 0.33
+       }
+      },
+      "face_whisker_l": {
+       "rotation": {
+        "a": 0.8,
+        "hz": 0.33,
+        "ph": 1
+       }
+      },
+      "face_whisker_r": {
+       "rotation": {
+        "a": -0.8,
+        "hz": 0.33,
+        "ph": 1
+       }
+      }
+     },
+     "hold_frames": 24,
+     "transition": "power2.out"
+    },
+    "face_furrow": {
+     "description": "brows knit and drop, eyes narrow, pupils tighten, whiskers draw back",
+     "parts": {
+      "face_brow_l": {
+       "rotation": 13,
+       "y": 14
+      },
+      "face_brow_r": {
+       "rotation": -13,
+       "y": 14
+      },
+      "face_lid_l": {
+       "close": 0.22
+      },
+      "face_lid_r": {
+       "close": 0.22
+      },
+      "face_pupil_l": {
+       "dilate": -0.3
+      },
+      "face_pupil_r": {
+       "dilate": -0.3
+      },
+      "face_whisker_l": {
+       "rotation": 3
+      },
+      "face_whisker_r": {
+       "rotation": -3
+      },
+      "face_head": {
+       "y": 8,
+       "scaleX": 1.015,
+       "scaleY": 1.015
+      },
+      "face_ear_l": {
+       "rotation": 3
+      },
+      "face_ear_r": {
+       "rotation": -3
+      }
+     },
+     "loops": {
+      "face_root": {
+       "scaleX": {
+        "a": 0.006,
+        "hz": 0.33
+       },
+       "scaleY": {
+        "a": 0.009,
+        "hz": 0.33
+       }
+      },
+      "face_whisker_l": {
+       "rotation": {
+        "a": 0.8,
+        "hz": 0.33,
+        "ph": 1
+       }
+      },
+      "face_whisker_r": {
+       "rotation": {
+        "a": -0.8,
+        "hz": 0.33,
+        "ph": 1
+       }
+      }
+     },
+     "hold_frames": 24,
+     "transition": "power2.inOut"
+    },
+    "face_roar": {
+     "description": "roar: jaw drops (mouth part), brows hard down, ears pinned back, whiskers flare, head surges",
+     "expression": "fierce",
+     "parts": {
+      "face_jaw": {
+       "open": 1
+      },
+      "face_brow_l": {
+       "rotation": 18,
+       "y": 20
+      },
+      "face_brow_r": {
+       "rotation": -18,
+       "y": 20
+      },
+      "face_lid_l": {
+       "close": 0.3
+      },
+      "face_lid_r": {
+       "close": 0.3
+      },
+      "face_pupil_l": {
+       "dilate": -0.45
+      },
+      "face_pupil_r": {
+       "dilate": -0.45
+      },
+      "face_whisker_l": {
+       "rotation": -7
+      },
+      "face_whisker_r": {
+       "rotation": 7
+      },
+      "face_ear_l": {
+       "rotation": 12
+      },
+      "face_ear_r": {
+       "rotation": -12
+      },
+      "face_head": {
+       "y": -12,
+       "scaleX": 1.025,
+       "scaleY": 1.025
+      }
+     },
+     "loops": {
+      "face_head": {
+       "x": {
+        "a": 2.5,
+        "hz": 9
+       }
+      }
+     },
+     "hold_frames": 24,
+     "transition": "power3.out"
+    },
+    "ear_flick_r": {
+     "description": "right ear flick (overlay pulse)",
+     "mode": "overlay",
+     "env": [
+      0.3,
+      0.55
+     ],
+     "parts": {
+      "face_ear_r": {
+       "rotation": -17,
+       "scaleY": 0.93
+      }
+     }
+    },
+    "ear_flick_l": {
+     "description": "left ear flick (overlay pulse)",
+     "mode": "overlay",
+     "env": [
+      0.3,
+      0.55
+     ],
+     "parts": {
+      "face_ear_l": {
+       "rotation": 17,
+       "scaleY": 0.93
+      }
+     }
+    },
+    "blink_slow": {
+     "description": "slow lazy blink for the sky tiger (overlay, periodic)",
+     "mode": "overlay",
+     "every": 3.4,
+     "env": [
+      0.4,
+      0.6
+     ],
+     "parts": {
+      "face_lid_l": {
+       "close": 1
+      },
+      "face_lid_r": {
+       "close": 1
+      },
+      "face_head": {
+       "y": 3
+      }
+     }
+    },
+    "sky_breathe": {
+     "description": "sky tiger slow breath: head scale + whisker drift",
+     "parts": {},
+     "loops": {
+      "face_root": {
+       "scaleX": {
+        "a": 0.012,
+        "hz": 0.2
+       },
+       "scaleY": {
+        "a": 0.018,
+        "hz": 0.2
+       }
+      },
+      "face_head": {
+       "y": {
+        "a": 5,
+        "hz": 0.2,
+        "ph": 1.2
+       }
+      },
+      "face_whisker_l": {
+       "rotation": {
+        "a": 1.6,
+        "hz": 0.2,
+        "ph": 1
+       }
+      },
+      "face_whisker_r": {
+       "rotation": {
+        "a": -1.6,
+        "hz": 0.2,
+        "ph": 1
+       }
+      }
+     },
+     "hold_frames": 24
+    }
+   },
+   "mouth_shapes": {
+    "closed": {
+     "description": "jaw.open = 0"
+    },
+    "roar": {
+     "description": "jaw.open = 1 (tiger.js lowers the lower lip + fangs)"
+    }
+   },
+   "action_cycles": {
+    "chains": {},
+    "mocap_map": {}
+   }
+  }
+ ],
+ "metadata": {
+  "source": "pose_library_builder",
+  "refined": true,
+  "channels": "rotation(deg) x y(px) scaleX scaleY + custom (hem hemP hemN flare, tilt yaw, close dilate gx gy open)",
+  "loops": "{a,hz,ph,o,a2,ph2} sinusoids added to the pose value, evaluated on wall time"
+ }
+}

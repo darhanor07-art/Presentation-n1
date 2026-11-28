@@ -1,0 +1,107 @@
+{
+ "version": "1.0",
+ "fps": 30,
+ "scenes": [
+  {
+   "scene_id": "s06",
+   "start_seconds": 0,
+   "end_seconds": 4,
+   "background": "red print wakes (clock = progress*4s): ink 0-1.4s, eyes open 1.4-1.9s, ear flicks + furrow, roar at 3.4s",
+   "camera": {
+    "framing": "portrait 1000x1400"
+   },
+   "effects": [],
+   "actions": [
+    {
+     "at_seconds": 0,
+     "duration_seconds": 0.2,
+     "character_id": "tiger",
+     "action": "face_sleep",
+     "pose": "face_sleep",
+     "easing": "power2.out"
+    },
+    {
+     "at_seconds": 1.1,
+     "duration_seconds": 0.45,
+     "character_id": "tiger",
+     "action": "face_wake",
+     "pose": "face_wake",
+     "easing": "power2.out",
+     "notes": "p .28-.39 head lifts as ink completes"
+    },
+    {
+     "at_seconds": 2.0,
+     "duration_seconds": 0.4,
+     "character_id": "tiger",
+     "action": "ear_flick_r",
+     "pose": "ear_flick_r",
+     "easing": "power2.out",
+     "notes": "p .50 ear flick"
+    },
+    {
+     "at_seconds": 2.35,
+     "duration_seconds": 0.4,
+     "character_id": "tiger",
+     "action": "ear_flick_l",
+     "pose": "ear_flick_l",
+     "easing": "power2.out"
+    },
+    {
+     "at_seconds": 2.2,
+     "duration_seconds": 0.9,
+     "character_id": "tiger",
+     "action": "face_furrow",
+     "pose": "face_furrow",
+     "easing": "power2.inOut",
+     "notes": "p .55-.77 brows knit during the push-in"
+    },
+    {
+     "at_seconds": 3.4,
+     "duration_seconds": 0.4,
+     "character_id": "tiger",
+     "action": "face_roar",
+     "pose": "face_roar",
+     "easing": "power3.out",
+     "notes": "p .85-.95 jaw opens = mouthOpen of v1"
+    }
+   ]
+  },
+  {
+   "scene_id": "s09",
+   "start_seconds": 0,
+   "end_seconds": 4,
+   "background": "sky tiger: breathes; slow blink about every 3.4s starting at 0.9s",
+   "camera": {
+    "framing": "portrait 1000x1400"
+   },
+   "effects": [],
+   "actions": [
+    {
+     "at_seconds": 0,
+     "duration_seconds": 0.3,
+     "character_id": "tiger",
+     "action": "sky_breathe",
+     "pose": "sky_breathe",
+     "easing": "power2.out"
+    },
+    {
+     "at_seconds": 0.9,
+     "duration_seconds": 0.9,
+     "character_id": "tiger",
+     "action": "blink_slow",
+     "pose": "blink_slow",
+     "easing": "power1.inOut",
+     "notes": "overlay, periodic"
+    }
+   ]
+  }
+ ],
+ "metadata": {
+  "source": "action_timeline_compiler (refined)",
+  "refined": true,
+  "clock": "scene seconds = scene progress p * 4.0 (len 1.6vh * 2.5 s/vh); s03 loops run on wall time",
+  "design_scale": {
+   "tiger": 1000
+  }
+ }
+}
