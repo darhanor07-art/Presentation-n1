@@ -4,6 +4,8 @@
 
 Names (900x1260 portrait):
   plates : plate_moon plate_macro plate_gate plate_tower plate_garden
+           plate_ots_castle plate_ots_tair   (over-the-shoulder: Aiaru's shoulder/hair out of focus in front)
+  seq    : feet_00 .. feet_11   (12-frame walk cycle, camera 30 cm above the flowers, renders/spring/seq)
   layers : moon_sky moon_castle   hero_sky hero_castle hero_fg   (RGBA, transparent film; stack bottom->top)
 Existing outputs are skipped (resume safe).  --quick = 450x630, 16 spp -> renders/spring/_preview/.
 
@@ -24,6 +26,7 @@ QUICK = "--quick" in sys.argv
 FORCE = "--force" in sys.argv
 SUB = "_preview" if QUICK else ""
 OUT = {"plate": os.path.join(HERE, "renders", "spring", SUB or "plates"),
+       "seq": os.path.join(HERE, "renders", "spring", SUB or "seq"),
        "layer": os.path.join(HERE, "renders", "spring", SUB or "layers")}
 for d in OUT.values():
     os.makedirs(d, exist_ok=True)
@@ -38,12 +41,16 @@ SHOTS = {
     "plate_gate":   ("plate", "CAM_GATE", None),
     "plate_tower":  ("plate", "CAM_TOWER", None),
     "plate_garden": ("plate", "CAM_GARDEN", None),
+    "plate_ots_castle": ("plate", "CAM_OTS_CASTLE", None),
+    "plate_ots_tair":   ("plate", "CAM_OTS_TAIR", None),
     "moon_sky":     ("layer", "CAM_MOON", "sky"),
     "moon_castle":  ("layer", "CAM_MOON", "castle"),
     "hero_sky":     ("layer", "CAM_HERO", "sky"),
     "hero_castle":  ("layer", "CAM_HERO", "castle"),
     "hero_fg":      ("layer", "CAM_HERO", "fg"),
 }
+for _i in range(12):
+    SHOTS[f"feet_{_i:02d}"] = ("seq", "CAM_FEET", None)
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
 bpy.ops.wm.open_mainfile(filepath=os.path.join(HERE, "moonlit_castle.blend"), load_ui=False, use_scripts=False)
@@ -299,6 +306,151 @@ def build_cameras():
     gx, gy = -0.4, 0.5
     p = (gx, gy, ground(gx, gy) + 1.55)
     make_cam("CAM_GARDEN", p, (10.0, 60.0, p[2] + 1.9), 32, 4.0, 7.0)
+    # over-the-shoulder shots: position is finalised in prep_*() once the character is placed
+    make_cam("CAM_OTS_CASTLE", (0, 5, 2), (28, 330, 30), 50, 2.0, 330.0)
+    make_cam("CAM_OTS_TAIR", (0, 5, 2), (28, 330, 30), 50, 2.2, 5.0)
+
+
+# ----------------------------------------------------------------------------
+# characters in the castle scene (over-the-shoulder shots, feet sequence)
+# ----------------------------------------------------------------------------
+sys.path.insert(0, HERE)
+import characters as C          # noqa: E402   (only the builders are used; no reset()/world_and_lights())
+
+
+def place_char(who, P, loc, yaw_deg):
+    """build_aiaru / build_tair into the open scene, parented to a root empty standing at `loc` (world metres)."""
+    before = set(bpy.data.objects)
+    C.build_aiaru(P) if who == "aiaru" else C.build_tair(P)
+    new = [o for o in bpy.data.objects if o not in before]
+    root = bpy.data.objects.new("Root_" + who, None)
+    sc.collection.objects.link(root)
+    root.location = loc
+    root.rotation_euler = (0, 0, math.radians(yaw_deg))
+    for o in new:
+        o.parent = root
+    return root, new
+
+
+def yaw_to(x0, y0, x1, y1):
+    """root yaw (deg) so that a character (facing +Y) looks from (x0,y0) toward (x1,y1)."""
+    return math.degrees(math.atan2(-(x1 - x0), (y1 - y0)))
+
+
+def char_light(name, direction_to, energy, color, angle, objs):
+    """sun that only lights `objs` (light linking), so the castle plates stay untouched."""
+    ld = bpy.data.lights.new(name, "SUN")
+    ld.energy = energy; ld.color = color; ld.angle = math.radians(angle)
+    ob = bpy.data.objects.new(name, ld)
+    sc.collection.objects.link(ob)
+    ob.rotation_euler = Vector(direction_to).to_track_quat("Z", "Y").to_euler()
+    coll = bpy.data.collections.new(name + "_rcv")
+    sc.collection.children.link(coll)
+    for o in objs:
+        coll.objects.link(o)
+    ob.light_linking.receiver_collection = coll
+    return ob, coll
+
+
+def remove_all(objs, colls=()):
+    for o in objs:
+        try:
+            bpy.data.objects.remove(o)
+        except ReferenceError:
+            pass
+    for c in colls:
+        bpy.data.collections.remove(c)
+
+
+def cam_az(p):
+    return math.degrees(math.atan2(CX - p[0], CY - p[1]))
+
+
+def prep_ots_castle(name):
+    sc.cycles_curves.shape = "THICK"
+    ax, ay = 0.5, 7.0
+    az = ground(ax, ay)
+    yaw = yaw_to(ax, ay, CX, CY)
+    root, objs = place_char("aiaru", dict(wind=0.30, lift=0.10, ph=0.8, view=0.0), (ax, ay, az), yaw)
+    # camera behind and slightly right of her head
+    a = math.radians(yaw)
+    fwd = Vector((-math.sin(a), math.cos(a), 0)); right = Vector((math.cos(a), math.sin(a), 0))
+    hd = Vector((ax, ay, az + 1.575))
+    cp = hd - fwd * OTS_C["back"] + right * OTS_C["right"] + Vector((0, 0, OTS_C["up"]))
+    cam = O["CAM_OTS_CASTLE"]
+    cam.location = cp
+    tgt = dirpt(cp, cam_az(cp) + OTS_C["yaw"], OTS_C["el"])
+    cam.rotation_euler = (Vector(tgt) - cp).to_track_quat("-Z", "Y").to_euler()
+    cam.data.dof.focus_distance = math.hypot(CX - cp.x, CY - cp.y)
+    lights = []
+    # cool moon rim from the front-right (edges of hair/shoulder), faint cold fill from the left behind
+    l1, c1 = char_light("OTS_Rim", (0.55, 0.80, 0.50), 9.0, (0.70, 0.80, 1.0), 3.0, objs)
+    l2, c2 = char_light("OTS_Fill", (-0.5, -0.6, 0.45), 0.9, (0.55, 0.62, 1.0), 20.0, objs)
+    return lambda: remove_all(objs + [root, l1, l2], [c1, c2])
+
+
+OTS_C = dict(back=1.0, right=0.18, up=0.0, yaw=0.0, el=7.0)
+TAIR_C = dict(look_az=-17.0, tair_off=3.0, dist=5.2, cam_up=-0.30, el=7.0, moon_az=-14.0, moon_el=9.0)
+
+
+def set_moon(cp, az, el):
+    """re-aim moon, halo and moon light for one plate; returns an undo function."""
+    names = ("Moon", "MoonHalo", "MoonLight")
+    old = {n: (O[n].location.copy(), O[n].rotation_euler.copy()) for n in names}
+    d = Vector(dirpt((0, 0, 0), az, el, 1.0)).normalized()
+    D = old["Moon"][0].length
+    O["Moon"].location = d * D
+    O["MoonHalo"].location = d * (D - 60)
+    O["MoonHalo"].rotation_euler = (-d).to_track_quat("Z", "Y").to_euler()
+    O["MoonLight"].rotation_euler = d.to_track_quat("Z", "Y").to_euler()
+    def undo():
+        for n in names:
+            O[n].location, O[n].rotation_euler = old[n][0], old[n][1]
+    return undo
+
+
+def prep_ots_tair(name):
+    sc.cycles_curves.shape = "THICK"
+    T = TAIR_C
+    ax, ay = 0.5, 7.0
+    az0 = ground(ax, ay)
+    look = T["look_az"]
+    yawA = -(look + T["tair_off"] * 0.5)
+    rootA, objsA = place_char("aiaru", dict(wind=0.30, lift=0.10, ph=0.8, view=0.0), (ax, ay, az0), yawA)
+    a = math.radians(yawA)
+    fwd = Vector((-math.sin(a), math.cos(a), 0)); right = Vector((math.cos(a), math.sin(a), 0))
+    hd = Vector((ax, ay, az0 + 1.575))
+    cp = hd - fwd * OTS_C["back"] + right * OTS_C["right"] + Vector((0, 0, T["cam_up"]))
+    cam = O["CAM_OTS_TAIR"]
+    cam.location = cp
+    tgt = dirpt(cp, look, T["el"])
+    cam.rotation_euler = (Vector(tgt) - cp).to_track_quat("-Z", "Y").to_euler()
+    # Tair stands in the flowers a few metres ahead, facing the camera
+    ta = math.radians(look + T["tair_off"])
+    tx, ty = cp.x + T["dist"] * math.sin(ta), cp.y + T["dist"] * math.cos(ta)
+    rootT, objsT = place_char("tair", dict(wind=0.35, lift=0.1, ph=0.4, view=0.0), (tx, ty, ground(tx, ty)), yaw_to(tx, ty, cp.x, cp.y))
+    cam.data.dof.focus_distance = T["dist"]
+    undo_moon = set_moon(cp, T["moon_az"], T["moon_el"])
+    # moon rim light on Tair only (hair + shoulders) from behind; his face gets nothing from the camera-side key
+    md = dirpt((0, 0, 0), T["moon_az"] + 6.0, T["moon_el"] + 14.0, 1.0)
+    lT, cT = char_light("TairRim", md, 14.0, (0.70, 0.80, 1.0), 2.5, objsT)
+    lA, cA = char_light("OTS_Rim", (0.55, 0.80, 0.50), 9.0, (0.70, 0.80, 1.0), 3.0, objsA)
+    lF, cF = char_light("OTS_Fill", (-0.5, -0.6, 0.45), 0.9, (0.55, 0.62, 1.0), 20.0, objsA)
+    # KeyFront (camera side) must not reach Tair's face
+    keep = [o for o in bpy.data.objects if o not in objsT and o.type in ("MESH", "CURVES", "HAIR") or (o.type not in ("LIGHT", "CAMERA", "EMPTY") and o not in objsT)]
+    kc = bpy.data.collections.new("KeyRcv"); sc.collection.children.link(kc)
+    for o in keep:
+        if o not in objsT and o.type not in ("LIGHT", "CAMERA", "EMPTY"):
+            kc.objects.link(o)
+    O["KeyFront"].light_linking.receiver_collection = kc
+    def cleanup():
+        O["KeyFront"].light_linking.receiver_collection = None
+        undo_moon()
+        remove_all(objsA + objsT + [rootA, rootT, lT, lA, lF], [cT, cA, cF, kc])
+    return cleanup
+
+
+PREP = {"plate_ots_castle": prep_ots_castle, "plate_ots_tair": prep_ots_tair}
 
 
 # ----------------------------------------------------------------------------
@@ -316,9 +468,11 @@ def setup_visibility(layer, cam):
             o.is_holdout = False
     show = lambda names, v: [setattr(O[n], "hide_render", not v) for n in names if n in O]
     if layer is None:
-        show(["MeadowMist"], cam in ("CAM_GARDEN", "CAM_HERO"))
+        show(["MeadowMist"], cam in ("CAM_GARDEN", "CAM_HERO", "CAM_OTS_CASTLE", "CAM_OTS_TAIR"))
         show(["FloatingPetals"], cam == "CAM_MACRO")
         show(["GateMist"], cam == "CAM_GATE")
+        if cam in ("CAM_OTS_CASTLE", "CAM_OTS_TAIR", "CAM_FEET"):      # nothing of the hero-lens foreground
+            show(["FG_Branch0", "FG_Branch1", "FG_LeavesL", "FG_LeavesR"] + [o.name for o in bpy.data.objects if o.name.startswith("HeroFlower")], False)
         return
     show(["GateMist"], False)
     everything = [o.name for o in bpy.data.objects if o.type == "MESH" and "Asset" not in o.name]
@@ -340,6 +494,7 @@ def render(name):
         print("SKIP", name, flush=True)
         return
     setup_visibility(layer, cam)
+    cleanup = PREP[name](name) if name in PREP else None
     sc.camera = O[cam]
     W, H = (450, 630) if QUICK else (900, 1260)
     sc.render.resolution_x, sc.render.resolution_y = W, H
@@ -358,6 +513,8 @@ def render(name):
     t = time.time()
     bpy.ops.render.render(write_still=True)
     print(f"DONE {name} {time.time() - t:.0f}s", flush=True)
+    if cleanup:
+        cleanup()
 
 
 if __name__ == "__main__":

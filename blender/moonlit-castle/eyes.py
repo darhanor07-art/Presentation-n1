@@ -55,6 +55,14 @@ JOBS = {
 for i, p in enumerate([0.60, 0.50, 0.41, 0.33, 0.26, 0.19]):
     JOBS[f"aiaru_pupil_{i}"] = ("aiaru", 0.52, 0.46, 0, 0, p)
 
+# two-eye strip 1600x560: name -> (who, upper, lower, yaw, pitch, pupil); lids open a little wider as the pupil shrinks
+PAIR_JOBS = {}
+for i, (p, up, lo) in enumerate([(0.55, 0.50, 0.46), (0.42, 0.55, 0.47), (0.30, 0.60, 0.49), (0.20, 0.66, 0.51)]):
+    PAIR_JOBS[f"aiaru_pair_{i}"] = ("aiaru", up, lo, 0, 0, p)
+IOD = 2.7                 # each eye sits at x = +-IOD (BU)
+PAIR = False              # set by render_job when building the strip
+EX, MIR = 0.0, 1.0        # world x offset / mirror of the eye currently being built
+
 
 # ----------------------------------------------------------------------------
 # scene
@@ -93,6 +101,7 @@ def reset():
 def make_skin_mat():
     m, nt = new_mat("Skin")
     reg = attr_node(nt, "reg").outputs["Fac"]
+    glow = attr_node(nt, "glow").outputs["Fac"]
     obj = texcoord(nt, "Object")
     base_c = nd(nt, "ShaderNodeRGB"); base_c.name = "SKINCOL"
     base_c.outputs[0].default_value = (0.8, 0.58, 0.52, 1)
@@ -100,14 +109,20 @@ def make_skin_mat():
     col = mixc(nt, base_c.outputs[0], (0.70, 0.45, 0.46), mt(nt, "MULTIPLY", mt(nt, "SUBTRACT", blotch, 0.4, clamp=True), 0.8))
     # warm flush and eyelid pinkness near margin
     col = mixc(nt, col, (0.62, 0.22, 0.24), mt(nt, "MULTIPLY", reg, 0.85, clamp=True))
+    if PAIR:    # warmer, living skin: blush + redness that fades out from the lid margins, faint cool shadow under the eye
+        col = mixc(nt, col, (0.80, 0.30, 0.30), mt(nt, "MULTIPLY", glow, 0.42, clamp=True))
+        wz = mt(nt, "MULTIPLY", sstep(nt, mt(nt, "ABSOLUTE", sepxyz(nt, obj)[0]), 4.5, 7.0), 0.30)
+        col = mixc(nt, col, (0.92, 0.50, 0.40), wz)                               # rosy cheeks outward
+        zz = sepxyz(nt, obj)[2]
+        col = mixc(nt, col, (0.55, 0.36, 0.48), mt(nt, "MULTIPLY", sstep(nt, zz, -0.75, -1.15), 0.28))   # under-eye shade
     pores = noise_tex(nt, obj, 65.0, 2, 0.5)
     fine = noise_tex(nt, obj, 220.0, 1, 0.5)
     bump = nd(nt, "ShaderNodeBump"); bump.inputs["Strength"].default_value = 0.35; bump.inputs["Distance"].default_value = 0.012
     lk(nt, out_sock(mt(nt, "ADD", pores, mt(nt, "MULTIPLY", fine, 0.5))), bump.inputs["Height"])
     b = principled(nt, Base_Color=col, Roughness=0.42)
-    b.inputs["Subsurface Weight"].default_value = 0.35
-    b.inputs["Subsurface Radius"].default_value = (1.0, 0.34, 0.22)
-    b.inputs["Subsurface Scale"].default_value = 0.04
+    b.inputs["Subsurface Weight"].default_value = 0.3 if PAIR else 0.35
+    b.inputs["Subsurface Radius"].default_value = (1.0, 0.3, 0.15) if PAIR else (1.0, 0.34, 0.22)
+    b.inputs["Subsurface Scale"].default_value = 0.025 if PAIR else 0.04
     b.inputs["Specular IOR Level"].default_value = 0.55
     b.inputs["Sheen Weight"].default_value = 0.35
     lk(nt, bump.outputs["Normal"], b.inputs["Normal"])
@@ -264,18 +279,34 @@ def emit_mat(name, color, strength):
     return m
 
 
-def add_panel(name, loc, size, color, strength, target=(0, 0, 0), circle=False):
+def add_panel(name, loc, size, color, strength, target=(0, 0, 0), circle=False, window=False):
     """emissive soft-box / moon disc that shows up in the cornea reflection but not to the camera"""
     if circle:
         n = 48
         verts = [(0, 0, 0)] + [(size * math.cos(2 * math.pi * k / n), size * math.sin(2 * math.pi * k / n), 0) for k in range(n)]
         faces = [(0, 1 + k, 1 + (k + 1) % n) for k in range(n)]
+    elif window:    # irregular casement window: 2 x 3 panes with mullions, jittered corners, slightly rotated
+        rg = np.random.default_rng(3)
+        xs = [-size * 0.8, -size * 0.05, size * 0.8]
+        ys = [-size, -size * 0.32, size * 0.30, size]
+        g = size * 0.085
+        verts, faces = [], []
+        for ia in range(2):
+            for ib in range(3):
+                x0, x1 = xs[ia] + (g if ia else 0), xs[ia + 1] - (0 if ia else g)
+                y0, y1 = ys[ib] + (g if ib else 0), ys[ib + 1] - (0 if ib == 2 else g)
+                base = len(verts)
+                for (vx, vy) in ((x0, y0), (x1, y0), (x1, y1), (x0, y1)):
+                    verts.append((vx + rg.normal(0, size * 0.035), vy + rg.normal(0, size * 0.035), 0))
+                faces.append((base, base + 1, base + 2, base + 3))
     else:
         verts = [(-size, -size, 0), (size, -size, 0), (size, size, 0), (-size, size, 0)]
         faces = [(0, 1, 2, 3)]
     ob = mesh_obj(name, verts, faces, [emit_mat(name, color, strength)], smooth=False)
     ob.location = loc
     ob.rotation_euler = (Vector(target) - Vector(loc)).to_track_quat("Z", "Y").to_euler()
+    if window:
+        ob.rotation_euler.rotate_axis("Z", math.radians(11))
     ob.visible_camera = False
     ob.visible_shadow = False
     return ob
@@ -299,12 +330,51 @@ def aperture_z(t, up, low, tilt):
     return max(zu, zl + 0.012), zl
 
 
+def pair_yb(xw, z):
+    """one continuous face: brow ridge, nose bridge between the eyes, bowl falling away to the temples."""
+    yb = -(0.36 + 0.16 * math.exp(-((z - 1.6) / 0.9) ** 2) - 0.02 * math.exp(-((z + 1.9) / 0.9) ** 2)) + 0.012 * (abs(xw) - IOD) ** 2
+    yb -= 0.34 * math.exp(-(xw / 1.15) ** 2) * math.exp(-((z - 0.2) / 2.3) ** 2)
+    yb -= 0.10 * math.exp(-(xw / 1.0) ** 2) * math.exp(-((z - 1.5) / 0.5) ** 2)
+    return yb
+
+
+def glow_fn(xl, z):
+    r = math.hypot(xl, z)
+    return max(0.0, 1 - (r - 1.0) / 1.7) ** 1.6 if r > 1.0 else 1.0
+
+
+def build_face_base():
+    """dense analytic face surface shared by both eyes (the lid patches blend into it): no seam at the nose bridge."""
+    xs = np.arange(-8.0, 8.0001, 0.07); zs = np.arange(-3.4, 4.2001, 0.07)
+    nx, nz = len(xs), len(zs)
+    verts, glow = [], []
+    for z in zs:
+        for x in xs:
+            rl = min(math.hypot(x - IOD, z), math.hypot(x + IOD, z))
+            xl = min(x - IOD, x + IOD, key=abs)
+            y = pair_yb(x, z) + 0.03 * (1 - SMOOTH(1.2, 1.6, rl))
+            verts.append((x, y, z)); glow.append(glow_fn(xl, z))
+    faces = [(j * nx + i, j * nx + i + 1, (j + 1) * nx + i + 1, (j + 1) * nx + i) for j in range(nz - 1) for i in range(nx - 1)]
+    ob = mesh_obj("FaceBase", verts, faces, [SKIN_MAT], smooth=True)
+    at = ob.data.attributes.new("glow", "FLOAT", "POINT"); at.data.foreach_set("value", glow)
+    bm = bmesh.new(); bm.from_mesh(ob.data); bm.faces.ensure_lookup_table()
+    if bm.faces[0].normal.y > 0:
+        for f in bm.faces:
+            f.normal_flip()
+    bm.to_mesh(ob.data); bm.free()
+    ob.data.polygons.foreach_set("use_smooth", [True] * len(ob.data.polygons))
+    return ob
+
+
 def skin_y(x, z, lid_t):
     """front surface of the skin: hugs the globe near the aperture, flattens into the face further out."""
     rho = math.hypot(x, z)
     yh = -(math.sqrt(max(1.0 - min(rho, 0.985) ** 2, 0.0)) + lid_t)
-    yb = -(0.36 + 0.16 * math.exp(-((z - 2.2) / 0.9) ** 2) + 0.05 * math.exp(-((x + 3.4) / 1.0) ** 2) * 0
-           - 0.02 * math.exp(-((z + 1.9) / 0.9) ** 2)) + 0.012 * (x * x)
+    if PAIR:
+        yb = pair_yb(EX + MIR * x, z)
+    else:
+        yb = -(0.36 + 0.16 * math.exp(-((z - 2.2) / 0.9) ** 2) + 0.05 * math.exp(-((x + 3.4) / 1.0) ** 2) * 0
+               - 0.02 * math.exp(-((z + 1.9) / 0.9) ** 2)) + 0.012 * (x * x)
     w = SMOOTH(0.55, 1.5, rho)
     return yh * (1 - w) + yb * w
 
@@ -336,14 +406,15 @@ def build_lids(who, up, low, pitch):
     S = [0, 0.02, 0.05, 0.09, 0.14, 0.2, 0.27, 0.35, 0.43, 0.5, 0.57, 0.64, 0.72, 0.82, 0.95, 1.1, 1.3, 1.55, 1.9, 2.4, 3.0, 3.8, 5.0]
     inner_s = [0.7, 0.4, 0.2, 0.08]
     rim_psi = [math.pi * k / 6 for k in range(1, 6)][::-1]   # near inner -> near outer skin
-    verts, faces, reg = [], [], []
+    verts, faces, reg, glow = [], [], [], []
     rings = []   # list of lists of vertex indices
 
-    def add_ring(fn, rv):
+    def add_ring(fn, rv, gv=1.0):
         idx = []
         for (t, upper) in loop:
             p = fn(t, upper)
             verts.append(p)
+            glow.append(glow_fn(p[0], p[2]))
             reg.append(rv(t, upper) if callable(rv) else rv)
             idx.append(len(verts) - 1)
         rings.append(idx)
@@ -366,6 +437,8 @@ def build_lids(who, up, low, pitch):
                 y -= 0.05 * math.exp(-((s - 0.2) / 0.3) ** 2) * SMOOTH(0.0, 0.3, up_e)
             else:
                 y += 0.03 * math.exp(-((s - 0.55) / 0.12) ** 2)
+            if PAIR:    # the outer part of the lid patch sinks behind the shared face surface
+                y += 0.012 * SMOOTH(1.0, 1.55, s)       # outer edge of the patch tucks just under the shared face surface
             return (px, y, pz)
         return fn
 
@@ -391,15 +464,19 @@ def build_lids(who, up, low, pitch):
         add_ring(inner_pos(s), 1.0)
     for psi in rim_psi:
         add_ring(rim_pos(psi), 1.0)
-    for s in S:
-        add_ring(skin_pos(s), max(0.0, 1 - s / 0.12) * 0.55)
+    for s in (S if not PAIR else [v for v in S if v <= 1.55]):
+        add_ring(skin_pos(s), max(0.0, 1 - s / 0.12) * 0.55, max(0.0, 1 - s / 1.7) ** 1.6)
     for a, b in zip(rings[:-1], rings[1:]):
         for i in range(L):
             j = (i + 1) % L
             faces.append((a[i], a[j], b[j], b[i]))
+    if PAIR:    # bake the eye offset / mirror into the vertices so the skin texture is continuous across the face
+        verts = [(EX + MIR * v[0], v[1], v[2]) for v in verts]
     ob = mesh_obj("Skin", verts, faces, [SKIN_MAT], smooth=True)
     at = ob.data.attributes.new("reg", "FLOAT", "POINT")
     at.data.foreach_set("value", reg)
+    at = ob.data.attributes.new("glow", "FLOAT", "POINT")
+    at.data.foreach_set("value", glow)
     # orientation: make normals point at the camera (-Y)
     bm = bmesh.new(); bm.from_mesh(ob.data)
     bm.faces.ensure_lookup_table()
@@ -515,6 +592,48 @@ def build_lids(who, up, low, pitch):
     return [ob, lo, me_, car, bk]
 
 
+def build_brow(lt):
+    """soft dark brow: tapered, directional hair curves lying on the brow ridge (eye-local coords)."""
+    rng = np.random.default_rng(41)
+    hm, nt = new_mat("BrowHair")
+    h = nd(nt, "ShaderNodeBsdfHairPrincipled", parametrization="COLOR")
+    h.inputs["Color"].default_value = (0.10, 0.060, 0.050, 1)
+    h.inputs["Roughness"].default_value = 0.4
+    h.inputs["Radial Roughness"].default_value = 0.5
+    h.inputs["Coat"].default_value = 0.1
+    mat_output(nt, h)
+    NS, M = 1100, 5
+    strands = np.zeros((NS, M, 3))
+    cz = lambda u: 1.32 + 0.50 * math.sin(math.pi * u ** 1.5) - 0.30 * u ** 2
+    for i in range(NS):
+        u = rng.uniform(0.0, 1.0) ** 0.9
+        th = 0.21 * (1 - u) ** 0.9 + 0.05                      # brow thickness tapers to the tail
+        v = rng.uniform(-1, 1)
+        x0 = -1.55 + 3.6 * u + rng.normal(0, 0.03)
+        z0 = cz(u) + v * th * (1.0 if v > 0 else 0.8)
+        # hairs sweep outward; near the inner end they point up, along the arch they follow it
+        du = 0.012
+        slope = (cz(min(u + du, 1.0)) - cz(max(u - du, 0.0))) / (3.6 * 2 * du)
+        ang = math.atan(slope) + math.radians(rng.normal(18 if u < 0.35 else 6, 6) * (1 - 0.6 * (v < 0)) * 0.9 + (-8 * v))
+        L = rng.uniform(0.22, 0.40) * (1.0 - 0.40 * u)
+        for k in range(M):
+            f = k / (M - 1)
+            x = x0 + math.cos(ang) * L * f
+            z = z0 + math.sin(ang) * L * f - 0.04 * f * f
+            y = skin_y(x, z, lt) - 0.02 - 0.05 * f
+            strands[i, k] = (x, y, z)
+    rad = np.array([0.0058, 0.0056, 0.0048, 0.0032, 0.0010])
+    hc = bpy.data.hair_curves.new("Brow")
+    hc.add_curves([M] * NS)
+    hc.points.foreach_set("position", strands.reshape(-1, 3).astype(np.float32).ravel())
+    at = hc.attributes.new("radius", "FLOAT", "POINT")
+    at.data.foreach_set("value", np.tile(rad, NS).astype(np.float32))
+    hc.materials.append(hm)
+    ob = bpy.data.objects.new("Brow", hc)
+    bpy.context.scene.collection.objects.link(ob)
+    return ob
+
+
 def build_eye(who, pupil, yaw, pitch):
     """eyeball group (sclera + iris + cornea), rotated by the gaze empty."""
     gaze = bpy.data.objects.new("Gaze", None)
@@ -585,18 +704,17 @@ def build_eye(who, pupil, yaw, pitch):
     return gaze
 
 
-def setup_camera(W, H):
+def setup_camera(W, H, frame_w=5.5, fstop=9.0, cz=0.0):
     cd = bpy.data.cameras.new("Cam")
     cd.sensor_fit = "HORIZONTAL"; cd.sensor_width = 36.0
     cd.lens = 100.0
-    frame_w = 5.5
     dist = frame_w * cd.lens / cd.sensor_width
     cd.dof.use_dof = True
     cd.dof.focus_distance = dist - 0.95
-    cd.dof.aperture_fstop = 9.0
+    cd.dof.aperture_fstop = fstop
     ob = bpy.data.objects.new("Cam", cd)
     bpy.context.scene.collection.objects.link(ob)
-    ob.location = (0.0, -dist, 0.0)
+    ob.location = (0.0, -dist, cz)
     ob.rotation_euler = (math.radians(90), 0, 0)
     bpy.context.scene.camera = ob
     return ob
@@ -604,24 +722,36 @@ def setup_camera(W, H):
 
 def add_lights(who):
     # moon-disc catch-light (visible in the cornea) + invisible-to-reflection soft area lights
-    add_panel("KeyMoon", (-6.5, -8.5, 6.0), 1.9, (0.80, 0.85, 1.0), 70.0, circle=True)
-    add_panel("Sparkle", (7.5, -9.0, -3.5), 0.9, (0.85, 0.9, 1.0), 25.0, circle=True)
-    for nm, loc, size, col, pw in (("KeyArea", (-8.0, -8.0, 8.0), 7.0, (0.74, 0.82, 1.0), 2200.0),
-                                   ("RimR", (9.0, -2.0, 3.0), 4.0, (0.55, 0.62, 1.0), 900.0),
-                                   ("WarmFill", (4.0, -9.0, -5.0), 5.0, (1.0, 0.78, 0.62), 25.0),
-                                   ("FillLow", (-3.0, -9.0, -6.5), 6.0, (0.78, 0.65, 1.0), 60.0)):
+    if PAIR:    # catch-lights far away (same angular size) so both eyes show nearly the same window reflection
+        k = 2.3
+        add_panel("KeyMoon", (-6.5 * k, -8.5 * k, 6.0 * k), 1.9 * k, (0.80, 0.85, 1.0), 70.0, window=True)
+        add_panel("Sparkle", (7.5 * k, -9.0 * k, -3.5 * k), 0.9 * k, (0.85, 0.9, 1.0), 25.0, circle=True)
+        lights = (("KeyArea", (-11.0, -11.0, 11.0), 9.0, (0.74, 0.82, 1.0), 4200.0),
+                  ("RimR", (12.0, -3.0, 3.0), 5.0, (0.55, 0.62, 1.0), 1500.0),
+                  ("WarmFill", (5.0, -10.0, -5.0), 6.0, (1.0, 0.72, 0.55), 800.0),
+                  ("WarmTop", (0.0, -11.0, 8.0), 8.0, (1.0, 0.78, 0.62), 700.0),
+                  ("FillLow", (-3.0, -9.0, -6.5), 6.0, (0.78, 0.65, 1.0), 60.0))
+    else:
+        add_panel("KeyMoon", (-6.5, -8.5, 6.0), 1.9, (0.80, 0.85, 1.0), 70.0, circle=True)
+        add_panel("Sparkle", (7.5, -9.0, -3.5), 0.9, (0.85, 0.9, 1.0), 25.0, circle=True)
+        lights = (("KeyArea", (-8.0, -8.0, 8.0), 7.0, (0.74, 0.82, 1.0), 2200.0),
+                  ("RimR", (9.0, -2.0, 3.0), 4.0, (0.55, 0.62, 1.0), 900.0),
+                  ("WarmFill", (4.0, -9.0, -5.0), 5.0, (1.0, 0.78, 0.62), 25.0),
+                  ("FillLow", (-3.0, -9.0, -6.5), 6.0, (0.78, 0.65, 1.0), 60.0))
+    for nm, loc, size, col, pw in lights:
         ld = bpy.data.lights.new(nm, "AREA"); ld.shape = "SQUARE"; ld.size = size; ld.energy = pw; ld.color = col
         ob = bpy.data.objects.new(nm, ld); bpy.context.scene.collection.objects.link(ob); ob.location = loc
         ob.visible_glossy = False
         ob.rotation_euler = (Vector((0, 0, 0)) - Vector(loc)).to_track_quat("-Z", "Y").to_euler()
 
 
-def render_job(name, who, up, low, yaw, pitch, pupil):
+def render_job(name, who, up, low, yaw, pitch, pupil, pair=False):
     path = os.path.join(OUTDIR, name + ".png")
     if os.path.exists(path) and not FORCE and not QUICK:
         print("SKIP", name, flush=True)
         return
-    global SKIN_MAT, LASH_MAT, MENISCUS_MAT, CORNEA_MAT, FLESH_MAT, BACK_MAT
+    global SKIN_MAT, LASH_MAT, MENISCUS_MAT, CORNEA_MAT, FLESH_MAT, BACK_MAT, PAIR, EX, MIR
+    PAIR = pair
     sc = reset()
     SKIN_MAT = make_skin_mat(); LASH_MAT = make_lash_mat(); FLESH_MAT = make_flesh_mat()
     BACK_MAT, _nt = new_mat('Back'); mat_output(_nt, principled(_nt, Base_Color=(0.25, 0.07, 0.09), Roughness=0.6))
@@ -629,15 +759,31 @@ def render_job(name, who, up, low, yaw, pitch, pupil):
     MENISCUS_MAT = make_glass_mat("Meniscus", 1.33, 0.02)
     for n in SKIN_MAT.node_tree.nodes:
         if n.name == "SKINCOL":
-            n.outputs[0].default_value = (*WHO[who]["skin"], 1)
-    build_eye(who, pupil, yaw, pitch)
-    build_lids(who, up, low, pitch)
+            n.outputs[0].default_value = ((0.96, 0.66, 0.50, 1) if pair else (*WHO[who]["skin"], 1))
+    if pair:
+        for ex, mir in ((IOD, 1.0), (-IOD, -1.0)):      # image-right eye is the original; image-left is its mirror
+            EX, MIR = ex, mir
+            root = bpy.data.objects.new("EyeRoot", None); sc.collection.objects.link(root)
+            root.location = (ex, 0, 0); root.scale = (mir, 1, 1)
+            parts = [build_eye(who, pupil, yaw, pitch), build_brow(WHO[who]["lid_t"])] + build_lids(who, up, low, pitch)[1:]
+            for o in parts:
+                o.parent = root
+    else:
+        build_eye(who, pupil, yaw, pitch)
+        build_lids(who, up, low, pitch)
+    if pair:
+        build_face_base()
     add_lights(who)
     W, H = (600, 210) if (QUICK and not MID) else (1200, 420)
-    setup_camera(W, H)
+    if pair:
+        W, H = (800, 280) if (QUICK and not MID) else (1600, 560)
+        sc.cycles_curves.shape = "THICK"
+        setup_camera(W, H, frame_w=12.0, fstop=6.0, cz=0.45)
+    else:
+        setup_camera(W, H)
     sc.render.resolution_x, sc.render.resolution_y = W, H
     sc.render.resolution_percentage = 100
-    sc.cycles.samples = (64 if MID else 28) if QUICK else 96
+    sc.cycles.samples = (64 if MID else 28) if QUICK else (80 if pair else 96)
     sc.render.film_transparent = False
     sc.view_settings.exposure = EXPOSURE
     sc.render.image_settings.file_format = "PNG"
@@ -650,6 +796,7 @@ def render_job(name, who, up, low, yaw, pitch, pupil):
 
 
 if __name__ == "__main__":
-    names = [a for a in sys.argv[1:] if not a.startswith("--") and a in JOBS] or list(JOBS)
+    ALL = {**JOBS, **PAIR_JOBS}
+    names = [a for a in sys.argv[1:] if not a.startswith("--") and a in ALL] or list(ALL)
     for n in names:
-        render_job(n, *JOBS[n])
+        render_job(n, *ALL[n], pair=n in PAIR_JOBS)

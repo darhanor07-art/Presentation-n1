@@ -305,6 +305,161 @@ def mat_face(center, tone=(0.72, 0.52, 0.46)):
 
 
 # ----------------------------------------------------------------------------
+# walking legs + sculpted ballet flats (used by the close-up feet sequence)
+# ----------------------------------------------------------------------------
+GAIT_L = 1.0          # metres travelled per full gait cycle (two steps)
+HIP_Z, THIGH, SHIN = 0.88, 0.40, 0.40
+SOLE_PTS = [(-0.042, -0.078), (0.12, -0.078), (0.18, -0.062)]     # heel / ball / toe contact points (y, z) in the foot frame
+smooth01 = lambda t: (lambda c: c * c * (3 - 2 * c))(min(1.0, max(0.0, t)))
+
+
+def gait_pose(p):
+    """phase p in [0,1): heel strike at 0, toe-off at ~0.6.  Returns (ankle_y rel. body, ankle_z, foot pitch rad (+ toes up))."""
+    p = p % 1.0
+    ps = 0.6
+    a_hs, a_to = math.radians(18), math.radians(-28)
+    if p < ps:
+        y = 0.30 * GAIT_L - GAIT_L * p
+        a = a_hs * (1 - smooth01(p / 0.10)) + a_to * smooth01((p - 0.38) / 0.22)
+        lift = 0.0
+    else:
+        u = (p - ps) / (1 - ps)
+        y = -0.30 * GAIT_L + 0.60 * GAIT_L * (3 * u * u - 2 * u ** 3) * 0.55 + 0.60 * GAIT_L * u * 0.45
+        a = a_to * (1 - smooth01(u * 1.7)) + a_hs * smooth01((u - 0.45) / 0.55)
+        lift = 0.085 * math.sin(math.pi * u) ** 1.3
+    ca, sa = math.cos(a), math.sin(a)
+    zmin = min(yy * sa + zz * ca for (yy, zz) in SOLE_PTS)
+    z = -zmin + lift
+    return y, z, a
+
+
+def foot_profile(y):
+    ky = [-0.045, -0.030, -0.010, 0.020, 0.060, 0.100, 0.130, 0.160, 0.182]
+    w = np.interp(y, ky, [0.020, 0.026, 0.027, 0.030, 0.034, 0.040, 0.041, 0.035, 0.020])
+    kt = [-0.045, -0.020, 0.0, 0.030, 0.060, 0.090, 0.120, 0.150, 0.182]
+    zt = np.interp(y, kt, [-0.012, 0.004, 0.012, 0.018, 0.000, -0.022, -0.040, -0.052, -0.056])
+    zb = -0.072 + 0.012 * smooth01((y - 0.10) / 0.08) ** 2
+    return w, zb, zt
+
+
+def _sup(c, h, th, n=2.4):
+    return c * np.sign(np.cos(th)) * np.abs(np.cos(th)) ** (2 / n), h * np.sign(np.sin(th)) * np.abs(np.sin(th)) ** (2 / n)
+
+
+def foot_rings(shell, nth=40, nst=34):
+    """station rings (foot frame: origin = ankle joint, +y toes, +z up) of the skin foot or of the shoe shell around it."""
+    y0, y1 = -0.047, 0.185
+    ys = y0 + (y1 - y0) * (1 - np.cos(np.pi * np.linspace(0, 1, nst))) / 2
+    th = np.linspace(0, 2 * np.pi, nth, endpoint=False)
+    rings = []
+    for y in ys:
+        w, zb, zt = foot_profile(y)
+        if shell:
+            w = w + 0.0036; zb = zb - 0.0065
+            zt = zt + 0.0040
+            zcut = -0.030 + 0.07 * smooth01((y - 0.085) / 0.022)
+            zt = min(zt, zcut)
+        cap = 1.0
+        if y < y0 + 0.028:
+            cap = math.sqrt(max(1 - ((y0 + 0.028 - y) / 0.028) ** 2, 0.0))
+        if y > y1 - 0.04:
+            cap = math.sqrt(max(1 - ((y - (y1 - 0.04)) / 0.04) ** 2, 0.0))
+        cap = max(cap, 0.03)
+        zc, hh = (zt + zb) / 2, (zt - zb) / 2
+        sx, sz = _sup(w * cap, hh * cap, th)
+        pts = np.stack([sx, np.full(nth, y), zc + sz], 1)
+        if shell:
+            pts[:, 2] = np.minimum(pts[:, 2], zt)
+        rings.append(pts)
+    return rings
+
+
+def mat_shoe():
+    m, nt = new_mat("Shoe")
+    obj = texcoord(nt, "Object")
+    x, y, z = sepxyz(nt, obj)
+    leather = (0.90, 0.90, 0.93)
+    sole = mixc(nt, (0.66, 0.58, 0.52), leather, sstep(nt, z, -0.0745, -0.0715))        # darker sole edge band
+    grain = noise_tex(nt, obj, 260.0, 1, 0.5)
+    bump = nd(nt, "ShaderNodeBump"); bump.inputs["Strength"].default_value = 0.15; bump.inputs["Distance"].default_value = 0.0006
+    lk(nt, grain, bump.inputs["Height"])
+    b = principled(nt, Base_Color=sole, Roughness=0.38)
+    b.inputs["Specular IOR Level"].default_value = 0.6
+    b.inputs["Coat Weight"].default_value = 0.25
+    b.inputs["Coat Roughness"].default_value = 0.2
+    b.inputs["Sheen Weight"].default_value = 0.2
+    lk(nt, bump.outputs["Normal"], b.inputs["Normal"])
+    mat_output(nt, b)
+    return m
+
+
+def build_foot(side, name, mats, parent):
+    """sculpted white ballet flat (toe box, heel counter, sole, instep strap + buckle) on a skin foot, parented to `parent`."""
+    skin, shoe, silver = mats
+    flip = np.array([side, 1.0, 1.0])
+    objs = []
+    for shell, mat, nm in ((False, skin, "FootSkin"), (True, shoe, "Shoe")):
+        rings = [r * flip for r in foot_rings(shell)]
+        ob = loft(f"{nm}{name}", rings, mat, True, True)
+        bm = bmesh.new(); bm.from_mesh(ob.data); bmesh.ops.recalc_face_normals(bm, faces=bm.faces); bm.to_mesh(ob.data); bm.free()
+        objs.append(ob)
+    # instep strap (Mary Jane) over the foot at y = 0.052, thin flat ribbon, buckle on the outer side
+    yS = 0.052
+    w, zb, zt = foot_profile(yS)
+    w += 0.0036; zt += 0.0034; zb -= 0.002
+    th = np.linspace(math.radians(-8), math.radians(188), 22)
+    sx, sz = _sup(w, (zt - zb) / 2, th)
+    pts = [np.array([x * side, yS, (zt + zb) / 2 + z]) for x, z in zip(sx, sz)]
+    objs.append(tube(f"Strap{name}", pts, [0.0095] * len(pts), shoe, 6, flat=0.3))
+    objs.append(blob(f"Buckle{name}", np.array([-side * 0.0, yS, 0.0]) + np.array([side * (w + 0.002) * 1.0, 0.0, (zt + zb) / 2 + 0.002]), (0.0035, 0.0065, 0.0055), silver, seg=12))
+    # small satin bow on the toe box
+    bz = foot_profile(0.095)[2] + 0.0075
+    for sg in (-1, 1):
+        objs.append(blob(f"Bow{name}", np.array([sg * 0.0085, 0.098, bz + 0.0]), (0.0085, 0.006, 0.0042), shoe, (0, 0, sg * 0.35), seg=12))
+    objs.append(blob(f"BowKnot{name}", np.array([0.0, 0.098, bz]), (0.0036, 0.0036, 0.0036), shoe, seg=10))
+    # ankle bones (medial / lateral malleolus)
+    for xs_, ys_, zs_, rr in ((0.0255, 0.003, 0.004, 0.0105), (-0.0250, -0.006, -0.008, 0.0095)):
+        objs.append(blob(f"Malleolus{name}", np.array([xs_ * side, ys_, zs_]), (rr, rr * 1.15, rr * 1.05), skin, seg=14))
+    for o in objs:
+        o.parent = parent
+    return objs
+
+
+def build_legs_walk(P, skin, dress_z=0.58):
+    """two proper legs + ballet flats driven by the gait phase P['gait_p'] (character local frame, forward = +Y)."""
+    p0 = P["gait_p"]
+    shoe, silver = mat_shoe(), mat_silver(0.25)
+    bob = 0.872 - 0.012 * math.cos(4 * math.pi * p0)
+    sway = 0.012 * math.sin(2 * math.pi * p0)
+    for k, side in enumerate((1, -1)):                    # +x leg then -x leg, half a cycle apart
+        p = p0 + 0.5 * k
+        ay, az, pitch = gait_pose(p)
+        hip = np.array([side * 0.060 + sway, 0.0, bob])
+        ank = np.array([side * 0.066, ay, az])
+        d = ank - hip
+        dl = min(np.linalg.norm(d), THIGH + SHIN - 0.004)
+        dn = d / np.linalg.norm(d)
+        a = (THIGH ** 2 - SHIN ** 2 + dl ** 2) / (2 * dl)
+        h = math.sqrt(max(THIGH ** 2 - a ** 2, 0.0))
+        perp = np.cross(np.array([1.0, 0, 0]), dn); perp /= np.linalg.norm(perp)
+        if perp[1] < 0:
+            perp = -perp                                   # knee bends forward
+        knee = hip + dn * a + perp * h
+        ank = hip + dn * dl
+        v = (ank - knee); v /= np.linalg.norm(v)
+        back = np.array([0, -1.0, 0])
+        pts = [hip, (hip + knee) / 2, knee, knee + v * 0.12 + back * 0.003, knee + v * 0.26 + back * 0.010, knee + v * 0.36 + back * 0.004, ank, ank + v * 0.05]
+        rad = [0.064, 0.056, 0.0445, 0.0455, 0.0425, 0.0300, 0.0262, 0.0258]
+        tube("Leg", pts, rad, skin, 20)
+        blob("Knee", knee + np.array([0, 0.026, 0.0]), (0.034, 0.026, 0.034), skin, seg=16)
+        foot = bpy.data.objects.new("FootEmpty", None)
+        bpy.context.scene.collection.objects.link(foot)
+        foot.location = tuple(ank)
+        foot.rotation_euler = (pitch, 0, math.radians(7) * -side)
+        build_foot(side, "R" if side > 0 else "L", (skin, shoe, silver), foot)
+
+
+# ----------------------------------------------------------------------------
 # AIARU
 # ----------------------------------------------------------------------------
 def ring_pts(cx, cy, z, rx, ry, n, fn=None, rot=0.0):
@@ -339,7 +494,7 @@ def build_aiaru(P):
             f += 0.06 * np.sin(3 * th + ph) * np.clip((0.95 - z) / 0.4, 0, 1)
             return f
         cx = 0.30 * wind * np.clip(0.95 - z, 0, None) ** 1.6 * 1.4 + 0.02 * math.sin(ph)
-        cy = -0.04 * np.clip(0.95 - z, 0, None) + (0.05 * walk * np.clip(0.95 - z, 0, None))
+        cy = -0.04 * np.clip(0.95 - z, 0, None) + (0.05 * walk * np.clip(0.95 - z, 0, None)) + P.get("sway", 0.0) * 0.55 * np.clip(0.95 - z, 0, None) ** 1.4
         r = ring_pts(cx, cy, z, rx, ry, n, fn)
         # scalloped hem
         w = np.clip((0.70 - z) / 0.12, 0, 1)
@@ -354,7 +509,11 @@ def build_aiaru(P):
         ribbon("SashTail", [(0.0, -0.095, 1.07), (sgn * 0.03 + 0.04 * wind, -0.115, 1.0), (sgn * 0.05 + 0.1 * wind, -0.13 - 0.05 * lift, 0.9), (sgn * 0.06 + 0.2 * wind, -0.14, 0.80)],
                [0.045, 0.045, 0.04, 0.035], [0.2, 0.5, 0.9, 1.3], sash)
     # ---- legs (visible below the hem) ----
-    for sgn in (-1, 1):
+    if "gait_p" in P:
+        build_legs_walk(P, skin)
+        if P.get("lower"):
+            return dict(zc=0.40, height=0.8)
+    for sgn in ((-1, 1) if "gait_p" not in P else ()):
         sw = 0.0
         if walk:
             sw = math.radians(20) * walk * sgn
