@@ -9,3 +9,6 @@ manhwa/build/_raw/
 manhwa/build/_*/
 manhwa/assets/audio/*.wav
 manhwa/build/vendor/node_modules/
+blender/**/*.blend1
+blender/**/*.blend
+blender/**/renders/frames/
